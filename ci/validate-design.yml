@@ -1,0 +1,29 @@
+# Include in your .gitlab-ci.yml:
+#   include:
+#     - project: 'dkumar70/AIUI'
+#       ref: main
+#       file: 'ci/validate-design.yml'
+#
+# Then add the job:
+#   design-validation:
+#     extends: .aiui-validate
+
+.aiui-validate:
+  image: node:20-alpine
+  stage: test
+  variables:
+    AIUI_FILES: "src/**/*.{tsx,jsx,ts,js,css,html}"
+    AIUI_STRICT: "true"
+    AIUI_FORMAT: "text"
+  script:
+    - npx @aiui/cli validate
+        --files "$AIUI_FILES"
+        --format "$AIUI_FORMAT"
+        ${AIUI_STRICT:+--strict}
+        ${AIUI_API_KEY:+--api-key "$AIUI_API_KEY"}
+        ${AIUI_PROJECT:+--project "$AIUI_PROJECT"}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "src/**"
+  allow_failure: false

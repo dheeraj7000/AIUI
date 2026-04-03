@@ -1,0 +1,37 @@
+name: 'AIUI Design Validation'
+description: 'Validate UI code against your AIUI design system tokens'
+inputs:
+  api-key:
+    description: 'AIUI API key (alternative to local .aiui/tokens.json)'
+    required: false
+  project:
+    description: 'AIUI project slug (used with api-key)'
+    required: false
+  files:
+    description: 'Glob pattern for files to scan'
+    required: false
+    default: 'src/**/*.{tsx,jsx,ts,js,css,html}'
+  strict:
+    description: 'Fail on any violation'
+    required: false
+    default: 'true'
+  format:
+    description: 'Output format (text, json, github)'
+    required: false
+    default: 'github'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Run AIUI validation
+      shell: bash
+      run: |
+        npx @aiui/cli validate \
+          --files "${{ inputs.files }}" \
+          --format "${{ inputs.format }}" \
+          ${{ inputs.strict == 'true' && '--strict' || '' }} \
+          ${{ inputs.api-key && format('--api-key "{0}"', inputs.api-key) || '' }} \
+          ${{ inputs.project && format('--project "{0}"', inputs.project) || '' }}
