@@ -92,6 +92,10 @@ export async function compileDesignProfile(db: Database, id: string) {
     .set({
       compiledJson: compiled,
       version: compiled.version,
+      compiledHash: compiled.compiledHash,
+      tokensHash: compiled.tokensHash,
+      lastCompiledAt: new Date(),
+      compilationValid: true,
       updatedAt: new Date(),
     })
     .where(eq(designProfiles.id, id))

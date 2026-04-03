@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { projects, styleTokens } from '@aiui/design-core';
+import { projects, styleTokens, designProfiles, computeTokensHash } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 
 interface Violation {
@@ -95,10 +95,38 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
       const errorCount = violations.filter((v) => v.severity === 'error').length;
       const warningCount = violations.filter((v) => v.severity === 'warning').length;
 
+      // Check if the project's design profile is stale
+      let memoryFresh = true;
+      const [profile] = await db
+        .select({
+          tokensHash: designProfiles.tokensHash,
+          compilationValid: designProfiles.compilationValid,
+          stylePackId: designProfiles.stylePackId,
+        })
+        .from(designProfiles)
+        .where(eq(designProfiles.projectId, projectId))
+        .limit(1);
+
+      if (profile?.stylePackId) {
+        const currentTokensHash = await computeTokensHash(db, profile.stylePackId);
+        if (
+          !profile.compilationValid ||
+          (profile.tokensHash && profile.tokensHash !== currentTokensHash)
+        ) {
+          memoryFresh = false;
+        }
+      }
+
+      const stalenessWarning = memoryFresh
+        ? undefined
+        : 'Design memory may be outdated. Consider re-syncing.';
+
       return {
         compliant: violations.length === 0,
         score: Math.max(0, 100 - errorCount * 20 - warningCount * 5),
         violations,
+        memoryFresh,
+        ...(stalenessWarning ? { stalenessWarning } : {}),
         summary: {
           errors: errorCount,
           warnings: warningCount,

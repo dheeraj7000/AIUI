@@ -3,8 +3,9 @@
  * a unified compiled_json document.
  */
 
-import { eq, inArray } from 'drizzle-orm';
-import { stylePacks, componentRecipes } from '../db/schema';
+import { createHash } from 'crypto';
+import { eq, inArray, asc } from 'drizzle-orm';
+import { stylePacks, componentRecipes, styleTokens } from '../db/schema';
 import type { Database } from '../db';
 import { resolveTokens, type TokenMap } from './token-resolver';
 import { exportTokens } from '../operations/style-tokens';
@@ -32,6 +33,52 @@ export interface CompiledProfile {
     overrideCount: number;
     warnings: string[];
   };
+  compiledHash: string;
+  tokensHash: string;
+}
+
+/**
+ * Compute a deterministic SHA-256 hash of a token map.
+ * Keys are sorted to ensure determinism.
+ */
+function hashTokenMap(tokenMap: TokenMap): string {
+  const sortedOuter = Object.keys(tokenMap).sort();
+  const normalized: Record<string, Record<string, string>> = {};
+  for (const type of sortedOuter) {
+    const sortedInner = Object.keys(tokenMap[type]).sort();
+    normalized[type] = {};
+    for (const key of sortedInner) {
+      normalized[type][key] = tokenMap[type][key];
+    }
+  }
+  return createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+}
+
+/**
+ * Compute the current tokens hash for a style pack directly from the DB.
+ * This can be compared against a stored tokensHash to detect staleness.
+ */
+export async function computeTokensHash(db: Database, stylePackId: string): Promise<string> {
+  const tokens = await db
+    .select({
+      tokenKey: styleTokens.tokenKey,
+      tokenType: styleTokens.tokenType,
+      tokenValue: styleTokens.tokenValue,
+    })
+    .from(styleTokens)
+    .where(eq(styleTokens.stylePackId, stylePackId))
+    .orderBy(asc(styleTokens.tokenType), asc(styleTokens.tokenKey));
+
+  const grouped: TokenMap = {};
+  for (const t of tokens) {
+    if (!grouped[t.tokenType]) grouped[t.tokenType] = {};
+    const shortKey = t.tokenKey.includes('.')
+      ? t.tokenKey.substring(t.tokenKey.indexOf('.') + 1)
+      : t.tokenKey;
+    grouped[t.tokenType][shortKey] = t.tokenValue;
+  }
+
+  return hashTokenMap(grouped);
 }
 
 /**
@@ -92,9 +139,14 @@ export async function compileProfile(
           .where(inArray(componentRecipes.id, selectedComponentIds))
       : [];
 
+  // Compute hashes for staleness detection
+  const tokensHash = hashTokenMap(baseTokens);
+  const compiledHash = hashTokenMap(tokens);
+  const compiledAt = new Date().toISOString();
+
   return {
     version: currentVersion + 1,
-    compiledAt: new Date().toISOString(),
+    compiledAt,
     stylePack: {
       id: pack.id,
       name: pack.name,
@@ -108,5 +160,7 @@ export async function compileProfile(
       overrideCount: Object.keys(overridesJson).length,
       warnings,
     },
+    compiledHash,
+    tokensHash,
   };
 }

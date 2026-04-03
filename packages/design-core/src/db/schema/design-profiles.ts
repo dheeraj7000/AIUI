@@ -1,4 +1,13 @@
-import { pgTable, uuid, varchar, integer, jsonb, timestamp, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  integer,
+  jsonb,
+  timestamp,
+  boolean,
+  index,
+} from 'drizzle-orm/pg-core';
 import { stylePacks } from './style-packs';
 
 export const designProfiles = pgTable(
@@ -14,6 +23,10 @@ export const designProfiles = pgTable(
     overridesJson: jsonb('overrides_json'),
     selectedComponents: jsonb('selected_components').default([]).notNull(),
     compiledJson: jsonb('compiled_json'),
+    compiledHash: varchar('compiled_hash', { length: 64 }),
+    lastCompiledAt: timestamp('last_compiled_at'),
+    tokensHash: varchar('tokens_hash', { length: 64 }),
+    compilationValid: boolean('compilation_valid').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

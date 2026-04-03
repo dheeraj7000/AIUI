@@ -1,11 +1,23 @@
 import { eq, and, asc, count } from 'drizzle-orm';
-import { styleTokens, stylePacks } from '../db/schema';
+import { styleTokens, stylePacks, designProfiles } from '../db/schema';
 import type { Database } from '../db';
 import type {
   CreateTokenInput,
   UpdateTokenInput,
   ListTokensInput,
 } from '../validation/style-token';
+
+/**
+ * Invalidate all design profiles that reference a given style pack.
+ * Sets compilationValid = false so downstream consumers know the
+ * compiled profile may be stale.
+ */
+async function invalidateProfilesForPack(db: Database, stylePackId: string): Promise<void> {
+  await db
+    .update(designProfiles)
+    .set({ compilationValid: false, updatedAt: new Date() })
+    .where(eq(designProfiles.stylePackId, stylePackId));
+}
 
 /**
  * Create a single style token within a style pack.
@@ -34,6 +46,8 @@ export async function createToken(db: Database, stylePackId: string, data: Creat
         description: data.description,
       })
       .returning();
+
+    await invalidateProfilesForPack(db, stylePackId);
 
     return { data: token };
   } catch (err: unknown) {
@@ -94,6 +108,10 @@ export async function updateToken(
     .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.stylePackId, stylePackId)))
     .returning();
 
+  if (updated) {
+    await invalidateProfilesForPack(db, stylePackId);
+  }
+
   return updated ?? null;
 }
 
@@ -105,6 +123,10 @@ export async function deleteToken(db: Database, tokenId: string, stylePackId: st
     .delete(styleTokens)
     .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.stylePackId, stylePackId)))
     .returning();
+
+  if (deleted) {
+    await invalidateProfilesForPack(db, stylePackId);
+  }
 
   return deleted ?? null;
 }
@@ -149,6 +171,8 @@ export async function bulkImportTokens(
         description: t.description,
       }))
     );
+
+    await invalidateProfilesForPack(db, stylePackId);
   }
 
   return {

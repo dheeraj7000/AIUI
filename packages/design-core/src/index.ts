@@ -229,8 +229,8 @@ export {
 } from './operations/design-profiles';
 
 // Compiler
-export { compileProfile, resolveTokens } from './compiler';
-export type { CompiledProfile, TokenMap, ResolveResult } from './compiler';
+export { compileProfile, computeTokensHash, resolveTokens, computeMemoryDiff } from './compiler';
+export type { CompiledProfile, TokenMap, ResolveResult, MemoryDiff } from './compiler';
 
 // Project validation
 export {
