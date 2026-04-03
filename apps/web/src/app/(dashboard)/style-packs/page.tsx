@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { createDb, stylePacks, styleTokens, componentRecipes } from '@aiui/design-core';
-import { eq, count } from 'drizzle-orm';
+import { eq, count, inArray } from 'drizzle-orm';
 import { Layers, LayoutGrid, Sparkles, Zap, Globe, Paintbrush, Puzzle } from 'lucide-react';
+import { TokenStrip } from '@/components/ui/TokenPreview';
 
 export const metadata = { title: 'Style Packs - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,31 @@ function getDb() {
 async function getStylePacks() {
   const db = getDb();
   const packs = await db.select().from(stylePacks).orderBy(stylePacks.createdAt);
+
+  // Fetch preview tokens for all packs in one query (color, font, radius types)
+  const packIds = packs.map((p) => p.id);
+  const previewTokens =
+    packIds.length > 0
+      ? await db
+          .select({
+            stylePackId: styleTokens.stylePackId,
+            tokenKey: styleTokens.tokenKey,
+            tokenType: styleTokens.tokenType,
+            tokenValue: styleTokens.tokenValue,
+          })
+          .from(styleTokens)
+          .where(inArray(styleTokens.stylePackId, packIds))
+      : [];
+
+  // Group preview tokens by pack id (keep only types useful for strip)
+  const stripTypes = new Set(['color', 'font', 'radius']);
+  const tokensByPack = new Map<string, typeof previewTokens>();
+  for (const t of previewTokens) {
+    if (!stripTypes.has(t.tokenType)) continue;
+    const arr = tokensByPack.get(t.stylePackId) ?? [];
+    arr.push(t);
+    tokensByPack.set(t.stylePackId, arr);
+  }
 
   const packsWithCounts = await Promise.all(
     packs.map(async (pack) => {
@@ -30,6 +56,7 @@ async function getStylePacks() {
         ...pack,
         tokenCount: tokenCount?.count ?? 0,
         recipeCount: recipeCount?.count ?? 0,
+        previewTokens: tokensByPack.get(pack.id) ?? [],
       };
     })
   );
@@ -44,15 +71,6 @@ const categoryColors: Record<string, string> = {
   'ui-library': 'bg-orange-50 text-orange-700 border-orange-200',
   animations: 'bg-pink-50 text-pink-700 border-pink-200',
   creative: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-};
-
-const categoryGradients: Record<string, string> = {
-  saas: 'from-blue-50 via-blue-100/50 to-indigo-50',
-  fintech: 'from-emerald-50 via-emerald-100/50 to-teal-50',
-  startup: 'from-purple-50 via-purple-100/50 to-violet-50',
-  'ui-library': 'from-orange-50 via-orange-100/50 to-amber-50',
-  animations: 'from-pink-50 via-pink-100/50 to-rose-50',
-  creative: 'from-cyan-50 via-cyan-100/50 to-sky-50',
 };
 
 const categoryIcons: Record<string, typeof Layers> = {
@@ -92,19 +110,13 @@ export default async function StylePacksPage() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {packs.map((pack) => {
-          const gradient =
-            categoryGradients[pack.category] ?? 'from-gray-50 via-gray-100/50 to-gray-50';
           return (
             <Link
               key={pack.id}
               href={`/style-packs/${pack.id}`}
               className="group rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div
-                className={`flex h-32 items-center justify-center rounded-t-xl bg-gradient-to-br ${gradient}`}
-              >
-                <span className="text-sm font-medium text-gray-400">v{pack.version}</span>
-              </div>
+              <TokenStrip tokens={pack.previewTokens} />
               <div className="p-5">
                 <span
                   className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${categoryColors[pack.category] ?? 'bg-gray-50 text-gray-700 border-gray-200'}`}

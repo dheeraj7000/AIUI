@@ -16,15 +16,22 @@ export interface JwtClaims {
 // Local secret for signing/verifying JWTs
 // ---------------------------------------------------------------------------
 
-const SECRET_KEY = (() => {
-  const secret = process.env.JWT_SECRET;
-  if (!secret && process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET environment variable must be set in production');
-  }
-  return secret ?? 'aiui-local-dev-secret-change-in-production';
-})();
-const secret = new TextEncoder().encode(SECRET_KEY);
+const DEFAULT_SECRET = 'aiui-local-dev-secret-change-in-production';
 const ISSUER = 'aiui-local';
+
+function getSecret(): Uint8Array {
+  const key = process.env.JWT_SECRET ?? DEFAULT_SECRET;
+  if (
+    key === DEFAULT_SECRET &&
+    process.env.NODE_ENV === 'production' &&
+    typeof globalThis.fetch !== 'undefined' // skip during build (no runtime)
+  ) {
+    console.warn(
+      'WARNING: JWT_SECRET is not set — using insecure default. Set JWT_SECRET in production.'
+    );
+  }
+  return new TextEncoder().encode(key);
+}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -47,7 +54,7 @@ export async function createToken(
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuer(ISSUER)
     .setExpirationTime('1h')
-    .sign(secret);
+    .sign(getSecret());
 
   const idToken = await new SignJWT({
     sub: userId,
@@ -57,7 +64,7 @@ export async function createToken(
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuer(ISSUER)
     .setExpirationTime('1h')
-    .sign(secret);
+    .sign(getSecret());
 
   return { accessToken, idToken, expiresAt };
 }
@@ -69,7 +76,7 @@ export async function createToken(
  */
 export async function verifyToken(token: string): Promise<JwtClaims | null> {
   try {
-    const { payload } = await jwtVerify(token, secret, {
+    const { payload } = await jwtVerify(token, getSecret(), {
       issuer: ISSUER,
     });
 

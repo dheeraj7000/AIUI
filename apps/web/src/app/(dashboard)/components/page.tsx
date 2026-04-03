@@ -1,22 +1,6 @@
-import Link from 'next/link';
-import { createDb, componentRecipes, stylePacks } from '@aiui/design-core';
-import { eq } from 'drizzle-orm';
-import {
-  Image,
-  DollarSign,
-  HelpCircle,
-  PanelBottom,
-  FileText,
-  Megaphone,
-  MessageSquare,
-  Sparkles,
-  Mail,
-  CreditCard,
-  Navigation,
-  Puzzle,
-  Bot,
-  type LucideIcon,
-} from 'lucide-react';
+import { createDb, componentRecipes, stylePacks, styleTokens } from '@aiui/design-core';
+import { eq, inArray } from 'drizzle-orm';
+import { ComponentGrid, type RecipeItem } from './ComponentGrid';
 
 export const metadata = { title: 'Components - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -27,8 +11,10 @@ function getDb() {
   return createDb(url);
 }
 
-async function getRecipes() {
+async function getRecipesWithColors(): Promise<RecipeItem[]> {
   const db = getDb();
+
+  // Fetch all recipes joined with packs
   const recipes = await db
     .select({
       id: componentRecipes.id,
@@ -44,54 +30,50 @@ async function getRecipes() {
     .leftJoin(stylePacks, eq(componentRecipes.stylePackId, stylePacks.id))
     .orderBy(componentRecipes.name);
 
-  return recipes;
+  // Collect unique non-null pack IDs to fetch their color tokens
+  const packIds = [
+    ...new Set(recipes.map((r) => r.stylePackId).filter((id): id is string => id != null)),
+  ];
+
+  // Fetch color tokens for all relevant packs in one query
+  const colorTokens =
+    packIds.length > 0
+      ? await db
+          .select({
+            stylePackId: styleTokens.stylePackId,
+            tokenKey: styleTokens.tokenKey,
+            tokenValue: styleTokens.tokenValue,
+          })
+          .from(styleTokens)
+          .where(inArray(styleTokens.stylePackId, packIds))
+      : [];
+
+  // Build a pack-id -> colors map
+  const packColorMap: Record<
+    string,
+    { primary?: string; bg?: string; text?: string; accent?: string }
+  > = {};
+
+  for (const token of colorTokens) {
+    if (!packColorMap[token.stylePackId]) {
+      packColorMap[token.stylePackId] = {};
+    }
+    const colors = packColorMap[token.stylePackId];
+    if (token.tokenKey === 'color.primary') colors.primary = token.tokenValue;
+    if (token.tokenKey === 'color.background') colors.bg = token.tokenValue;
+    if (token.tokenKey === 'color.text-primary') colors.text = token.tokenValue;
+    if (token.tokenKey === 'color.accent') colors.accent = token.tokenValue;
+  }
+
+  return recipes.map((r) => ({
+    ...r,
+    stylePackId: r.stylePackId ?? '',
+    colors: r.stylePackId ? packColorMap[r.stylePackId] : undefined,
+  }));
 }
 
-const typeIcons: Record<string, LucideIcon> = {
-  hero: Image,
-  pricing: DollarSign,
-  faq: HelpCircle,
-  footer: PanelBottom,
-  header: FileText,
-  cta: Megaphone,
-  testimonial: MessageSquare,
-  feature: Sparkles,
-  contact: Mail,
-  card: CreditCard,
-  navigation: Navigation,
-};
-
-const typeColors: Record<string, string> = {
-  hero: 'bg-violet-50 text-violet-700',
-  pricing: 'bg-green-50 text-green-700',
-  faq: 'bg-amber-50 text-amber-700',
-  footer: 'bg-gray-100 text-gray-700',
-  header: 'bg-blue-50 text-blue-700',
-  cta: 'bg-rose-50 text-rose-700',
-  testimonial: 'bg-cyan-50 text-cyan-700',
-  feature: 'bg-indigo-50 text-indigo-700',
-  contact: 'bg-teal-50 text-teal-700',
-  card: 'bg-orange-50 text-orange-700',
-  navigation: 'bg-sky-50 text-sky-700',
-};
-
-const typeIconBgs: Record<string, string> = {
-  hero: 'bg-violet-100',
-  pricing: 'bg-green-100',
-  faq: 'bg-amber-100',
-  footer: 'bg-gray-200',
-  header: 'bg-blue-100',
-  cta: 'bg-rose-100',
-  testimonial: 'bg-cyan-100',
-  feature: 'bg-indigo-100',
-  contact: 'bg-teal-100',
-  card: 'bg-orange-100',
-  navigation: 'bg-sky-100',
-};
-
 export default async function ComponentBrowserPage() {
-  const recipes = await getRecipes();
-  const types = ['All', ...new Set(recipes.map((r) => r.type))];
+  const recipes = await getRecipesWithColors();
 
   return (
     <div>
@@ -100,59 +82,7 @@ export default async function ComponentBrowserPage() {
         Browse {recipes.length} component recipes from your design library.
       </p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {types.map((t) => {
-          const TypeIcon = typeIcons[t] ?? Puzzle;
-          return (
-            <span
-              key={t}
-              className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
-            >
-              {t !== 'All' && <TypeIcon size={12} />}
-              {t}
-            </span>
-          );
-        })}
-      </div>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {recipes.map((recipe) => {
-          const Icon = typeIcons[recipe.type] ?? Puzzle;
-          const iconBg = typeIconBgs[recipe.type] ?? 'bg-gray-100';
-          const iconColor = typeColors[recipe.type]?.split(' ')[1] ?? 'text-gray-600';
-          return (
-            <Link
-              key={recipe.id}
-              href={`/components/${recipe.id}`}
-              className="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className={`mb-3 flex h-28 items-center justify-center rounded-lg ${iconBg}`}>
-                <Icon size={32} className={iconColor} strokeWidth={1.5} />
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${typeColors[recipe.type] ?? 'bg-gray-100 text-gray-600'}`}
-                >
-                  {recipe.type}
-                </span>
-                {recipe.packName && (
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-300" />
-                    {recipe.packName}
-                  </span>
-                )}
-              </div>
-              <h3 className="mt-1.5 text-base font-semibold text-gray-900">{recipe.name}</h3>
-              {recipe.aiUsageRules && (
-                <div className="mt-2 flex items-start gap-1.5 rounded-md bg-blue-50/50 px-2 py-1.5">
-                  <Bot size={14} className="mt-0.5 shrink-0 text-blue-500" />
-                  <p className="line-clamp-2 text-xs text-blue-700">{recipe.aiUsageRules}</p>
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </div>
+      <ComponentGrid recipes={recipes} />
     </div>
   );
 }
