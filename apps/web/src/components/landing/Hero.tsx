@@ -9,15 +9,15 @@ export function Hero() {
             Control how AI builds your UI
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Choose styles, components, and tokens from a visual console. Claude Code uses them
-            automatically when generating your frontend.
+            Choose your design system. Get a config block. Claude follows it everywhere. Zero
+            install — one JSON snippet is all you need.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
             <Link
-              href="/sign-up"
+              href="/studio"
               className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
             >
-              Start for Free
+              Get Started
             </Link>
             <a
               href="#how-it-works"

@@ -4,6 +4,8 @@ import { Construct } from 'constructs';
 
 export interface S3StackProps extends cdk.StackProps {
   stage: string;
+  /** Allowed CORS origins for all S3 buckets */
+  corsOrigins?: string[];
 }
 
 export class S3Stack extends cdk.Stack {
@@ -20,9 +22,11 @@ export class S3Stack extends cdk.Stack {
     const removalPolicy = isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
     const autoDeleteObjects = !isProd;
 
+    const allowedOrigins = props.corsOrigins ?? ['http://localhost:3000', 'https://*.aiui.dev'];
+
     const corsRules: s3.CorsRule[] = [
       {
-        allowedOrigins: ['http://localhost:3000', 'https://*.aiui.dev'],
+        allowedOrigins,
         allowedMethods: [
           s3.HttpMethods.GET,
           s3.HttpMethods.PUT,

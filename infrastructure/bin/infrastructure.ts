@@ -12,6 +12,20 @@ const app = new cdk.App();
 
 const stage = app.node.tryGetContext('stage') || 'dev';
 
+// ── CDK context parameters ──
+const webImageUri = app.node.tryGetContext('webImageUri') as string | undefined;
+const mcpImageUri = app.node.tryGetContext('mcpImageUri') as string | undefined;
+const appDomains = app.node.tryGetContext('appDomains') as string[] | undefined;
+const corsOrigins = app.node.tryGetContext('corsOrigins') as string[] | undefined;
+const alarmEmail = app.node.tryGetContext('alarmEmail') as string | undefined;
+
+if (!alarmEmail) {
+  throw new Error(
+    'CDK context variable "alarmEmail" is required. ' +
+      'Pass it via -c alarmEmail=ops@yourcompany.com'
+  );
+}
+
 const env: cdk.Environment = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
   region: process.env.CDK_DEFAULT_REGION || 'us-east-1',
@@ -34,6 +48,7 @@ rdsStack.addDependency(vpcStack);
 // S3 Storage Stack
 const s3Stack = new S3Stack(app, `AiuiS3-${stage}`, {
   stage,
+  corsOrigins,
   env,
 });
 
@@ -41,6 +56,7 @@ const s3Stack = new S3Stack(app, `AiuiS3-${stage}`, {
 const cognitoStack = new CognitoStack(app, `AiuiCognito-${stage}`, {
   stage,
   rdsSecretArn: rdsStack.dbSecret.secretArn,
+  appDomains,
   env,
 });
 cognitoStack.addDependency(rdsStack);
@@ -58,6 +74,8 @@ const appRunnerStack = new AppRunnerStack(app, `AiuiAppRunner-${stage}`, {
   },
   cognitoUserPoolId: cognitoStack.userPool.userPoolId,
   cognitoClientId: cognitoStack.userPoolClient.userPoolClientId,
+  webImageUri,
+  mcpImageUri,
   env,
 });
 appRunnerStack.addDependency(vpcStack);
@@ -80,6 +98,7 @@ const monitoringStack = new MonitoringStack(app, `AiuiMonitoring-${stage}`, {
   webServiceName: `aiui-web-${stage}`,
   mcpServiceName: `aiui-mcp-${stage}`,
   rdsInstanceId: `aiui-db-${stage}`,
+  alarmEmail,
   env,
 });
 monitoringStack.addDependency(appRunnerStack);

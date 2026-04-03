@@ -16,6 +16,10 @@ export interface AppRunnerStackProps extends cdk.StackProps {
   };
   cognitoUserPoolId: string;
   cognitoClientId: string;
+  /** Override ECR image URI for the web app service */
+  webImageUri?: string;
+  /** Override ECR image URI for the MCP server service */
+  mcpImageUri?: string;
 }
 
 export class AppRunnerStack extends cdk.Stack {
@@ -147,19 +151,28 @@ export class AppRunnerStack extends cdk.Stack {
       { name: 'STAGE', value: stage },
     ];
 
+    // ── Resolve ECR image URIs ──
+    const webImageUri =
+      props.webImageUri ??
+      `${cdk.Aws.ACCOUNT_ID}.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com/aiui-web:latest`;
+    const mcpImageUri =
+      props.mcpImageUri ??
+      `${cdk.Aws.ACCOUNT_ID}.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com/aiui-mcp:latest`;
+
     // ── Web App Service ──
     const webService = new apprunner.CfnService(this, 'WebAppService', {
       serviceName: `aiui-web-${stage}`,
       sourceConfiguration: {
-        // ECR image will be configured by CI/CD pipeline.
-        // Using a placeholder image configuration — replace with actual ECR repo URI.
         imageRepository: {
-          imageIdentifier: 'public.ecr.aws/nginx/nginx:latest',
-          imageRepositoryType: 'ECR_PUBLIC',
+          imageIdentifier: webImageUri,
+          imageRepositoryType: 'ECR',
           imageConfiguration: {
             port: '3000',
             runtimeEnvironmentVariables: sharedEnvVars,
           },
+        },
+        authenticationConfiguration: {
+          accessRoleArn: accessRole.roleArn,
         },
         autoDeploymentsEnabled: false,
       },
@@ -203,15 +216,16 @@ export class AppRunnerStack extends cdk.Stack {
     const mcpService = new apprunner.CfnService(this, 'McpServerService', {
       serviceName: `aiui-mcp-${stage}`,
       sourceConfiguration: {
-        // ECR image will be configured by CI/CD pipeline.
-        // Using a placeholder image configuration — replace with actual ECR repo URI.
         imageRepository: {
-          imageIdentifier: 'public.ecr.aws/nginx/nginx:latest',
-          imageRepositoryType: 'ECR_PUBLIC',
+          imageIdentifier: mcpImageUri,
+          imageRepositoryType: 'ECR',
           imageConfiguration: {
             port: '8080',
             runtimeEnvironmentVariables: mcpEnvVars,
           },
+        },
+        authenticationConfiguration: {
+          accessRoleArn: accessRole.roleArn,
         },
         autoDeploymentsEnabled: false,
       },

@@ -6,6 +6,8 @@ import { Construct } from 'constructs';
 export interface CognitoStackProps extends cdk.StackProps {
   stage: string;
   rdsSecretArn: string;
+  /** Application domains used for OAuth callback and logout URLs */
+  appDomains?: string[];
 }
 
 export class CognitoStack extends cdk.Stack {
@@ -17,6 +19,8 @@ export class CognitoStack extends cdk.Stack {
     super(scope, id, props);
 
     const { stage, rdsSecretArn } = props;
+
+    const appDomains = props.appDomains ?? ['http://localhost:3000', 'https://app.aiui.dev'];
 
     // Post-confirmation Lambda trigger
     this.postConfirmationLambda = new lambda.Function(this, 'PostConfirmationFn', {
@@ -86,11 +90,8 @@ export class CognitoStack extends cdk.Stack {
           authorizationCodeGrant: true,
         },
         scopes: [cognito.OAuthScope.OPENID, cognito.OAuthScope.EMAIL, cognito.OAuthScope.PROFILE],
-        callbackUrls: [
-          'http://localhost:3000/api/auth/callback',
-          'https://app.aiui.dev/api/auth/callback',
-        ],
-        logoutUrls: ['http://localhost:3000', 'https://app.aiui.dev'],
+        callbackUrls: appDomains.map((domain) => `${domain}/api/auth/callback`),
+        logoutUrls: appDomains,
       },
       accessTokenValidity: cdk.Duration.hours(1),
       idTokenValidity: cdk.Duration.hours(1),

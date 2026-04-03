@@ -16,6 +16,7 @@ const PUBLIC_PAGE_PREFIXES = [
   '/components',
   '/projects',
   '/studio',
+  '/api-keys',
   '/_next',
   '/favicon.ico',
 ];

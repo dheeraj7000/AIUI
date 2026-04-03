@@ -254,19 +254,55 @@ export default async function ProjectDetailPage(props: RouteContext) {
               Add to <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">.mcp.json</code> in
               your target project:
             </p>
-            <pre className="mt-3 rounded-md bg-gray-900 p-4 text-xs text-gray-200 overflow-x-auto">
-              {`{
+
+            {/* Remote MCP (recommended) */}
+            <div className="mt-3">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                  Recommended
+                </span>
+                <span className="text-xs font-medium text-gray-500">Remote — zero install</span>
+              </div>
+              <pre className="rounded-md bg-gray-900 p-4 text-xs text-gray-200 overflow-x-auto">
+                {`{
+  "mcpServers": {
+    "aiui": {
+      "type": "streamable-http",
+      "url": "${process.env.NEXT_PUBLIC_MCP_URL ?? 'https://mcp.aiui.dev/mcp'}",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}`}
+              </pre>
+              <p className="mt-2 text-xs text-gray-400">
+                <a href="/api-keys" className="text-blue-600 hover:underline">
+                  Generate an API key
+                </a>{' '}
+                to replace <code className="rounded bg-gray-100 px-1">YOUR_API_KEY</code> above.
+              </p>
+            </div>
+
+            {/* Local MCP (self-hosted) */}
+            <details className="mt-4">
+              <summary className="cursor-pointer text-xs font-medium text-gray-500 hover:text-gray-700">
+                Alternative: Local MCP (self-hosted)
+              </summary>
+              <pre className="mt-2 rounded-md bg-gray-900 p-4 text-xs text-gray-200 overflow-x-auto">
+                {`{
   "mcpServers": {
     "aiui": {
       "command": "npx",
-      "args": ["tsx", "/home/AIUI/apps/mcp-server/src/index.ts"],
+      "args": ["tsx", "<path-to-AIUI>/apps/mcp-server/src/index.ts"],
       "env": {
         "DATABASE_URL": "postgresql://aiui:aiui@127.0.0.1:5432/aiui"
       }
     }
   }
 }`}
-            </pre>
+              </pre>
+            </details>
           </div>
 
           {/* Step 2: Sync design memory */}

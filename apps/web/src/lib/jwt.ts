@@ -16,7 +16,13 @@ export interface JwtClaims {
 // Local secret for signing/verifying JWTs
 // ---------------------------------------------------------------------------
 
-const SECRET_KEY = process.env.JWT_SECRET ?? 'aiui-local-dev-secret-change-in-production';
+const SECRET_KEY = (() => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable must be set in production');
+  }
+  return secret ?? 'aiui-local-dev-secret-change-in-production';
+})();
 const secret = new TextEncoder().encode(SECRET_KEY);
 const ISSUER = 'aiui-local';
 

@@ -1,0 +1,19 @@
+{
+  "name": "aiui-post-confirmation-lambda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cognito post-confirmation trigger — provisions user, org, and membership in RDS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.0.0",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "typescript": "~5.7.0"
+  }
+}

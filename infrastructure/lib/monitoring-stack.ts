@@ -11,6 +11,8 @@ export interface MonitoringStackProps extends cdk.StackProps {
   webServiceName: string;
   mcpServiceName: string;
   rdsInstanceId: string;
+  /** Email address for CloudWatch alarm notifications (required, no default) */
+  alarmEmail: string;
 }
 
 export class MonitoringStack extends cdk.Stack {
@@ -31,16 +33,7 @@ export class MonitoringStack extends cdk.Stack {
       displayName: `AIUI ${stage} Alarms`,
     });
 
-    // Email subscription — replace with actual email or parameterize
-    const alarmEmail = new cdk.CfnParameter(this, 'AlarmEmail', {
-      type: 'String',
-      default: 'ops@example.com',
-      description: 'Email address for CloudWatch alarm notifications',
-    });
-
-    this.alarmTopic.addSubscription(
-      new sns_subscriptions.EmailSubscription(alarmEmail.valueAsString)
-    );
+    this.alarmTopic.addSubscription(new sns_subscriptions.EmailSubscription(props.alarmEmail));
 
     // ── CloudWatch Log Groups ──
     new logs.LogGroup(this, 'WebAppRunnerLogs', {

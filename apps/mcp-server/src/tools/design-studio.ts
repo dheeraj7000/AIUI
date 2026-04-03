@@ -26,6 +26,8 @@ export function registerDesignStudio(server: AiuiMcpServer) {
     async (args) => {
       const slug = args.slug as string | undefined;
       const targetDir = args.targetDir as string | undefined;
+      // In HTTP mode, AIUI_WEB_URL is validated on startup (see index.ts).
+      // The localhost fallback only applies to local stdio usage.
       const baseUrl = process.env.AIUI_WEB_URL ?? 'http://localhost:3000';
 
       // If slug provided, verify project exists
