@@ -1,0 +1,100 @@
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  createDb,
+  createToken,
+  listTokens,
+  exportTokens,
+  createTokenSchema,
+  listTokensSchema,
+} from '@aiui/design-core';
+
+function getDb() {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL environment variable is not set');
+  return createDb(url);
+}
+
+type RouteContext = { params: Promise<{ id: string }> };
+
+/**
+ * POST /api/style-packs/[id]/tokens — Create a token.
+ */
+export async function POST(req: NextRequest, context: RouteContext) {
+  const userId = req.headers.get('x-user-id');
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id: stylePackId } = await context.params;
+    const body = await req.json();
+
+    const parsed = createTokenSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const db = getDb();
+    const result = await createToken(db, stylePackId, parsed.data);
+
+    if ('error' in result) {
+      if (result.error === 'style_pack_not_found') {
+        return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
+      }
+      if (result.error === 'duplicate_token_key') {
+        return NextResponse.json(
+          { error: 'Token key already exists in this style pack' },
+          { status: 409 }
+        );
+      }
+    }
+
+    return NextResponse.json(result.data, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create token:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * GET /api/style-packs/[id]/tokens — List or export tokens.
+ */
+export async function GET(req: NextRequest, context: RouteContext) {
+  const userId = req.headers.get('x-user-id');
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id: stylePackId } = await context.params;
+    const params = {
+      tokenType: req.nextUrl.searchParams.get('tokenType') ?? undefined,
+      format: req.nextUrl.searchParams.get('format') ?? undefined,
+    };
+
+    const parsed = listTokensSchema.safeParse(params);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const db = getDb();
+
+    // Export as structured JSON
+    if (parsed.data.format === 'json') {
+      const exported = await exportTokens(db, stylePackId);
+      return NextResponse.json(exported);
+    }
+
+    const result = await listTokens(db, stylePackId, parsed.data);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Failed to list tokens:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "/AiuiCognito-dev/UserPoolId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "UserPoolId"
+    }
+  ],
+  "/AiuiCognito-dev/UserPoolArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "UserPoolArn"
+    }
+  ],
+  "/AiuiCognito-dev/AppClientId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AppClientId"
+    }
+  ],
+  "/AiuiCognito-dev/PostConfirmationLambdaArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PostConfirmationLambdaArn"
+    }
+  ],
+  "/AiuiCognito-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiCognito-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiCognito-dev/PostConfirmationFn/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PostConfirmationFnE0D8EF4F"
+    }
+  ],
+  "/AiuiCognito-dev/AiuiUserPool/PostConfirmationCognito": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiUserPoolPostConfirmationCognito5060BB64"
+    }
+  ],
+  "/AiuiCognito-dev/AiuiUserPool/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiUserPool97C6EC33"
+    }
+  ],
+  "/AiuiCognito-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiCognito-dev/Exports/Output{\"Ref\":\"AiuiUserPool97C6EC33\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAiuiUserPool97C6EC33AB95A0B0"
+    }
+  ],
+  "/AiuiCognito-dev/Exports/Output{\"Ref\":\"AiuiUserPoolAiuiWebClient3DB57121\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAiuiUserPoolAiuiWebClient3DB571216E050D40"
+    }
+  ],
+  "/AiuiCognito-dev/PostConfirmationFn/ServiceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PostConfirmationFnServiceRole5E4DC5AE"
+    }
+  ],
+  "/AiuiCognito-dev/AiuiUserPool/AiuiWebClient/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiUserPoolAiuiWebClient3DB57121"
+    }
+  ]
+}

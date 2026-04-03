@@ -1,0 +1,98 @@
+{
+  "/AiuiAppRunner-dev/VpcConnector": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VpcConnector"
+    }
+  ],
+  "/AiuiAppRunner-dev/WebAutoScaling": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebAutoScaling"
+    }
+  ],
+  "/AiuiAppRunner-dev/WebAppService": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebAppService"
+    }
+  ],
+  "/AiuiAppRunner-dev/McpAutoScaling": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "McpAutoScaling"
+    }
+  ],
+  "/AiuiAppRunner-dev/McpServerService": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "McpServerService"
+    }
+  ],
+  "/AiuiAppRunner-dev/WebServiceUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebServiceUrl"
+    }
+  ],
+  "/AiuiAppRunner-dev/WebServiceArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebServiceArn"
+    }
+  ],
+  "/AiuiAppRunner-dev/McpServiceUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "McpServiceUrl"
+    }
+  ],
+  "/AiuiAppRunner-dev/McpServiceArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "McpServiceArn"
+    }
+  ],
+  "/AiuiAppRunner-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiAppRunner-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiAppRunner-dev/AppRunnerVpcConnectorSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AppRunnerVpcConnectorSgF80E3646"
+    }
+  ],
+  "/AiuiAppRunner-dev/AppRunnerInstanceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AppRunnerInstanceRole96A5A063"
+    }
+  ],
+  "/AiuiAppRunner-dev/AppRunnerAccessRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AppRunnerAccessRoleC89E5843"
+    }
+  ],
+  "/AiuiAppRunner-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiAppRunner-dev/AppRunnerInstanceRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AppRunnerInstanceRoleDefaultPolicy35195718"
+    }
+  ]
+}

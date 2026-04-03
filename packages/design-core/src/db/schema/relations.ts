@@ -1,0 +1,131 @@
+import { relations } from 'drizzle-orm';
+import { users } from './users';
+import { organizations } from './organizations';
+import { organizationMembers } from './organization-members';
+import { projects } from './projects';
+import { stylePacks } from './style-packs';
+import { styleTokens } from './style-tokens';
+import { componentRecipes } from './component-recipes';
+import { assets } from './assets';
+import { tags } from './tags';
+import { resourceTags } from './resource-tags';
+import { designProfiles } from './design-profiles';
+import { promptBundles } from './prompt-bundles';
+
+// ── Users ──────────────────────────────────────────────────────────────────
+export const usersRelations = relations(users, ({ many }) => ({
+  organizationMembers: many(organizationMembers),
+}));
+
+// ── Organizations ──────────────────────────────────────────────────────────
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  members: many(organizationMembers),
+  projects: many(projects),
+  stylePacks: many(stylePacks),
+  componentRecipes: many(componentRecipes),
+  assets: many(assets),
+}));
+
+// ── Organization Members ───────────────────────────────────────────────────
+export const organizationMembersRelations = relations(organizationMembers, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [organizationMembers.organizationId],
+    references: [organizations.id],
+  }),
+  user: one(users, {
+    fields: [organizationMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+// ── Projects ───────────────────────────────────────────────────────────────
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [projects.organizationId],
+    references: [organizations.id],
+  }),
+  assets: many(assets),
+  designProfiles: many(designProfiles),
+  promptBundles: many(promptBundles),
+}));
+
+// ── Style Packs ────────────────────────────────────────────────────────────
+export const stylePacksRelations = relations(stylePacks, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [stylePacks.organizationId],
+    references: [organizations.id],
+  }),
+  styleTokens: many(styleTokens),
+  componentRecipes: many(componentRecipes),
+  designProfiles: many(designProfiles),
+}));
+
+// ── Style Tokens ───────────────────────────────────────────────────────────
+export const styleTokensRelations = relations(styleTokens, ({ one }) => ({
+  stylePack: one(stylePacks, {
+    fields: [styleTokens.stylePackId],
+    references: [stylePacks.id],
+  }),
+}));
+
+// ── Component Recipes ──────────────────────────────────────────────────────
+export const componentRecipesRelations = relations(componentRecipes, ({ one }) => ({
+  stylePack: one(stylePacks, {
+    fields: [componentRecipes.stylePackId],
+    references: [stylePacks.id],
+  }),
+  organization: one(organizations, {
+    fields: [componentRecipes.organizationId],
+    references: [organizations.id],
+  }),
+}));
+
+// ── Assets ─────────────────────────────────────────────────────────────────
+export const assetsRelations = relations(assets, ({ one }) => ({
+  project: one(projects, {
+    fields: [assets.projectId],
+    references: [projects.id],
+  }),
+  organization: one(organizations, {
+    fields: [assets.organizationId],
+    references: [organizations.id],
+  }),
+}));
+
+// ── Tags ───────────────────────────────────────────────────────────────────
+export const tagsRelations = relations(tags, ({ many }) => ({
+  resourceTags: many(resourceTags),
+}));
+
+// ── Resource Tags ──────────────────────────────────────────────────────────
+export const resourceTagsRelations = relations(resourceTags, ({ one }) => ({
+  tag: one(tags, {
+    fields: [resourceTags.tagId],
+    references: [tags.id],
+  }),
+}));
+
+// ── Design Profiles ────────────────────────────────────────────────────────
+export const designProfilesRelations = relations(designProfiles, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [designProfiles.projectId],
+    references: [projects.id],
+  }),
+  stylePack: one(stylePacks, {
+    fields: [designProfiles.stylePackId],
+    references: [stylePacks.id],
+  }),
+  promptBundles: many(promptBundles),
+}));
+
+// ── Prompt Bundles ─────────────────────────────────────────────────────────
+export const promptBundlesRelations = relations(promptBundles, ({ one }) => ({
+  designProfile: one(designProfiles, {
+    fields: [promptBundles.designProfileId],
+    references: [designProfiles.id],
+  }),
+  project: one(projects, {
+    fields: [promptBundles.projectId],
+    references: [projects.id],
+  }),
+}));

@@ -1,0 +1,80 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createDb, createProject, listProjects } from '@aiui/design-core';
+import { createProjectSchema, listProjectsSchema } from '@aiui/design-core/src/validation/project';
+
+function getDb() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error('DATABASE_URL environment variable is not set');
+  }
+  return createDb(url);
+}
+
+/**
+ * GET /api/projects — List projects for an organization.
+ */
+export async function GET(req: NextRequest) {
+  const userId = req.headers.get('x-user-id');
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const parsed = listProjectsSchema.safeParse({
+      orgId: searchParams.get('orgId'),
+      limit: searchParams.get('limit'),
+      offset: searchParams.get('offset'),
+    });
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const db = getDb();
+    const result = await listProjects(db, parsed.data);
+
+    return NextResponse.json({
+      data: result.projects,
+      total: result.total,
+      limit: parsed.data.limit,
+      offset: parsed.data.offset,
+    });
+  } catch (error) {
+    console.error('Failed to list projects:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/projects — Create a new project.
+ */
+export async function POST(req: NextRequest) {
+  const userId = req.headers.get('x-user-id');
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const parsed = createProjectSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const db = getDb();
+    const project = await createProject(db, parsed.data);
+
+    return NextResponse.json(project, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create project:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

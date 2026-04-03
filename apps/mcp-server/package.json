@@ -1,0 +1,28 @@
+{
+  "name": "@aiui/mcp-server",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aiui/component-engine": "workspace:*",
+    "@aiui/design-core": "workspace:*",
+    "@aiui/prompt-compiler": "workspace:*",
+    "@aiui/types": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "drizzle-orm": "^0.45.2",
+    "express": "^5.2.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0"
+  }
+}

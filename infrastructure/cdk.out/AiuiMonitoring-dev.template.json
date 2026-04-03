@@ -1,0 +1,270 @@
+{
+  "Resources": {
+    "AlarmTopicD01E77F9": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "AIUI dev Alarms",
+        "TopicName": "aiui-alarms-dev"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/AlarmTopic/Resource"
+      }
+    },
+    "AlarmTopicTokenSubscription17F7316A1": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "Endpoint": {
+          "Ref": "AlarmEmail"
+        },
+        "Protocol": "email",
+        "TopicArn": {
+          "Ref": "AlarmTopicD01E77F9"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/AlarmTopic/TokenSubscription:1/Resource"
+      }
+    },
+    "WebAppRunnerLogs83AD6BDE": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/apprunner/aiui-web-dev",
+        "RetentionInDays": 30
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/WebAppRunnerLogs/Resource"
+      }
+    },
+    "McpAppRunnerLogsCC3D93D0": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/apprunner/aiui-mcp-dev",
+        "RetentionInDays": 30
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/McpAppRunnerLogs/Resource"
+      }
+    },
+    "PostConfirmationLambdaLogs3C04B5EB": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/aiui-post-confirmation-dev",
+        "RetentionInDays": 14
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/PostConfirmationLambdaLogs/Resource"
+      }
+    },
+    "Web5xxAlarm2C721558": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9"
+          }
+        ],
+        "AlarmDescription": "Web App Runner service 5xx error count exceeded threshold",
+        "AlarmName": "aiui-web-5xx-dev",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "ServiceName",
+            "Value": "aiui-web-dev"
+          }
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "5xxCount",
+        "Namespace": "AWS/AppRunner",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 5,
+        "TreatMissingData": "notBreaching"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/Web5xxAlarm/Resource"
+      }
+    },
+    "Mcp5xxAlarmCCD00B47": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9"
+          }
+        ],
+        "AlarmDescription": "MCP App Runner service 5xx error count exceeded threshold",
+        "AlarmName": "aiui-mcp-5xx-dev",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "ServiceName",
+            "Value": "aiui-mcp-dev"
+          }
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "5xxCount",
+        "Namespace": "AWS/AppRunner",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 5,
+        "TreatMissingData": "notBreaching"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/Mcp5xxAlarm/Resource"
+      }
+    },
+    "WebLatencyAlarmAD0E7A5B": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9"
+          }
+        ],
+        "AlarmDescription": "Web App Runner service p95 latency exceeded 3000ms",
+        "AlarmName": "aiui-web-latency-p95-dev",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "ServiceName",
+            "Value": "aiui-web-dev"
+          }
+        ],
+        "EvaluationPeriods": 2,
+        "ExtendedStatistic": "p95",
+        "MetricName": "RequestLatency",
+        "Namespace": "AWS/AppRunner",
+        "Period": 300,
+        "Threshold": 3000,
+        "TreatMissingData": "notBreaching"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/WebLatencyAlarm/Resource"
+      }
+    },
+    "McpLatencyAlarm256CD734": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9"
+          }
+        ],
+        "AlarmDescription": "MCP App Runner service p95 latency exceeded 5000ms",
+        "AlarmName": "aiui-mcp-latency-p95-dev",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "ServiceName",
+            "Value": "aiui-mcp-dev"
+          }
+        ],
+        "EvaluationPeriods": 2,
+        "ExtendedStatistic": "p95",
+        "MetricName": "RequestLatency",
+        "Namespace": "AWS/AppRunner",
+        "Period": 300,
+        "Threshold": 5000,
+        "TreatMissingData": "notBreaching"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/McpLatencyAlarm/Resource"
+      }
+    },
+    "Dashboard9E4231ED": {
+      "Type": "AWS::CloudWatch::Dashboard",
+      "Properties": {
+        "DashboardBody": {
+          "Fn::Join": [
+            "",
+            [
+              "{\"widgets\":[{\"type\":\"metric\",\"width\":24,\"height\":8,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"App Runner Request Latency\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/AppRunner\",\"RequestLatency\",\"ServiceName\",\"aiui-web-dev\",{\"label\":\"Web p50\",\"stat\":\"p50\"}],[\"AWS/AppRunner\",\"RequestLatency\",\"ServiceName\",\"aiui-web-dev\",{\"label\":\"Web p95\",\"stat\":\"p95\"}],[\"AWS/AppRunner\",\"RequestLatency\",\"ServiceName\",\"aiui-web-dev\",{\"label\":\"Web p99\",\"stat\":\"p99\"}],[\"AWS/AppRunner\",\"RequestLatency\",\"ServiceName\",\"aiui-mcp-dev\",{\"label\":\"MCP p50\",\"stat\":\"p50\"}],[\"AWS/AppRunner\",\"RequestLatency\",\"ServiceName\",\"aiui-mcp-dev\",{\"label\":\"MCP p95\",\"stat\":\"p95\"}],[\"AWS/AppRunner\",\"RequestLatency\",\"ServiceName\",\"aiui-mcp-dev\",{\"label\":\"MCP p99\",\"stat\":\"p99\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":8,\"properties\":{\"view\":\"timeSeries\",\"title\":\"App Runner 5xx Errors\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/AppRunner\",\"5xxCount\",\"ServiceName\",\"aiui-web-dev\",{\"label\":\"Web 5xx\",\"stat\":\"Sum\"}],[\"AWS/AppRunner\",\"5xxCount\",\"ServiceName\",\"aiui-mcp-dev\",{\"label\":\"MCP 5xx\",\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":24,\"height\":4,\"x\":0,\"y\":14,\"properties\":{\"view\":\"singleValue\",\"title\":\"App Runner Active Instances\",\"region\":\"",
+              {
+                "Ref": "AWS::Region"
+              },
+              "\",\"metrics\":[[\"AWS/AppRunner\",\"ActiveInstances\",\"ServiceName\",\"aiui-web-dev\",{\"label\":\"Web Instances\"}],[\"AWS/AppRunner\",\"ActiveInstances\",\"ServiceName\",\"aiui-mcp-dev\",{\"label\":\"MCP Instances\"}]]}}]}"
+            ]
+          ]
+        },
+        "DashboardName": "aiui-dev"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/Dashboard/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/02JywrCMBBFv6X7dKxFBZei4EZQrHuZJrFNH0nJJHYR8u8SiuLqnnNuCeVmB0WGM+Vc9PmgagiVQ94znOkZSBOEh5kUZ8eXXqDyNXGrJqeMTvXfIxtMQxAupjlb46f0fzkyPhgvZnS8hXAY0I7pXuCE1NYGrUjpJzEmvaHFUTppk1y9m7yLTBshoaPVuyxgvYdt1pFSufXaqVHCfdkPo/BcxN8AAAA="
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiMonitoring-dev/CDKMetadata/Default"
+      }
+    }
+  },
+  "Parameters": {
+    "AlarmEmail": {
+      "Type": "String",
+      "Default": "ops@example.com",
+      "Description": "Email address for CloudWatch alarm notifications"
+    },
+    "BootstrapVersion": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+    }
+  },
+  "Outputs": {
+    "AlarmTopicArn": {
+      "Description": "ARN of the SNS topic for CloudWatch alarms",
+      "Value": {
+        "Ref": "AlarmTopicD01E77F9"
+      },
+      "Export": {
+        "Name": "aiui-alarm-topic-arn-dev"
+      }
+    },
+    "DashboardName": {
+      "Description": "Name of the CloudWatch dashboard",
+      "Value": "aiui-dev",
+      "Export": {
+        "Name": "aiui-dashboard-name-dev"
+      }
+    }
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  ["1", "2", "3", "4", "5"],
+                  {
+                    "Ref": "BootstrapVersion"
+                  }
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+        }
+      ]
+    }
+  }
+}

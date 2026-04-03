@@ -1,0 +1,182 @@
+{
+  "/AiuiS3-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+    {
+      "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+      "data": true
+    }
+  ],
+  "/AiuiS3-dev/AssetsBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucketName"
+    }
+  ],
+  "/AiuiS3-dev/AssetsBucketArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucketArn"
+    }
+  ],
+  "/AiuiS3-dev/BundlesBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BundlesBucketName"
+    }
+  ],
+  "/AiuiS3-dev/BundlesBucketArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BundlesBucketArn"
+    }
+  ],
+  "/AiuiS3-dev/PreviewsBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PreviewsBucketName"
+    }
+  ],
+  "/AiuiS3-dev/PreviewsBucketArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PreviewsBucketArn"
+    }
+  ],
+  "/AiuiS3-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiS3-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiS3-dev/AssetsBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucket5CB76180"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketAutoDeleteObjects"
+      }
+    }
+  ],
+  "/AiuiS3-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+    }
+  ],
+  "/AiuiS3-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+    }
+  ],
+  "/AiuiS3-dev/BundlesBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BundlesBucket4FD5E753"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketAutoDeleteObjects"
+      }
+    }
+  ],
+  "/AiuiS3-dev/PreviewsBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PreviewsBucketE65CC574"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketAutoDeleteObjects"
+      }
+    }
+  ],
+  "/AiuiS3-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiS3-dev/Exports/Output{\"Ref\":\"AssetsBucket5CB76180\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAssetsBucket5CB761808BF2E271"
+    }
+  ],
+  "/AiuiS3-dev/Exports/Output{\"Ref\":\"BundlesBucket4FD5E753\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefBundlesBucket4FD5E7533AD00CFB"
+    }
+  ],
+  "/AiuiS3-dev/Exports/Output{\"Ref\":\"PreviewsBucketE65CC574\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefPreviewsBucketE65CC5746765D071"
+    }
+  ],
+  "/AiuiS3-dev/AssetsBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucketPolicyFFACF6C4"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketPolicyStatements"
+      }
+    }
+  ],
+  "/AiuiS3-dev/AssetsBucket/AutoDeleteObjectsCustomResource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucketAutoDeleteObjectsCustomResource51BA1286"
+    }
+  ],
+  "/AiuiS3-dev/BundlesBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BundlesBucketPolicy909F2438"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketPolicyStatements"
+      }
+    }
+  ],
+  "/AiuiS3-dev/BundlesBucket/AutoDeleteObjectsCustomResource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BundlesBucketAutoDeleteObjectsCustomResource0EF6EBD8"
+    }
+  ],
+  "/AiuiS3-dev/PreviewsBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PreviewsBucketPolicy6551CCF0"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketPolicyStatements"
+      }
+    }
+  ],
+  "/AiuiS3-dev/PreviewsBucket/AutoDeleteObjectsCustomResource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PreviewsBucketAutoDeleteObjectsCustomResource6FFE931B"
+    }
+  ]
+}

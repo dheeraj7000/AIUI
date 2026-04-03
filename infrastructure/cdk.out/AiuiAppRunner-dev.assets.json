@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "e0434779523f88b4e112b46d6b4a78dcd6e8006bda341cb6739ede45d05ba5f3": {
+      "displayName": "AiuiAppRunner-dev Template",
+      "source": {
+        "path": "AiuiAppRunner-dev.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "731732766290-us-west-1-4bab31ee": {
+          "bucketName": "cdk-hnb659fds-assets-731732766290-us-west-1",
+          "objectKey": "e0434779523f88b4e112b46d6b4a78dcd6e8006bda341cb6739ede45d05ba5f3.json",
+          "region": "us-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::731732766290:role/cdk-hnb659fds-file-publishing-role-731732766290-us-west-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

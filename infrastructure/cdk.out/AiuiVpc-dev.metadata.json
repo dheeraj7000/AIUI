@@ -1,0 +1,152 @@
+{
+  "/AiuiVpc-dev/VpcId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VpcId"
+    }
+  ],
+  "/AiuiVpc-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiVpc-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpc2894FA22"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/IGW": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcIGW1304410A"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/VPCGW": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcVPCGW0A7C32B9"
+    }
+  ],
+  "/AiuiVpc-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiVpc-dev/Exports/Output{\"Fn::GetAtt\":[\"AiuiVpc2894FA22\",\"CidrBlock\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttAiuiVpc2894FA22CidrBlock3DE65687"
+    }
+  ],
+  "/AiuiVpc-dev/Exports/Output{\"Ref\":\"AiuiVpc2894FA22\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAiuiVpc2894FA22F4255A9B"
+    }
+  ],
+  "/AiuiVpc-dev/Exports/Output{\"Ref\":\"AiuiVpcPrivateSubnet1Subnet1405825E\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAiuiVpcPrivateSubnet1Subnet1405825EB93543AB"
+    }
+  ],
+  "/AiuiVpc-dev/Exports/Output{\"Ref\":\"AiuiVpcPrivateSubnet2SubnetCB723B06\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAiuiVpcPrivateSubnet2SubnetCB723B06962BD40D"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet1Subnet93AB50D0"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet1RouteTable27BFB672"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet1RouteTableAssociation97E5FA33"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet1/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet1DefaultRoute47D93240"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet2Subnet0FCDC7AF"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet2RouteTable716B5FE1"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet2RouteTableAssociation5757DF7E"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PublicSubnet2/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPublicSubnet2DefaultRoute024006C0"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PrivateSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPrivateSubnet1Subnet1405825E"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PrivateSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPrivateSubnet1RouteTableF395C46F"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PrivateSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPrivateSubnet1RouteTableAssociationE973190E"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PrivateSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPrivateSubnet2SubnetCB723B06"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PrivateSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPrivateSubnet2RouteTable7AE07A03"
+    }
+  ],
+  "/AiuiVpc-dev/AiuiVpc/PrivateSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiVpcPrivateSubnet2RouteTableAssociation78CBC5AD"
+    }
+  ]
+}

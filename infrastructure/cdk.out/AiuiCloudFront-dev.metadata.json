@@ -1,0 +1,181 @@
+{
+  "/AiuiCloudFront-dev/DistributionDomainName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DistributionDomainName"
+    }
+  ],
+  "/AiuiCloudFront-dev/DistributionId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DistributionId"
+    }
+  ],
+  "/AiuiCloudFront-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiCloudFront-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiCloudFront-dev/AssetsCachePolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsCachePolicyE2E5AAD9"
+    }
+  ],
+  "/AiuiCloudFront-dev/BundlesCachePolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BundlesCachePolicyA4C4163E"
+    }
+  ],
+  "/AiuiCloudFront-dev/PreviewsCachePolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PreviewsCachePolicy1A15D6F6"
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Origin1": [
+    {
+      "type": "aws:cdk:warning",
+      "data": "Cannot update bucket policy of an imported bucket. You will need to update the policy manually instead.\nSee the \"Setting up OAC with imported S3 buckets\" section of module's README for more info. [ack: @aws-cdk/aws-cloudfront-origins:updateImportedBucketPolicyOac]",
+      "trace": [
+        "Annotations.addMessage (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2270)",
+        "Annotations.addWarningV2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:984)",
+        "S3BucketOriginWithOAC.bind (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront-origins/lib/s3-bucket-origin.js:2:282)",
+        "WrappedClass.addOrigin (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:23747)",
+        "new Distribution2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:13023)",
+        "new Distribution2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:726)",
+        "new CloudFrontStack (/home/AIUI/infrastructure/lib/cloudfront-stack.ts:70:25)",
+        "Object.<anonymous> (/home/AIUI/infrastructure/bin/infrastructure.ts:69:25)",
+        "Module._compile (node:internal/modules/cjs/loader:1521:14)",
+        "Module.m._compile (/home/AIUI/infrastructure/node_modules/ts-node/src/index.ts:1618:23)",
+        "Module._extensions..js (node:internal/modules/cjs/loader:1623:10)",
+        "Object.require.extensions.<computed> [as .ts] (/home/AIUI/infrastructure/node_modules/ts-node/src/index.ts:1621:12)",
+        "Module.load (node:internal/modules/cjs/loader:1266:32)",
+        "Function.Module._load (node:internal/modules/cjs/loader:1091:12)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)",
+        "phase4 (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:649:14)",
+        "bootstrap (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:95:10)",
+        "main (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:55:10)",
+        "Object.<anonymous> (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:800:3)",
+        "Module._compile (node:internal/modules/cjs/loader:1521:14)",
+        "Object.Module._extensions..js (node:internal/modules/cjs/loader:1623:10)",
+        "Module.load (node:internal/modules/cjs/loader:1266:32)",
+        "Function.Module._load (node:internal/modules/cjs/loader:1091:12)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)",
+        "node:internal/main/run_main_module:28:49"
+      ]
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Origin2": [
+    {
+      "type": "aws:cdk:warning",
+      "data": "Cannot update bucket policy of an imported bucket. You will need to update the policy manually instead.\nSee the \"Setting up OAC with imported S3 buckets\" section of module's README for more info. [ack: @aws-cdk/aws-cloudfront-origins:updateImportedBucketPolicyOac]",
+      "trace": [
+        "Annotations.addMessage (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2270)",
+        "Annotations.addWarningV2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:984)",
+        "S3BucketOriginWithOAC.bind (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront-origins/lib/s3-bucket-origin.js:2:282)",
+        "WrappedClass.addOrigin (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:23747)",
+        "WrappedClass.addBehavior (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:21908)",
+        "WrappedClass.<anonymous> (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/metadata-resource.js:1:2015)",
+        "/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:13291",
+        "Array.forEach (<anonymous>)",
+        "new Distribution2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:13244)",
+        "new Distribution2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:726)",
+        "new CloudFrontStack (/home/AIUI/infrastructure/lib/cloudfront-stack.ts:70:25)",
+        "Object.<anonymous> (/home/AIUI/infrastructure/bin/infrastructure.ts:69:25)",
+        "Module._compile (node:internal/modules/cjs/loader:1521:14)",
+        "Module.m._compile (/home/AIUI/infrastructure/node_modules/ts-node/src/index.ts:1618:23)",
+        "Module._extensions..js (node:internal/modules/cjs/loader:1623:10)",
+        "Object.require.extensions.<computed> [as .ts] (/home/AIUI/infrastructure/node_modules/ts-node/src/index.ts:1621:12)",
+        "Module.load (node:internal/modules/cjs/loader:1266:32)",
+        "Function.Module._load (node:internal/modules/cjs/loader:1091:12)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)",
+        "phase4 (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:649:14)",
+        "bootstrap (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:95:10)",
+        "main (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:55:10)",
+        "Object.<anonymous> (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:800:3)",
+        "Module._compile (node:internal/modules/cjs/loader:1521:14)",
+        "Object.Module._extensions..js (node:internal/modules/cjs/loader:1623:10)",
+        "Module.load (node:internal/modules/cjs/loader:1266:32)",
+        "Function.Module._load (node:internal/modules/cjs/loader:1091:12)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)",
+        "node:internal/main/run_main_module:28:49"
+      ]
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Origin3": [
+    {
+      "type": "aws:cdk:warning",
+      "data": "Cannot update bucket policy of an imported bucket. You will need to update the policy manually instead.\nSee the \"Setting up OAC with imported S3 buckets\" section of module's README for more info. [ack: @aws-cdk/aws-cloudfront-origins:updateImportedBucketPolicyOac]",
+      "trace": [
+        "Annotations.addMessage (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:2270)",
+        "Annotations.addWarningV2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:984)",
+        "S3BucketOriginWithOAC.bind (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront-origins/lib/s3-bucket-origin.js:2:282)",
+        "WrappedClass.addOrigin (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:23747)",
+        "WrappedClass.addBehavior (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:21908)",
+        "WrappedClass.<anonymous> (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/metadata-resource.js:1:2015)",
+        "/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:13291",
+        "Array.forEach (<anonymous>)",
+        "new Distribution2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/aws-cloudfront/lib/distribution.js:1:13244)",
+        "new Distribution2 (/home/AIUI/infrastructure/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:726)",
+        "new CloudFrontStack (/home/AIUI/infrastructure/lib/cloudfront-stack.ts:70:25)",
+        "Object.<anonymous> (/home/AIUI/infrastructure/bin/infrastructure.ts:69:25)",
+        "Module._compile (node:internal/modules/cjs/loader:1521:14)",
+        "Module.m._compile (/home/AIUI/infrastructure/node_modules/ts-node/src/index.ts:1618:23)",
+        "Module._extensions..js (node:internal/modules/cjs/loader:1623:10)",
+        "Object.require.extensions.<computed> [as .ts] (/home/AIUI/infrastructure/node_modules/ts-node/src/index.ts:1621:12)",
+        "Module.load (node:internal/modules/cjs/loader:1266:32)",
+        "Function.Module._load (node:internal/modules/cjs/loader:1091:12)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)",
+        "phase4 (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:649:14)",
+        "bootstrap (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:95:10)",
+        "main (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:55:10)",
+        "Object.<anonymous> (/home/AIUI/infrastructure/node_modules/ts-node/src/bin.ts:800:3)",
+        "Module._compile (node:internal/modules/cjs/loader:1521:14)",
+        "Object.Module._extensions..js (node:internal/modules/cjs/loader:1623:10)",
+        "Module.load (node:internal/modules/cjs/loader:1266:32)",
+        "Function.Module._load (node:internal/modules/cjs/loader:1091:12)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)",
+        "node:internal/main/run_main_module:28:49"
+      ]
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Distribution830FAC52"
+    }
+  ],
+  "/AiuiCloudFront-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Origin1/S3OriginAccessControl/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DistributionOrigin1S3OriginAccessControlEB606076"
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Origin2/S3OriginAccessControl/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DistributionOrigin2S3OriginAccessControlDC470594"
+    }
+  ],
+  "/AiuiCloudFront-dev/Distribution/Origin3/S3OriginAccessControl/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DistributionOrigin3S3OriginAccessControl9DA31435"
+    }
+  ]
+}

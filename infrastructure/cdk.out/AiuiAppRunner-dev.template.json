@@ -1,0 +1,521 @@
+{
+  "Resources": {
+    "AppRunnerVpcConnectorSgF80E3646": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Security group for App Runner VPC connector - allows outbound to RDS",
+        "GroupName": "aiui-apprunner-vpc-sg-dev",
+        "SecurityGroupEgress": [
+          {
+            "Description": "Allow outbound to RDS PostgreSQL",
+            "DestinationSecurityGroupId": {
+              "Fn::ImportValue": "AiuiRds-dev:ExportsOutputFnGetAttDbSecurityGroupE9D701ADGroupId7A7C114A"
+            },
+            "FromPort": 5432,
+            "IpProtocol": "tcp",
+            "ToPort": 5432
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow outbound HTTPS for AWS services",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443
+          }
+        ],
+        "VpcId": {
+          "Fn::ImportValue": "AiuiVpc-dev:ExportsOutputRefAiuiVpc2894FA22F4255A9B"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/AppRunnerVpcConnectorSg/Resource"
+      }
+    },
+    "VpcConnector": {
+      "Type": "AWS::AppRunner::VpcConnector",
+      "Properties": {
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": ["AppRunnerVpcConnectorSgF80E3646", "GroupId"]
+          }
+        ],
+        "Subnets": [
+          {
+            "Fn::ImportValue": "AiuiVpc-dev:ExportsOutputRefAiuiVpcPrivateSubnet1Subnet1405825EB93543AB"
+          },
+          {
+            "Fn::ImportValue": "AiuiVpc-dev:ExportsOutputRefAiuiVpcPrivateSubnet2SubnetCB723B06962BD40D"
+          }
+        ],
+        "VpcConnectorName": "aiui-vpc-connector-dev"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/VpcConnector"
+      }
+    },
+    "AppRunnerInstanceRole96A5A063": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "tasks.apprunner.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Description": "IAM role assumed by App Runner service instances",
+        "RoleName": "aiui-apprunner-instance-dev"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/AppRunnerInstanceRole/Resource"
+      }
+    },
+    "AppRunnerInstanceRoleDefaultPolicy35195718": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "AiuiRds-dev:ExportsOutputRefAiuiDatabaseSecretAttachment3BA09E46ECE679F7"
+              },
+              "Sid": "SecretsManagerRead"
+            },
+            {
+              "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefAssetsBucket5CB761808BF2E271"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefBundlesBucket4FD5E7533AD00CFB"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefPreviewsBucketE65CC5746765D071"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefAssetsBucket5CB761808BF2E271"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefBundlesBucket4FD5E7533AD00CFB"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefPreviewsBucketE65CC5746765D071"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ],
+              "Sid": "S3ReadWrite"
+            },
+            {
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:logs:us-west-1:731732766290:log-group:/aws/apprunner/aiui-*",
+                "arn:aws:logs:us-west-1:731732766290:log-group:/aws/apprunner/aiui-*:*"
+              ],
+              "Sid": "CloudWatchLogs"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "AppRunnerInstanceRoleDefaultPolicy35195718",
+        "Roles": [
+          {
+            "Ref": "AppRunnerInstanceRole96A5A063"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/AppRunnerInstanceRole/DefaultPolicy/Resource"
+      }
+    },
+    "AppRunnerAccessRoleC89E5843": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "build.apprunner.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Description": "IAM role for App Runner to pull images from ECR",
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSAppRunnerServicePolicyForECRAccess"
+              ]
+            ]
+          }
+        ],
+        "RoleName": "aiui-apprunner-access-dev"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/AppRunnerAccessRole/Resource"
+      }
+    },
+    "WebAutoScaling": {
+      "Type": "AWS::AppRunner::AutoScalingConfiguration",
+      "Properties": {
+        "AutoScalingConfigurationName": "aiui-web-scaling-dev",
+        "MaxConcurrency": 100,
+        "MaxSize": 4,
+        "MinSize": 1
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/WebAutoScaling"
+      }
+    },
+    "WebAppService": {
+      "Type": "AWS::AppRunner::Service",
+      "Properties": {
+        "AutoScalingConfigurationArn": {
+          "Fn::GetAtt": ["WebAutoScaling", "AutoScalingConfigurationArn"]
+        },
+        "HealthCheckConfiguration": {
+          "HealthyThreshold": 1,
+          "Interval": 10,
+          "Path": "/api/health",
+          "Protocol": "HTTP",
+          "Timeout": 5,
+          "UnhealthyThreshold": 5
+        },
+        "InstanceConfiguration": {
+          "Cpu": "1024",
+          "InstanceRoleArn": {
+            "Fn::GetAtt": ["AppRunnerInstanceRole96A5A063", "Arn"]
+          },
+          "Memory": "2048"
+        },
+        "NetworkConfiguration": {
+          "EgressConfiguration": {
+            "EgressType": "VPC",
+            "VpcConnectorArn": {
+              "Fn::GetAtt": ["VpcConnector", "VpcConnectorArn"]
+            }
+          }
+        },
+        "ServiceName": "aiui-web-dev",
+        "SourceConfiguration": {
+          "AutoDeploymentsEnabled": false,
+          "ImageRepository": {
+            "ImageConfiguration": {
+              "Port": "3000",
+              "RuntimeEnvironmentVariables": [
+                {
+                  "Name": "NODE_ENV",
+                  "Value": "development"
+                },
+                {
+                  "Name": "RDS_SECRET_ARN",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiRds-dev:ExportsOutputRefAiuiDatabaseSecretAttachment3BA09E46ECE679F7"
+                  }
+                },
+                {
+                  "Name": "NEXT_PUBLIC_COGNITO_POOL_ID",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiCognito-dev:ExportsOutputRefAiuiUserPool97C6EC33AB95A0B0"
+                  }
+                },
+                {
+                  "Name": "NEXT_PUBLIC_COGNITO_CLIENT_ID",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiCognito-dev:ExportsOutputRefAiuiUserPoolAiuiWebClient3DB571216E050D40"
+                  }
+                },
+                {
+                  "Name": "S3_ASSETS_BUCKET",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefAssetsBucket5CB761808BF2E271"
+                  }
+                },
+                {
+                  "Name": "S3_BUNDLES_BUCKET",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefBundlesBucket4FD5E7533AD00CFB"
+                  }
+                },
+                {
+                  "Name": "S3_PREVIEWS_BUCKET",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefPreviewsBucketE65CC5746765D071"
+                  }
+                },
+                {
+                  "Name": "STAGE",
+                  "Value": "dev"
+                }
+              ]
+            },
+            "ImageIdentifier": "public.ecr.aws/nginx/nginx:latest",
+            "ImageRepositoryType": "ECR_PUBLIC"
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/WebAppService"
+      }
+    },
+    "McpAutoScaling": {
+      "Type": "AWS::AppRunner::AutoScalingConfiguration",
+      "Properties": {
+        "AutoScalingConfigurationName": "aiui-mcp-scaling-dev",
+        "MaxConcurrency": 100,
+        "MaxSize": 2,
+        "MinSize": 1
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/McpAutoScaling"
+      }
+    },
+    "McpServerService": {
+      "Type": "AWS::AppRunner::Service",
+      "Properties": {
+        "AutoScalingConfigurationArn": {
+          "Fn::GetAtt": ["McpAutoScaling", "AutoScalingConfigurationArn"]
+        },
+        "HealthCheckConfiguration": {
+          "HealthyThreshold": 1,
+          "Interval": 10,
+          "Path": "/health",
+          "Protocol": "HTTP",
+          "Timeout": 5,
+          "UnhealthyThreshold": 5
+        },
+        "InstanceConfiguration": {
+          "Cpu": "512",
+          "InstanceRoleArn": {
+            "Fn::GetAtt": ["AppRunnerInstanceRole96A5A063", "Arn"]
+          },
+          "Memory": "1024"
+        },
+        "NetworkConfiguration": {
+          "EgressConfiguration": {
+            "EgressType": "VPC",
+            "VpcConnectorArn": {
+              "Fn::GetAtt": ["VpcConnector", "VpcConnectorArn"]
+            }
+          }
+        },
+        "ServiceName": "aiui-mcp-dev",
+        "SourceConfiguration": {
+          "AutoDeploymentsEnabled": false,
+          "ImageRepository": {
+            "ImageConfiguration": {
+              "Port": "8080",
+              "RuntimeEnvironmentVariables": [
+                {
+                  "Name": "NODE_ENV",
+                  "Value": "development"
+                },
+                {
+                  "Name": "RDS_SECRET_ARN",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiRds-dev:ExportsOutputRefAiuiDatabaseSecretAttachment3BA09E46ECE679F7"
+                  }
+                },
+                {
+                  "Name": "NEXT_PUBLIC_COGNITO_POOL_ID",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiCognito-dev:ExportsOutputRefAiuiUserPool97C6EC33AB95A0B0"
+                  }
+                },
+                {
+                  "Name": "NEXT_PUBLIC_COGNITO_CLIENT_ID",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiCognito-dev:ExportsOutputRefAiuiUserPoolAiuiWebClient3DB571216E050D40"
+                  }
+                },
+                {
+                  "Name": "S3_ASSETS_BUCKET",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefAssetsBucket5CB761808BF2E271"
+                  }
+                },
+                {
+                  "Name": "S3_BUNDLES_BUCKET",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefBundlesBucket4FD5E7533AD00CFB"
+                  }
+                },
+                {
+                  "Name": "S3_PREVIEWS_BUCKET",
+                  "Value": {
+                    "Fn::ImportValue": "AiuiS3-dev:ExportsOutputRefPreviewsBucketE65CC5746765D071"
+                  }
+                },
+                {
+                  "Name": "STAGE",
+                  "Value": "dev"
+                },
+                {
+                  "Name": "MCP_SERVER_PORT",
+                  "Value": "8080"
+                }
+              ]
+            },
+            "ImageIdentifier": "public.ecr.aws/nginx/nginx:latest",
+            "ImageRepositoryType": "ECR_PUBLIC"
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/McpServerService"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WMwQ6CMBBEv8V7WZGoiUfDwaMGEq+mLoUswm5TWoxp+u8GOXmaNy+TKaDYHyHf6PeUYfPKBnpCrL3Gl9Lv6RENFhBrg8GR/1ycBKvKlv9EUtpaF5iNg1i2fLdYCrNBL24Zn4OXGvVA3JXCLXXBaU/C65GbCU1SpEeIlQxmsb+8yUD4WepKKS18Dd4GnxRLY6CftnORw+4Eh00/EWUusKfRQLXmF9qIieHdAAAA"
+      },
+      "Metadata": {
+        "aws:cdk:path": "AiuiAppRunner-dev/CDKMetadata/Default"
+      }
+    }
+  },
+  "Outputs": {
+    "WebServiceUrl": {
+      "Description": "URL of the AIUI web application App Runner service",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": ["WebAppService", "ServiceUrl"]
+            }
+          ]
+        ]
+      }
+    },
+    "WebServiceArn": {
+      "Description": "ARN of the web App Runner service",
+      "Value": {
+        "Fn::GetAtt": ["WebAppService", "ServiceArn"]
+      }
+    },
+    "McpServiceUrl": {
+      "Description": "URL of the MCP server App Runner service",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": ["McpServerService", "ServiceUrl"]
+            }
+          ]
+        ]
+      }
+    },
+    "McpServiceArn": {
+      "Description": "ARN of the MCP server App Runner service",
+      "Value": {
+        "Fn::GetAtt": ["McpServerService", "ServiceArn"]
+      }
+    }
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+    }
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  ["1", "2", "3", "4", "5"],
+                  {
+                    "Ref": "BootstrapVersion"
+                  }
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+        }
+      ]
+    }
+  }
+}

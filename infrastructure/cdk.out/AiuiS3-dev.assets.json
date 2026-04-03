@@ -1,0 +1,36 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "AiuiS3-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "731732766290-us-west-1-0f9c4cbf": {
+          "bucketName": "cdk-hnb659fds-assets-731732766290-us-west-1",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "us-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::731732766290:role/cdk-hnb659fds-file-publishing-role-731732766290-us-west-1"
+        }
+      }
+    },
+    "f5e52cfaa2acf58e5200ee5cf7c08ea98ff2331f86fb30e7a2210489b64a3d82": {
+      "displayName": "AiuiS3-dev Template",
+      "source": {
+        "path": "AiuiS3-dev.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "731732766290-us-west-1-4aa2eb26": {
+          "bucketName": "cdk-hnb659fds-assets-731732766290-us-west-1",
+          "objectKey": "f5e52cfaa2acf58e5200ee5cf7c08ea98ff2331f86fb30e7a2210489b64a3d82.json",
+          "region": "us-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::731732766290:role/cdk-hnb659fds-file-publishing-role-731732766290-us-west-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

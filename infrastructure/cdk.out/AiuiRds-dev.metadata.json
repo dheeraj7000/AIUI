@@ -1,0 +1,80 @@
+{
+  "/AiuiRds-dev/DbSecretArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSecretArn"
+    }
+  ],
+  "/AiuiRds-dev/DbEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbEndpoint"
+    }
+  ],
+  "/AiuiRds-dev/DbSecurityGroupId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSecurityGroupId"
+    }
+  ],
+  "/AiuiRds-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiRds-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiRds-dev/DbSecurityGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSecurityGroupE9D701AD"
+    }
+  ],
+  "/AiuiRds-dev/AiuiDatabase/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiDatabase361CAE26"
+    }
+  ],
+  "/AiuiRds-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiRds-dev/Exports/Output{\"Ref\":\"AiuiDatabaseSecretAttachment3BA09E46\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAiuiDatabaseSecretAttachment3BA09E46ECE679F7"
+    }
+  ],
+  "/AiuiRds-dev/Exports/Output{\"Fn::GetAtt\":[\"DbSecurityGroupE9D701AD\",\"GroupId\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttDbSecurityGroupE9D701ADGroupId7A7C114A"
+    }
+  ],
+  "/AiuiRds-dev/AiuiDatabase/SubnetGroup/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiDatabaseSubnetGroup0F7CA4EE"
+    }
+  ],
+  "/AiuiRds-dev/AiuiDatabase/Secret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiRdsdevAiuiDatabaseSecret263BD71C3fdaad7efa858a3daf9490cf0a702aeb"
+    }
+  ],
+  "/AiuiRds-dev/AiuiDatabase/Secret/Attachment/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiuiDatabaseSecretAttachment3BA09E46"
+    }
+  ]
+}

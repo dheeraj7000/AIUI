@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.next/
+.turbo/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+coverage/
+.DS_Store
+
+# Claude Code local config
+.claude/settings.local.json
+.claude/projects/
+.claude/worktrees/
+
+# AIUI design memory (generated per-project, not committed)
+.aiui/
+
+# Dev planning (spoq epics)
+spoq/
+
+# IDE
+.vscode/
+.idea/

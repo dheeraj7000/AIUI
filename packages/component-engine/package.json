@@ -1,0 +1,21 @@
+{
+  "name": "@aiui/component-engine",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aiui/types": "workspace:*",
+    "@aiui/design-core": "workspace:*",
+    "@aiui/prompt-compiler": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.2"
+  }
+}

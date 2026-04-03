@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "2eec2676c449afdd86efc9c7b8df326520f4c781252968cc8fabf756fde174a4": {
+      "displayName": "AiuiCloudFront-dev Template",
+      "source": {
+        "path": "AiuiCloudFront-dev.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "731732766290-us-west-1-47e32993": {
+          "bucketName": "cdk-hnb659fds-assets-731732766290-us-west-1",
+          "objectKey": "2eec2676c449afdd86efc9c7b8df326520f4c781252968cc8fabf756fde174a4.json",
+          "region": "us-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::731732766290:role/cdk-hnb659fds-file-publishing-role-731732766290-us-west-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

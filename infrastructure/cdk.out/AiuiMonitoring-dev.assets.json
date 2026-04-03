@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "3ba29b09729e1e5d713d47ef161ce91f499e4199e26f32cac53928d7c35b6fc5": {
+      "displayName": "AiuiMonitoring-dev Template",
+      "source": {
+        "path": "AiuiMonitoring-dev.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "731732766290-us-west-1-8772bba9": {
+          "bucketName": "cdk-hnb659fds-assets-731732766290-us-west-1",
+          "objectKey": "3ba29b09729e1e5d713d47ef161ce91f499e4199e26f32cac53928d7c35b6fc5.json",
+          "region": "us-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::731732766290:role/cdk-hnb659fds-file-publishing-role-731732766290-us-west-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

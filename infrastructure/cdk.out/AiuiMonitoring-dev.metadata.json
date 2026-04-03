@@ -1,0 +1,98 @@
+{
+  "/AiuiMonitoring-dev/AlarmEmail": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmEmail"
+    }
+  ],
+  "/AiuiMonitoring-dev/AlarmTopicArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicArn"
+    }
+  ],
+  "/AiuiMonitoring-dev/DashboardName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DashboardName"
+    }
+  ],
+  "/AiuiMonitoring-dev/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AiuiMonitoring-dev/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AiuiMonitoring-dev/AlarmTopic/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicD01E77F9"
+    }
+  ],
+  "/AiuiMonitoring-dev/WebAppRunnerLogs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebAppRunnerLogs83AD6BDE"
+    }
+  ],
+  "/AiuiMonitoring-dev/McpAppRunnerLogs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "McpAppRunnerLogsCC3D93D0"
+    }
+  ],
+  "/AiuiMonitoring-dev/PostConfirmationLambdaLogs/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PostConfirmationLambdaLogs3C04B5EB"
+    }
+  ],
+  "/AiuiMonitoring-dev/Web5xxAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Web5xxAlarm2C721558"
+    }
+  ],
+  "/AiuiMonitoring-dev/Mcp5xxAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Mcp5xxAlarmCCD00B47"
+    }
+  ],
+  "/AiuiMonitoring-dev/WebLatencyAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebLatencyAlarmAD0E7A5B"
+    }
+  ],
+  "/AiuiMonitoring-dev/McpLatencyAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "McpLatencyAlarm256CD734"
+    }
+  ],
+  "/AiuiMonitoring-dev/Dashboard/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Dashboard9E4231ED"
+    }
+  ],
+  "/AiuiMonitoring-dev/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AiuiMonitoring-dev/AlarmTopic/TokenSubscription:1/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicTokenSubscription17F7316A1"
+    }
+  ]
+}
