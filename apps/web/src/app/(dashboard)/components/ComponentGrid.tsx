@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ComponentMockup } from '@/components/ui/ComponentMockup';
+import { ComponentPreviewCard } from '@/components/ui/ComponentPreview';
 import {
   Image,
   DollarSign,
@@ -56,10 +56,13 @@ export interface RecipeItem {
   name: string;
   slug: string;
   type: string;
+  codeTemplate: string;
+  jsonSchema: unknown;
   aiUsageRules: string | null;
   stylePackId: string;
   packName: string | null;
   packCategory: string | null;
+  primaryColor?: string;
   colors?: {
     primary?: string;
     bg?: string;
@@ -168,9 +171,15 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
             href={`/components/${recipe.id}`}
             className="group rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
           >
-            {/* Visual mockup thumbnail */}
+            {/* Visual preview thumbnail */}
             <div className="p-3 pb-0">
-              <ComponentMockup type={recipe.type} name={recipe.name} colors={recipe.colors} />
+              <ComponentPreviewCard
+                codeTemplate={recipe.codeTemplate}
+                type={recipe.type}
+                name={recipe.name}
+                jsonSchema={recipe.jsonSchema}
+                primaryColor={recipe.primaryColor}
+              />
             </div>
 
             {/* Info */}

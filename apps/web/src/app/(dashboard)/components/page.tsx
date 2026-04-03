@@ -21,6 +21,8 @@ async function getRecipesWithColors(): Promise<RecipeItem[]> {
       name: componentRecipes.name,
       slug: componentRecipes.slug,
       type: componentRecipes.type,
+      codeTemplate: componentRecipes.codeTemplate,
+      jsonSchema: componentRecipes.jsonSchema,
       aiUsageRules: componentRecipes.aiUsageRules,
       stylePackId: componentRecipes.stylePackId,
       packName: stylePacks.name,
@@ -69,6 +71,7 @@ async function getRecipesWithColors(): Promise<RecipeItem[]> {
     ...r,
     stylePackId: r.stylePackId ?? '',
     colors: r.stylePackId ? packColorMap[r.stylePackId] : undefined,
+    primaryColor: r.stylePackId ? packColorMap[r.stylePackId]?.primary : undefined,
   }));
 }
 

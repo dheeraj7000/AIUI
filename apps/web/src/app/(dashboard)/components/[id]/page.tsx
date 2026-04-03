@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { Bot } from 'lucide-react';
 import { AddToProject } from './AddToProject';
 import { CopyButton } from './CopyButton';
-import { ComponentMockup } from '@/components/ui/ComponentMockup';
+import { ComponentPreview } from '@/components/ui/ComponentPreview';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,26 +35,23 @@ async function getRecipe(id: string) {
 
   if (!recipe) return null;
 
-  // Fetch color tokens for this pack (only if pack is set)
-  const colors: { primary?: string; bg?: string; text?: string; accent?: string } = {};
+  // Fetch ALL tokens for this pack (used by live preview)
+  let packTokens: Array<{ tokenKey: string; tokenType: string; tokenValue: string }> = [];
+  let primaryColor: string | undefined;
   if (recipe.stylePackId) {
-    const colorTokens = await db
+    packTokens = await db
       .select({
         tokenKey: styleTokens.tokenKey,
+        tokenType: styleTokens.tokenType,
         tokenValue: styleTokens.tokenValue,
       })
       .from(styleTokens)
       .where(eq(styleTokens.stylePackId, recipe.stylePackId));
 
-    for (const token of colorTokens) {
-      if (token.tokenKey === 'color.primary') colors.primary = token.tokenValue;
-      if (token.tokenKey === 'color.background') colors.bg = token.tokenValue;
-      if (token.tokenKey === 'color.text-primary') colors.text = token.tokenValue;
-      if (token.tokenKey === 'color.accent') colors.accent = token.tokenValue;
-    }
+    primaryColor = packTokens.find((t) => t.tokenKey === 'color.primary')?.tokenValue;
   }
 
-  return { ...recipe, colors };
+  return { ...recipe, packTokens, primaryColor };
 }
 
 /** Parse a JSON Schema object into a flat list of property rows. */
@@ -122,7 +119,15 @@ export default async function ComponentDetailPage(props: RouteContext) {
 
       {/* Visual preview */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <ComponentMockup type={recipe.type} name={recipe.name} colors={recipe.colors} large />
+        <ComponentPreview
+          codeTemplate={recipe.codeTemplate}
+          type={recipe.type}
+          name={recipe.name}
+          jsonSchema={recipe.jsonSchema}
+          tokens={recipe.packTokens}
+          primaryColor={recipe.primaryColor}
+          large
+        />
       </div>
 
       {/* AI Usage Rules */}
