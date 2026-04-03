@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { createDb, stylePacks, styleTokens, componentRecipes } from '@aiui/design-core';
 import { eq, count } from 'drizzle-orm';
+import { Layers, LayoutGrid, Sparkles, Zap, Globe, Paintbrush, Puzzle } from 'lucide-react';
 
 export const metadata = { title: 'Style Packs - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -37,12 +38,30 @@ async function getStylePacks() {
 }
 
 const categoryColors: Record<string, string> = {
-  saas: 'bg-blue-50 text-blue-700',
-  fintech: 'bg-emerald-50 text-emerald-700',
-  startup: 'bg-purple-50 text-purple-700',
-  'ui-library': 'bg-orange-50 text-orange-700',
-  animations: 'bg-pink-50 text-pink-700',
-  creative: 'bg-cyan-50 text-cyan-700',
+  saas: 'bg-blue-50 text-blue-700 border-blue-200',
+  fintech: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  startup: 'bg-purple-50 text-purple-700 border-purple-200',
+  'ui-library': 'bg-orange-50 text-orange-700 border-orange-200',
+  animations: 'bg-pink-50 text-pink-700 border-pink-200',
+  creative: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+};
+
+const categoryGradients: Record<string, string> = {
+  saas: 'from-blue-50 via-blue-100/50 to-indigo-50',
+  fintech: 'from-emerald-50 via-emerald-100/50 to-teal-50',
+  startup: 'from-purple-50 via-purple-100/50 to-violet-50',
+  'ui-library': 'from-orange-50 via-orange-100/50 to-amber-50',
+  animations: 'from-pink-50 via-pink-100/50 to-rose-50',
+  creative: 'from-cyan-50 via-cyan-100/50 to-sky-50',
+};
+
+const categoryIcons: Record<string, typeof Layers> = {
+  saas: Globe,
+  fintech: Layers,
+  startup: Zap,
+  'ui-library': LayoutGrid,
+  animations: Sparkles,
+  creative: Paintbrush,
 };
 
 export default async function StylePacksPage() {
@@ -57,39 +76,57 @@ export default async function StylePacksPage() {
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        {categories.map((cat) => (
-          <span
-            key={cat}
-            className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600"
-          >
-            {cat}
-          </span>
-        ))}
+        {categories.map((cat) => {
+          const CatIcon = categoryIcons[cat] ?? Puzzle;
+          return (
+            <span
+              key={cat}
+              className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
+            >
+              {cat !== 'All' && <CatIcon size={12} />}
+              {cat}
+            </span>
+          );
+        })}
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {packs.map((pack) => (
-          <Link
-            key={pack.id}
-            href={`/style-packs/${pack.id}`}
-            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="mb-3 flex h-32 items-center justify-center rounded-lg bg-gradient-to-br from-blue-50 to-purple-50">
-              <span className="text-sm font-medium text-gray-400">v{pack.version}</span>
-            </div>
-            <span
-              className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${categoryColors[pack.category] ?? 'bg-gray-50 text-gray-700'}`}
+        {packs.map((pack) => {
+          const gradient =
+            categoryGradients[pack.category] ?? 'from-gray-50 via-gray-100/50 to-gray-50';
+          return (
+            <Link
+              key={pack.id}
+              href={`/style-packs/${pack.id}`}
+              className="group rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
             >
-              {pack.category}
-            </span>
-            <h3 className="mt-1 text-base font-semibold text-gray-900">{pack.name}</h3>
-            <p className="mt-1 line-clamp-2 text-sm text-gray-500">{pack.description}</p>
-            <div className="mt-3 flex gap-3 text-xs text-gray-400">
-              <span>{pack.tokenCount} tokens</span>
-              <span>{pack.recipeCount} components</span>
-            </div>
-          </Link>
-        ))}
+              <div
+                className={`flex h-32 items-center justify-center rounded-t-xl bg-gradient-to-br ${gradient}`}
+              >
+                <span className="text-sm font-medium text-gray-400">v{pack.version}</span>
+              </div>
+              <div className="p-5">
+                <span
+                  className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${categoryColors[pack.category] ?? 'bg-gray-50 text-gray-700 border-gray-200'}`}
+                >
+                  {pack.category}
+                </span>
+                <h3 className="mt-1.5 text-base font-semibold text-gray-900">{pack.name}</h3>
+                <p className="mt-1 line-clamp-2 text-sm text-gray-500">{pack.description}</p>
+                <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
+                  <span className="flex items-center gap-1">
+                    <Layers size={12} />
+                    {pack.tokenCount} tokens
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Puzzle size={12} />
+                    {pack.recipeCount} components
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

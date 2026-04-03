@@ -68,35 +68,52 @@ export default function SignUpPage() {
     }
   }
 
+  const inputClass =
+    'block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors';
+
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Create your account</h2>
+      <h2 className="text-xl font-semibold text-gray-900">Create your account</h2>
+      <p className="mt-1 mb-6 text-sm text-gray-500">
+        Free to start. Set up your design system in minutes.
+      </p>
 
       {serverError && (
-        <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
-          <p className="text-red-600 text-sm">{serverError}</p>
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+          <svg
+            className="mt-0.5 h-4 w-4 shrink-0 text-red-500"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <p className="text-sm text-red-600">{serverError}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+            Email address
           </label>
           <input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={inputClass}
             placeholder="you@example.com"
             autoComplete="email"
           />
-          {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
             Password
           </label>
           <input
@@ -104,15 +121,18 @@ export default function SignUpPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={inputClass}
             placeholder="At least 8 characters"
             autoComplete="new-password"
           />
-          {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
+          {errors.password && <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>}
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700 mb-1.5"
+          >
             Confirm password
           </label>
           <input
@@ -120,30 +140,53 @@ export default function SignUpPage() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={inputClass}
             placeholder="Re-enter your password"
             autoComplete="new-password"
           />
           {errors.confirmPassword && (
-            <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
+            <p className="mt-1.5 text-xs text-red-600">{errors.confirmPassword}</p>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 w-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Creating account...' : 'Sign up'}
+          {isSubmitting ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              Creating account...
+            </>
+          ) : (
+            'Create account'
+          )}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-600">
-        Already have an account?{' '}
-        <Link href="/sign-in" className="text-blue-600 hover:underline font-medium">
-          Sign in
-        </Link>
-      </p>
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500">
+          Already have an account?{' '}
+          <Link href="/sign-in" className="font-semibold text-blue-600 hover:text-blue-700">
+            Sign in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

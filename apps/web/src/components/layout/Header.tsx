@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { CircleUser, Menu } from 'lucide-react';
 
 function Breadcrumbs() {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ function Breadcrumbs() {
     assets: 'Assets',
     integrations: 'Integrations',
     bundle: 'Bundle',
+    'api-keys': 'API Keys',
   };
 
   return (
@@ -44,24 +46,17 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="rounded-md p-2 text-gray-500 hover:bg-gray-100 md:hidden"
+          className="rounded-lg p-2 text-gray-500 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 md:hidden"
           aria-label="Open menu"
         >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          <Menu size={20} />
         </button>
         <Breadcrumbs />
       </div>
       <div className="flex items-center gap-3">
-        <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
-          U
-        </div>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white transition-all duration-200 hover:shadow-md">
+          <CircleUser size={18} strokeWidth={1.5} />
+        </button>
       </div>
     </header>
   );

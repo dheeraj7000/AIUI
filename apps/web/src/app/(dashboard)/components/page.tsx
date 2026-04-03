@@ -1,6 +1,22 @@
 import Link from 'next/link';
 import { createDb, componentRecipes, stylePacks } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
+import {
+  Image,
+  DollarSign,
+  HelpCircle,
+  PanelBottom,
+  FileText,
+  Megaphone,
+  MessageSquare,
+  Sparkles,
+  Mail,
+  CreditCard,
+  Navigation,
+  Puzzle,
+  Bot,
+  type LucideIcon,
+} from 'lucide-react';
 
 export const metadata = { title: 'Components - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -31,18 +47,18 @@ async function getRecipes() {
   return recipes;
 }
 
-const typeIcons: Record<string, string> = {
-  hero: '\u{1F3A8}',
-  pricing: '\u{1F4B0}',
-  faq: '\u{2753}',
-  footer: '\u{1F4CB}',
-  header: '\u{1F4DD}',
-  cta: '\u{1F4E3}',
-  testimonial: '\u{1F4AC}',
-  feature: '\u{2728}',
-  contact: '\u{1F4E7}',
-  card: '\u{1F4C4}',
-  navigation: '\u{1F9ED}',
+const typeIcons: Record<string, LucideIcon> = {
+  hero: Image,
+  pricing: DollarSign,
+  faq: HelpCircle,
+  footer: PanelBottom,
+  header: FileText,
+  cta: Megaphone,
+  testimonial: MessageSquare,
+  feature: Sparkles,
+  contact: Mail,
+  card: CreditCard,
+  navigation: Navigation,
 };
 
 const typeColors: Record<string, string> = {
@@ -59,6 +75,20 @@ const typeColors: Record<string, string> = {
   navigation: 'bg-sky-50 text-sky-700',
 };
 
+const typeIconBgs: Record<string, string> = {
+  hero: 'bg-violet-100',
+  pricing: 'bg-green-100',
+  faq: 'bg-amber-100',
+  footer: 'bg-gray-200',
+  header: 'bg-blue-100',
+  cta: 'bg-rose-100',
+  testimonial: 'bg-cyan-100',
+  feature: 'bg-indigo-100',
+  contact: 'bg-teal-100',
+  card: 'bg-orange-100',
+  navigation: 'bg-sky-100',
+};
+
 export default async function ComponentBrowserPage() {
   const recipes = await getRecipes();
   const types = ['All', ...new Set(recipes.map((r) => r.type))];
@@ -71,40 +101,57 @@ export default async function ComponentBrowserPage() {
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        {types.map((t) => (
-          <span
-            key={t}
-            className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600"
-          >
-            {t}
-          </span>
-        ))}
+        {types.map((t) => {
+          const TypeIcon = typeIcons[t] ?? Puzzle;
+          return (
+            <span
+              key={t}
+              className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-all duration-200 hover:border-gray-300 hover:shadow-sm"
+            >
+              {t !== 'All' && <TypeIcon size={12} />}
+              {t}
+            </span>
+          );
+        })}
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {recipes.map((recipe) => (
-          <Link
-            key={recipe.id}
-            href={`/components/${recipe.id}`}
-            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="mb-3 flex h-28 items-center justify-center rounded-lg bg-gray-50 text-3xl">
-              {typeIcons[recipe.type] ?? '\u{1F9E9}'}
-            </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${typeColors[recipe.type] ?? 'bg-gray-100 text-gray-600'}`}
-              >
-                {recipe.type}
-              </span>
-              {recipe.packName && <span className="text-xs text-gray-400">{recipe.packName}</span>}
-            </div>
-            <h3 className="mt-1 text-base font-semibold text-gray-900">{recipe.name}</h3>
-            {recipe.aiUsageRules && (
-              <p className="mt-1 line-clamp-2 text-sm text-gray-500">{recipe.aiUsageRules}</p>
-            )}
-          </Link>
-        ))}
+        {recipes.map((recipe) => {
+          const Icon = typeIcons[recipe.type] ?? Puzzle;
+          const iconBg = typeIconBgs[recipe.type] ?? 'bg-gray-100';
+          const iconColor = typeColors[recipe.type]?.split(' ')[1] ?? 'text-gray-600';
+          return (
+            <Link
+              key={recipe.id}
+              href={`/components/${recipe.id}`}
+              className="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className={`mb-3 flex h-28 items-center justify-center rounded-lg ${iconBg}`}>
+                <Icon size={32} className={iconColor} strokeWidth={1.5} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${typeColors[recipe.type] ?? 'bg-gray-100 text-gray-600'}`}
+                >
+                  {recipe.type}
+                </span>
+                {recipe.packName && (
+                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-gray-300" />
+                    {recipe.packName}
+                  </span>
+                )}
+              </div>
+              <h3 className="mt-1.5 text-base font-semibold text-gray-900">{recipe.name}</h3>
+              {recipe.aiUsageRules && (
+                <div className="mt-2 flex items-start gap-1.5 rounded-md bg-blue-50/50 px-2 py-1.5">
+                  <Bot size={14} className="mt-0.5 shrink-0 text-blue-500" />
+                  <p className="line-clamp-2 text-xs text-blue-700">{recipe.aiUsageRules}</p>
+                </div>
+              )}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

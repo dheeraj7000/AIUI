@@ -64,67 +64,106 @@ export default function SignInPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Sign in to your account</h2>
+      <h2 className="text-xl font-semibold text-gray-900">Sign in to your account</h2>
+      <p className="mt-1 mb-6 text-sm text-gray-500">
+        Welcome back. Enter your credentials to continue.
+      </p>
 
       {serverError && (
-        <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
-          <p className="text-red-600 text-sm">{serverError}</p>
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+          <svg
+            className="mt-0.5 h-4 w-4 shrink-0 text-red-500"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <p className="text-sm text-red-600">{serverError}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+            Email address
           </label>
           <input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
             placeholder="you@example.com"
             autoComplete="email"
           />
-          {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-blue-600 hover:text-blue-700"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
             autoComplete="current-password"
           />
-          {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
-        </div>
-
-        <div className="flex justify-end">
-          <Link href="/forgot-password" className="text-blue-600 hover:underline text-sm">
-            Forgot password?
-          </Link>
+          {errors.password && <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 w-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Signing in...' : 'Sign in'}
+          {isSubmitting ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              Signing in...
+            </>
+          ) : (
+            'Sign in'
+          )}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-600">
-        Don&apos;t have an account?{' '}
-        <Link href="/sign-up" className="text-blue-600 hover:underline font-medium">
-          Sign up
-        </Link>
-      </p>
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500">
+          Don&apos;t have an account?{' '}
+          <Link href="/sign-up" className="font-semibold text-blue-600 hover:text-blue-700">
+            Create one free
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

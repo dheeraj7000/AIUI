@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { getPersistedAccessToken, getActiveOrgId } from '@/lib/session';
+import { Key, Copy, Check, Trash2, Loader2, ShieldAlert, Plus, KeyRound } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -208,17 +209,23 @@ export default function ApiKeysPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">API Keys</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Manage API keys to connect Claude Code and other tools to your design system.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+            <Key size={20} className="text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">API Keys</h1>
+            <p className="text-sm text-gray-600">
+              Manage API keys to connect Claude Code and other tools to your design system.
+            </p>
+          </div>
         </div>
         {!showCreateForm && !createdKey && (
           <button
             onClick={() => setShowCreateForm(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-md"
           >
+            <Plus size={16} />
             Create API Key
           </button>
         )}
@@ -233,9 +240,9 @@ export default function ApiKeysPage() {
 
       {/* Newly created key banner */}
       {createdKey && (
-        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
+        <div className="mt-6 rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-5">
           <div className="mb-2 flex items-center gap-2">
-            <span className="text-lg">&#9888;</span>
+            <ShieldAlert size={20} className="text-amber-600" />
             <h2 className="text-base font-semibold text-amber-900">Save your API key</h2>
           </div>
           <p className="mb-3 text-sm text-amber-800">
@@ -249,9 +256,19 @@ export default function ApiKeysPage() {
             </code>
             <button
               onClick={() => copyToClipboard(createdKey.rawKey, 'key')}
-              className="rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-800 transition-colors hover:bg-amber-100"
+              className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-800 transition-all duration-200 hover:bg-amber-100"
             >
-              {copiedKey ? 'Copied!' : 'Copy'}
+              {copiedKey ? (
+                <>
+                  <Check size={14} className="text-green-600" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy size={14} />
+                  Copy
+                </>
+              )}
             </button>
           </div>
 
@@ -261,9 +278,19 @@ export default function ApiKeysPage() {
               <span className="text-sm font-medium text-amber-900">Add to your .mcp.json</span>
               <button
                 onClick={() => copyToClipboard(mcpSnippet(createdKey.rawKey), 'snippet')}
-                className="text-sm font-medium text-amber-700 transition-colors hover:text-amber-900"
+                className="flex items-center gap-1.5 text-sm font-medium text-amber-700 transition-colors hover:text-amber-900"
               >
-                {copiedSnippet ? 'Copied!' : 'Copy snippet'}
+                {copiedSnippet ? (
+                  <>
+                    <Check size={14} className="text-green-600" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy size={14} />
+                    Copy snippet
+                  </>
+                )}
               </button>
             </div>
             <pre className="overflow-x-auto rounded-lg border border-amber-300 bg-white p-3 font-mono text-xs text-gray-800">
@@ -273,7 +300,7 @@ export default function ApiKeysPage() {
 
           <button
             onClick={() => setCreatedKey(null)}
-            className="mt-4 rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 transition-colors hover:bg-amber-100"
+            className="mt-4 rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-medium text-amber-800 transition-all duration-200 hover:bg-amber-100"
           >
             Done
           </button>
@@ -303,9 +330,16 @@ export default function ApiKeysPage() {
             <button
               type="submit"
               disabled={creating || !newKeyName.trim()}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50"
             >
-              {creating ? 'Creating...' : 'Create Key'}
+              {creating ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Key'
+              )}
             </button>
             <button
               type="button"
@@ -313,7 +347,7 @@ export default function ApiKeysPage() {
                 setShowCreateForm(false);
                 setNewKeyName('');
               }}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50"
             >
               Cancel
             </button>
@@ -323,11 +357,18 @@ export default function ApiKeysPage() {
 
       {/* Keys table */}
       {loading ? (
-        <div className="mt-8 text-center text-sm text-gray-500">Loading API keys...</div>
+        <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
+          <Loader2 size={16} className="animate-spin" />
+          Loading API keys...
+        </div>
       ) : keys.length === 0 && !createdKey ? (
         <div className="mt-8 rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-sm text-gray-500">
-            No API keys yet. Create one to connect Claude Code to your design system.
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+            <KeyRound size={24} className="text-gray-400" />
+          </div>
+          <p className="text-sm font-medium text-gray-600">No API keys yet</p>
+          <p className="mt-1 text-xs text-gray-400">
+            Create one to connect Claude Code to your design system.
           </p>
         </div>
       ) : keys.length > 0 ? (
@@ -344,8 +385,16 @@ export default function ApiKeysPage() {
             </thead>
             <tbody>
               {keys.map((key) => (
-                <tr key={key.id} className="border-b border-gray-100 last:border-b-0">
-                  <td className="px-4 py-3 font-medium text-gray-900">{key.name}</td>
+                <tr
+                  key={key.id}
+                  className="border-b border-gray-100 transition-colors last:border-b-0 hover:bg-gray-50/50"
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Key size={14} className="text-gray-400" />
+                      <span className="font-medium text-gray-900">{key.name}</span>
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <code className="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs text-gray-700">
                       {key.keyPrefix}...
@@ -359,9 +408,19 @@ export default function ApiKeysPage() {
                         <button
                           onClick={() => handleRevoke(key.id)}
                           disabled={revokingId === key.id}
-                          className="text-sm font-medium text-red-600 transition-colors hover:text-red-800 disabled:opacity-50"
+                          className="flex items-center gap-1 text-sm font-medium text-red-600 transition-colors hover:text-red-800 disabled:opacity-50"
                         >
-                          {revokingId === key.id ? 'Revoking...' : 'Confirm'}
+                          {revokingId === key.id ? (
+                            <>
+                              <Loader2 size={14} className="animate-spin" />
+                              Revoking...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 size={14} />
+                              Confirm
+                            </>
+                          )}
                         </button>
                         <button
                           onClick={() => setConfirmRevokeId(null)}
@@ -373,8 +432,9 @@ export default function ApiKeysPage() {
                     ) : (
                       <button
                         onClick={() => setConfirmRevokeId(key.id)}
-                        className="text-sm font-medium text-red-600 transition-colors hover:text-red-800"
+                        className="flex items-center gap-1 text-sm font-medium text-red-600 transition-colors hover:text-red-800"
                       >
+                        <Trash2 size={14} />
                         Revoke
                       </button>
                     )}

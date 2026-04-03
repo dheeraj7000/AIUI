@@ -2,18 +2,58 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  FolderOpen,
+  Palette,
+  LayoutGrid,
+  Key,
+  type LucideIcon,
+} from 'lucide-react';
 
-const mainItems = [
-  { label: 'Dashboard', href: '/dashboard', icon: '▦' },
-  { label: 'Projects', href: '/projects', icon: '📁' },
+interface NavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+const mainItems: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Projects', href: '/projects', icon: FolderOpen },
 ];
 
-const designItems = [
-  { label: 'Style Packs', href: '/style-packs', icon: '🎨' },
-  { label: 'Components', href: '/components', icon: '🧩' },
+const designItems: NavItem[] = [
+  { label: 'Style Packs', href: '/style-packs', icon: Palette },
+  { label: 'Components', href: '/components', icon: LayoutGrid },
 ];
 
-const integrationItems = [{ label: 'API Keys', href: '/api-keys', icon: '🔑' }];
+const integrationItems: NavItem[] = [{ label: 'API Keys', href: '/api-keys', icon: Key }];
+
+function NavLink({
+  item,
+  active,
+  onClose,
+}: {
+  item: NavItem;
+  active: boolean;
+  onClose?: () => void;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onClose}
+      className={`mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+        active
+          ? 'bg-blue-50 text-blue-700 shadow-sm'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      }`}
+    >
+      <Icon size={18} className={active ? 'text-blue-600' : 'text-gray-400'} />
+      {item.label}
+    </Link>
+  );
+}
 
 export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
@@ -21,64 +61,43 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   return (
     <nav className="flex h-full w-60 flex-col border-r border-gray-200 bg-white">
       <div className="flex h-14 items-center border-b border-gray-200 px-4">
-        <Link href="/dashboard" className="text-lg font-bold text-gray-900">
+        <Link href="/dashboard" className="text-lg font-bold text-gray-900 tracking-tight">
           AIUI
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
           Main
         </div>
         {mainItems.map((item) => (
-          <Link
+          <NavLink
             key={item.href}
-            href={item.href}
-            onClick={onClose}
-            className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              pathname?.startsWith(item.href)
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </Link>
+            item={item}
+            active={!!pathname?.startsWith(item.href)}
+            onClose={onClose}
+          />
         ))}
-        <div className="mb-2 mt-6 px-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
           Design
         </div>
         {designItems.map((item) => (
-          <Link
+          <NavLink
             key={item.href}
-            href={item.href}
-            onClick={onClose}
-            className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              pathname?.startsWith(item.href)
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </Link>
+            item={item}
+            active={!!pathname?.startsWith(item.href)}
+            onClose={onClose}
+          />
         ))}
-        <div className="mb-2 mt-6 px-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
           Integration
         </div>
         {integrationItems.map((item) => (
-          <Link
+          <NavLink
             key={item.href}
-            href={item.href}
-            onClick={onClose}
-            className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              pathname?.startsWith(item.href)
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </Link>
+            item={item}
+            active={!!pathname?.startsWith(item.href)}
+            onClose={onClose}
+          />
         ))}
       </div>
     </nav>
