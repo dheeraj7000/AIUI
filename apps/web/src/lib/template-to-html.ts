@@ -106,6 +106,28 @@ function generateSampleValues(jsonSchema: unknown): Record<string, string> {
 function jsxToHtml(jsx: string): string {
   let html = jsx;
 
+  // Handle className={`template literal`} → class="static content"
+  // Extracts the static string parts, strips ${...} interpolations
+  html = html.replace(/className=\{`([^`]*)`\}/g, (_match, content) => {
+    const staticContent = content
+      .replace(/\$\{[^}]*\}/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return `className="${staticContent}"`;
+  });
+
+  // Handle className={cn(...)} or className={someVar} → extract string literals
+  html = html.replace(/className=\{([^}]+)\}/g, (_match, expr) => {
+    // Extract string literals from the expression
+    const strings = expr.match(/["']([^"']+)["']/g);
+    if (strings) {
+      const classes = strings.map((s: string) => s.replace(/["']/g, '')).join(' ');
+      return `className="${classes}"`;
+    }
+    // If no string literals found, remove the attribute
+    return '';
+  });
+
   // Replace className with class
   html = html.replace(/\bclassName=/g, 'class=');
 
@@ -157,14 +179,27 @@ function jsxToHtml(jsx: string): string {
   // Remove {...props} spread
   html = html.replace(/\{\.\.\.[\w]+\}/g, '');
 
-  // Replace {variable} template expressions with empty spans (except already-substituted ones)
+  // Remove JSX conditional rendering: {condition && <el>...</el>}
+  // Keep the HTML part, discard the condition
+  html = html.replace(/\{\w+\s*&&\s*(<[^}]+>)\}/g, '$1');
+
+  // Remove ternary expressions: {condition ? <a> : <b>} → keep the first branch
+  html = html.replace(/\{[^?]+\?\s*(<[^:]+>)\s*:\s*[^}]+\}/g, '$1');
+
+  // Replace {children} with empty string
+  html = html.replace(/\{children\}/g, '');
+
+  // Replace {variable} template expressions with visible sample text
   html = html.replace(/\{(\w+(?:\.\w+)*)\}/g, '<span>$1</span>');
 
-  // Remove remaining complex JSX expressions like {arr.map(() => ...)}
+  // Remove remaining complex JSX expressions (map, ternary, etc.)
   html = html.replace(/\{[^}]{20,}\}/g, '');
 
   // Remove TypeScript type annotations from tag attributes
   html = html.replace(/\bas\s+\w+/g, '');
+
+  // Clean up empty attributes (class= without value)
+  html = html.replace(/\bclass=\s+/g, '');
 
   return html;
 }
