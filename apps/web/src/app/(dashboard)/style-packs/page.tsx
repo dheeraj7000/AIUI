@@ -1,7 +1,16 @@
 import Link from 'next/link';
 import { createDb, stylePacks, styleTokens, componentRecipes } from '@aiui/design-core';
 import { eq, count, inArray } from 'drizzle-orm';
-import { Layers, LayoutGrid, Sparkles, Zap, Globe, Paintbrush, Puzzle } from 'lucide-react';
+import {
+  Layers,
+  LayoutGrid,
+  Sparkles,
+  Zap,
+  Globe,
+  Paintbrush,
+  Puzzle,
+  Download,
+} from 'lucide-react';
 import { TokenStrip } from '@/components/ui/TokenPreview';
 
 export const metadata = { title: 'Style Packs - AIUI' };
@@ -88,10 +97,21 @@ export default async function StylePacksPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900">Style Packs</h1>
-      <p className="mt-2 text-sm text-gray-600">
-        Browse and apply design styles to your projects. {packs.length} packs available.
-      </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Style Packs</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Browse and apply design styles to your projects. {packs.length} packs available.
+          </p>
+        </div>
+        <Link
+          href="/import"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+        >
+          <Download size={16} />
+          Import Design
+        </Link>
+      </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
         {categories.map((cat) => {

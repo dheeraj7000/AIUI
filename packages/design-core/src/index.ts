@@ -309,3 +309,15 @@ export {
 // API key operations
 export { createApiKey, listApiKeys, revokeApiKey, verifyApiKey } from './operations/api-keys';
 export type { CreateApiKeyInput, ApiKeyWithRaw, ApiKeyContext } from './operations/api-keys';
+
+// Design token importers
+export {
+  detectFormat,
+  parseTokens,
+  parseFigmaUrl,
+  extractFigmaTokens,
+  parseCssVariables,
+  parseTokensStudio,
+  parseTailwindConfig,
+} from './importers';
+export type { ImportFormat, ImportResult, FigmaExtractionResult } from './importers';

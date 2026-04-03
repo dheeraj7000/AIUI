@@ -8,6 +8,7 @@ import {
   Palette,
   LayoutGrid,
   Key,
+  Download,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -25,6 +26,7 @@ const mainItems: NavItem[] = [
 const designItems: NavItem[] = [
   { label: 'Style Packs', href: '/style-packs', icon: Palette },
   { label: 'Components', href: '/components', icon: LayoutGrid },
+  { label: 'Import', href: '/import', icon: Download },
 ];
 
 const integrationItems: NavItem[] = [{ label: 'API Keys', href: '/api-keys', icon: Key }];
