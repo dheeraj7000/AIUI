@@ -1,0 +1,23 @@
+# Copy to terraform.tfvars and fill in values
+# cp terraform.tfvars.example terraform.tfvars
+
+region   = "us-east-1"
+project  = "aiui"
+stage    = "dev"
+
+# Database
+db_username = "aiui_admin"
+db_password = "CHANGE_ME_strong_password_here"  # min 8 chars
+db_name     = "aiui"
+
+# Auth
+jwt_secret = "CHANGE_ME_at_least_32_characters_long_secret"
+
+# SSH (optional — leave empty to use SSM Session Manager)
+ec2_key_name = ""
+
+# Monitoring (optional)
+alarm_email = ""
+
+# Custom domain (optional)
+app_domain = ""
