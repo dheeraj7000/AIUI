@@ -10,6 +10,20 @@ import type { Database } from '../db';
 import { resolveTokens, type TokenMap } from './token-resolver';
 import { exportTokens } from '../operations/style-tokens';
 
+export interface CompiledComponent {
+  id: string;
+  name: string;
+  type: string;
+  tier: string | null;
+  codeTemplate: string;
+  jsonSchema: unknown;
+  aiUsageRules: string | null;
+  variantsSchema: unknown | null;
+  statesSchema: unknown | null;
+  composedOf: unknown | null;
+  guidelinesJson: unknown | null;
+}
+
 export interface CompiledProfile {
   version: number;
   compiledAt: string;
@@ -19,20 +33,16 @@ export interface CompiledProfile {
     category: string | null;
   };
   tokens: TokenMap;
-  components: Array<{
-    id: string;
-    name: string;
-    type: string;
-    codeTemplate: string;
-    jsonSchema: unknown;
-    aiUsageRules: string | null;
-  }>;
+  components: CompiledComponent[];
   metadata: {
     tokenCount: number;
     componentCount: number;
     overrideCount: number;
     warnings: string[];
+    tierCounts: { atom: number; molecule: number; organism: number; template: number };
+    guidelineCoverage: number;
   };
+  voiceTone: unknown | null;
   compiledHash: string;
   tokensHash: string;
 }
@@ -123,21 +133,46 @@ export async function compileProfile(
     tokenCount += Object.keys(group).length;
   }
 
-  // Fetch selected component recipes
-  const components =
+  // Fetch selected component recipes with new fields
+  const components: CompiledComponent[] =
     selectedComponentIds.length > 0
-      ? await db
-          .select({
-            id: componentRecipes.id,
-            name: componentRecipes.name,
-            type: componentRecipes.type,
-            codeTemplate: componentRecipes.codeTemplate,
-            jsonSchema: componentRecipes.jsonSchema,
-            aiUsageRules: componentRecipes.aiUsageRules,
-          })
-          .from(componentRecipes)
-          .where(inArray(componentRecipes.id, selectedComponentIds))
+      ? (
+          await db
+            .select({
+              id: componentRecipes.id,
+              name: componentRecipes.name,
+              type: componentRecipes.type,
+              codeTemplate: componentRecipes.codeTemplate,
+              jsonSchema: componentRecipes.jsonSchema,
+              aiUsageRules: componentRecipes.aiUsageRules,
+              variantsSchema: componentRecipes.variantsSchema,
+              statesSchema: componentRecipes.statesSchema,
+              composedOf: componentRecipes.composedOf,
+              tier: componentRecipes.tier,
+              guidelinesJson: componentRecipes.guidelinesJson,
+            })
+            .from(componentRecipes)
+            .where(inArray(componentRecipes.id, selectedComponentIds))
+        ).map((c) => ({
+          ...c,
+          variantsSchema: c.variantsSchema ?? null,
+          statesSchema: c.statesSchema ?? null,
+          composedOf: c.composedOf ?? null,
+          guidelinesJson: c.guidelinesJson ?? null,
+        }))
       : [];
+
+  // Compute tier counts
+  const tierCounts = { atom: 0, molecule: 0, organism: 0, template: 0 };
+  for (const c of components) {
+    const tier = (c.tier ?? 'organism') as keyof typeof tierCounts;
+    if (tier in tierCounts) tierCounts[tier]++;
+  }
+
+  // Compute guideline coverage
+  const withGuidelines = components.filter((c) => c.guidelinesJson).length;
+  const guidelineCoverage =
+    components.length > 0 ? Math.round((withGuidelines / components.length) * 100) : 0;
 
   // Compute hashes for staleness detection
   const tokensHash = hashTokenMap(baseTokens);
@@ -159,7 +194,10 @@ export async function compileProfile(
       componentCount: components.length,
       overrideCount: Object.keys(overridesJson).length,
       warnings,
+      tierCounts,
+      guidelineCoverage,
     },
+    voiceTone: null, // Populated by caller from designProfile.voiceToneJson
     compiledHash,
     tokensHash,
   };

@@ -27,6 +27,7 @@ export const designProfiles = pgTable(
     lastCompiledAt: timestamp('last_compiled_at'),
     tokensHash: varchar('tokens_hash', { length: 64 }),
     compilationValid: boolean('compilation_valid').default(true).notNull(),
+    voiceToneJson: jsonb('voice_tone_json'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

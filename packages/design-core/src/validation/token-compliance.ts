@@ -1,5 +1,24 @@
+export type ComplianceViolationType =
+  | 'color'
+  | 'font'
+  | 'font-size'
+  | 'font-weight'
+  | 'line-height'
+  | 'letter-spacing'
+  | 'spacing'
+  | 'radius'
+  | 'shadow'
+  | 'elevation'
+  | 'z-index'
+  | 'breakpoint'
+  | 'opacity'
+  | 'border-width'
+  | 'animation'
+  | 'transition'
+  | 'general';
+
 export interface ComplianceViolation {
-  type: 'color' | 'font' | 'radius' | 'spacing' | 'shadow' | 'general';
+  type: ComplianceViolationType;
   severity: 'error' | 'warning';
   message: string;
   line?: number;

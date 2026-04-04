@@ -1,7 +1,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { checkTokenCompliance } from '@aiui/design-core';
-import type { ComplianceResult } from '@aiui/design-core';
+import type {
+  ComplianceResult,
+  ComplianceViolation,
+  ComplianceViolationType,
+} from '@aiui/design-core';
 
 export interface ApprovedToken {
   tokenKey: string;
@@ -13,6 +17,26 @@ export interface FileResult {
   filePath: string;
   result: ComplianceResult;
 }
+
+/** All 16 supported token types. */
+const ALL_TOKEN_TYPES = [
+  'color',
+  'font',
+  'font-size',
+  'font-weight',
+  'line-height',
+  'letter-spacing',
+  'spacing',
+  'radius',
+  'shadow',
+  'elevation',
+  'z-index',
+  'breakpoint',
+  'opacity',
+  'border-width',
+  'animation',
+  'transition',
+] as const;
 
 /**
  * Load tokens from a local .aiui/tokens.json file.
@@ -61,7 +85,7 @@ export function loadLocalTokens(tokensPath: string): ApprovedToken[] {
 
   if (tokens.length === 0) {
     throw new Error(
-      `No tokens found in ${tokensPath}. Ensure the file contains token categories (color, font, radius, etc.).`
+      `No tokens found in ${tokensPath}. Ensure the file contains token categories (${ALL_TOKEN_TYPES.join(', ')}).`
     );
   }
 
@@ -267,10 +291,186 @@ export function findFiles(pattern: string, cwd: string, ignore: string[]): strin
 }
 
 /**
+ * Extract CSS property values from source code for a given set of property names.
+ * Returns matched values with line numbers. Skips var(--...) references.
+ */
+function extractCssValues(
+  code: string,
+  propertyPattern: RegExp
+): Array<{ value: string; line: number }> {
+  const results: Array<{ value: string; line: number }> = [];
+  const lines = code.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const lineText = lines[i];
+    let match: RegExpExecArray | null;
+    // Reset lastIndex for global regex
+    propertyPattern.lastIndex = 0;
+    while ((match = propertyPattern.exec(lineText)) !== null) {
+      const value = (match[1] ?? '').trim();
+      // Skip CSS custom property references — var(--anything) is never a violation
+      if (!value || /^var\(--/.test(value)) continue;
+      results.push({ value, line: i + 1 });
+    }
+  }
+  return results;
+}
+
+/**
+ * Extract @media breakpoint values from source code.
+ * Matches min-width and max-width inside @media queries.
+ */
+function extractBreakpoints(code: string): Array<{ value: string; line: number }> {
+  const results: Array<{ value: string; line: number }> = [];
+  const lines = code.split('\n');
+  const re = /@media[^{]*(?:min|max)-width:\s*([^)}\s,]+)/g;
+  for (let i = 0; i < lines.length; i++) {
+    re.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(lines[i])) !== null) {
+      const value = (match[1] ?? '').trim();
+      if (!value || /^var\(--/.test(value)) continue;
+      results.push({ value, line: i + 1 });
+    }
+  }
+  return results;
+}
+
+/**
+ * Configuration for extracting values of each additional token type.
+ * Maps token type -> regex that captures the value (group 1).
+ */
+const TOKEN_EXTRACTORS: Array<{
+  tokenType: ComplianceViolationType;
+  extract: (code: string) => Array<{ value: string; line: number }>;
+}> = [
+  {
+    tokenType: 'font-size',
+    extract: (code) => extractCssValues(code, /font-size:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'font-weight',
+    extract: (code) => extractCssValues(code, /font-weight:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'line-height',
+    extract: (code) => extractCssValues(code, /line-height:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'letter-spacing',
+    extract: (code) => extractCssValues(code, /letter-spacing:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'spacing',
+    extract: (code) => extractCssValues(code, /(?:margin|padding|gap):\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'radius',
+    extract: (code) => extractCssValues(code, /border-radius:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'border-width',
+    extract: (code) => extractCssValues(code, /border(?:-width)?:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'z-index',
+    extract: (code) => extractCssValues(code, /z-index:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'opacity',
+    extract: (code) => extractCssValues(code, /opacity:\s*([^;}\n]+)/g),
+  },
+  {
+    tokenType: 'breakpoint',
+    extract: extractBreakpoints,
+  },
+];
+
+/**
+ * Build a Set of approved values for a given token type, lowercased and trimmed.
+ */
+function approvedValueSet(tokens: ApprovedToken[], tokenType: string): Set<string> {
+  return new Set(
+    tokens.filter((t) => t.tokenType === tokenType).map((t) => t.tokenValue.toLowerCase().trim())
+  );
+}
+
+/**
+ * For multi-value shorthand properties (e.g. margin: 8px 16px),
+ * split into individual values and check each.
+ */
+function splitShorthandValues(raw: string): string[] {
+  // Trim and split on whitespace, but keep function calls like rgb(...) together
+  const values: string[] = [];
+  let current = '';
+  let depth = 0;
+  for (const ch of raw) {
+    if (ch === '(') depth++;
+    if (ch === ')') depth--;
+    if (/\s/.test(ch) && depth === 0) {
+      if (current.trim()) values.push(current.trim());
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim()) values.push(current.trim());
+  return values;
+}
+
+/**
  * Scan a single file for token compliance violations.
+ *
+ * Runs the core color/font check via checkTokenCompliance, then performs
+ * additional extraction for all 16 token types and appends violations.
  */
 export function scanFile(filePath: string, tokens: ApprovedToken[]): FileResult {
   const code = fs.readFileSync(filePath, 'utf-8');
+
+  // 1. Run existing core checks (color + font)
   const result = checkTokenCompliance(code, tokens);
+
+  // 2. Run additional token-type checks
+  const additionalViolations: ComplianceViolation[] = [];
+
+  for (const { tokenType, extract } of TOKEN_EXTRACTORS) {
+    const approved = approvedValueSet(tokens, tokenType);
+
+    // Skip types that have no approved values defined
+    if (approved.size === 0) continue;
+
+    const usedValues = extract(code);
+    for (const { value: rawValue, line } of usedValues) {
+      // For shorthand properties (e.g. "8px 16px 8px 16px"), check each part
+      const parts = splitShorthandValues(rawValue);
+      for (const part of parts) {
+        // Skip CSS custom property references
+        if (/^var\(--/.test(part)) continue;
+        // Skip CSS keywords that aren't concrete values (inherit, initial, etc.)
+        if (/^(inherit|initial|unset|revert|auto|none|normal)$/i.test(part)) continue;
+
+        if (!approved.has(part.toLowerCase())) {
+          additionalViolations.push({
+            type: tokenType,
+            severity: 'warning',
+            message: `Unauthorized ${tokenType} value "${part}" at line ${line}`,
+            line,
+            value: part,
+            suggestion: `Replace with an approved ${tokenType} token value`,
+          });
+        }
+      }
+    }
+  }
+
+  if (additionalViolations.length > 0) {
+    result.violations.push(...additionalViolations);
+    result.compliant = result.violations.length === 0;
+
+    // Recalculate score with all violations
+    const errorCount = result.violations.filter((v) => v.severity === 'error').length;
+    const warningCount = result.violations.filter((v) => v.severity === 'warning').length;
+    result.score = Math.max(0, 100 - errorCount * 20 - warningCount * 5);
+  }
+
   return { filePath, result };
 }

@@ -55,3 +55,7 @@ export {
   formatSizeLimit,
   isValidAssetType,
 } from './asset-validation';
+
+// Accessibility rules
+export { DEFAULT_A11Y_RULES, getDefaultA11yRules } from './accessibility';
+export type { A11yRule } from './accessibility';

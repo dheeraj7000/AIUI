@@ -18,7 +18,11 @@ export type { DesignProfileComposition } from './schemas/design-profile.schema';
 
 // Token compliance
 export { checkTokenCompliance } from './validation/token-compliance';
-export type { ComplianceViolation, ComplianceResult } from './validation/token-compliance';
+export type {
+  ComplianceViolationType,
+  ComplianceViolation,
+  ComplianceResult,
+} from './validation/token-compliance';
 
 // Drift detection
 export { detectDrift } from './validation/drift-detection';

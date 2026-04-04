@@ -83,7 +83,13 @@ function getAgeWarning(ageHours: number): string | null {
 interface DesignMemory {
   markdown: string;
   tokensJson: Record<string, Record<string, string>>;
-  componentIndex: Array<{ id: string; name: string; type: string; usage: string | null }>;
+  componentIndex: Array<{
+    id: string;
+    name: string;
+    type: string;
+    tier: string | null;
+    usage: string | null;
+  }>;
   meta: {
     project: string;
     slug: string;
@@ -95,7 +101,90 @@ interface DesignMemory {
     driftScore: number | null;
     driftChanges: DriftChange[];
     version: number;
+    tierCounts: { atom: number; molecule: number; organism: number; template: number };
+    guidelineCoverage: number;
   };
+}
+
+// Token type display order and labels
+const TOKEN_TYPE_LABELS: Record<string, string> = {
+  color: 'Color',
+  font: 'Font Family',
+  'font-size': 'Font Size',
+  'font-weight': 'Font Weight',
+  'line-height': 'Line Height',
+  'letter-spacing': 'Letter Spacing',
+  spacing: 'Spacing',
+  radius: 'Border Radius',
+  shadow: 'Shadow',
+  elevation: 'Elevation',
+  'z-index': 'Z-Index',
+  breakpoint: 'Breakpoint',
+  opacity: 'Opacity',
+  'border-width': 'Border Width',
+  animation: 'Animation',
+  transition: 'Transition',
+};
+
+const TOKEN_TYPE_ORDER = Object.keys(TOKEN_TYPE_LABELS);
+
+// Component tier classification defaults
+const ATOM_TYPES = new Set([
+  'button',
+  'input',
+  'badge',
+  'avatar',
+  'tooltip',
+  'toggle',
+  'checkbox',
+  'radio',
+  'select',
+  'textarea',
+  'switch',
+  'tag',
+  'alert',
+  'divider',
+  'skeleton',
+  'progress',
+  'loader',
+]);
+const MOLECULE_TYPES = new Set([
+  'card',
+  'dropdown',
+  'tabs',
+  'modal',
+  'dialog',
+  'popover',
+  'toast',
+  'breadcrumb',
+  'menu',
+]);
+const ORGANISM_TYPES = new Set([
+  'hero',
+  'pricing',
+  'faq',
+  'footer',
+  'header',
+  'cta',
+  'testimonial',
+  'feature',
+  'contact',
+  'navigation',
+  'table',
+  'sidebar',
+  'toolbar',
+  'stepper',
+  'accordion',
+]);
+const TEMPLATE_TYPES = new Set(['layout', 'page-template']);
+
+function inferTier(type: string, explicit?: string | null): string {
+  if (explicit) return explicit;
+  if (ATOM_TYPES.has(type)) return 'atom';
+  if (MOLECULE_TYPES.has(type)) return 'molecule';
+  if (ORGANISM_TYPES.has(type)) return 'organism';
+  if (TEMPLATE_TYPES.has(type)) return 'template';
+  return 'organism';
 }
 
 async function generateDesignMemory(
@@ -220,18 +309,42 @@ async function generateDesignMemory(
     }
   }
 
-  // Build component index
+  // Fetch voice/tone from design profile
+  const [profileFull] = profile
+    ? await db
+        .select({ voiceToneJson: designProfiles.voiceToneJson })
+        .from(designProfiles)
+        .where(eq(designProfiles.projectId, project.id))
+        .limit(1)
+    : [null];
+  const voiceTone = (profileFull?.voiceToneJson ?? null) as Record<string, unknown> | null;
+
+  // Build component index with tier
   const componentIndex = recipes.map((r) => ({
     id: r.id,
     name: r.name,
     type: r.type,
+    tier: inferTier(r.type, (r as Record<string, unknown>).tier as string | null),
     usage: r.aiUsageRules,
   }));
+
+  // Tier counts
+  const tierCounts = { atom: 0, molecule: 0, organism: 0, template: 0 };
+  for (const c of componentIndex) {
+    if (c.tier in tierCounts) tierCounts[c.tier as keyof typeof tierCounts]++;
+  }
+
+  // Guideline coverage
+  const withGuidelines = recipes.filter(
+    (r) => (r as Record<string, unknown>).guidelinesJson
+  ).length;
+  const guidelineCoverage =
+    recipes.length > 0 ? Math.round((withGuidelines / recipes.length) * 100) : 0;
 
   const syncedAt = new Date().toISOString();
 
   // ---------------------------------------------------------------------------
-  // Generate markdown
+  // Generate markdown — Full 5-Layer Design System
   // ---------------------------------------------------------------------------
   const lines: string[] = [];
 
@@ -262,7 +375,9 @@ async function generateDesignMemory(
   lines.push(`**Slug:** ${project.slug}  `);
   lines.push(`**Framework:** ${project.frameworkTarget}  `);
   lines.push(`**Style Pack:** ${pack ? pack.name : 'None'}  `);
-  lines.push(`**Components:** ${recipes.length}  `);
+  lines.push(
+    `**Components:** ${recipes.length} (${tierCounts.atom} atoms, ${tierCounts.molecule} molecules, ${tierCounts.organism} organisms, ${tierCounts.template} templates)  `
+  );
   lines.push(`**Tokens:** ${tokens.length}  `);
   lines.push('');
 
@@ -270,7 +385,7 @@ async function generateDesignMemory(
   lines.push('## Design Rules');
   lines.push('');
   lines.push(
-    '1. **Use ONLY these tokens** for all design values — never hardcode colors, fonts, spacing, or shadows'
+    '1. **Use ONLY these tokens** for all design values — never hardcode colors, fonts, spacing, shadows, or any design values'
   );
   lines.push('2. **Use ONLY the selected components** listed below as building blocks');
   lines.push(
@@ -278,14 +393,38 @@ async function generateDesignMemory(
   );
   lines.push('4. **Call `validate_ui_output`** after generating UI to check design compliance');
   lines.push('5. **Match the framework target** — generate code for ' + project.frameworkTarget);
+  lines.push(
+    '6. **Follow accessibility guidelines** — use proper ARIA roles, keyboard navigation, and focus management'
+  );
+  lines.push('7. **Respect component variants** — use the defined variant values, not custom ones');
   lines.push('');
 
-  // Tokens
+  // =========================================================================
+  // LAYER 1: Foundation Tokens
+  // =========================================================================
   if (tokens.length > 0) {
-    lines.push('## Design Tokens');
+    lines.push('## Layer 1: Foundation Tokens');
     lines.push('');
 
+    // Render tokens in defined order, skip empty types
+    for (const type of TOKEN_TYPE_ORDER) {
+      const typeTokens = tokensByType[type];
+      if (!typeTokens || Object.keys(typeTokens).length === 0) continue;
+
+      const label = TOKEN_TYPE_LABELS[type] ?? type;
+      lines.push(`### ${label}`);
+      lines.push('');
+      lines.push('| Token | Value |');
+      lines.push('|---|---|');
+      for (const [key, value] of Object.entries(typeTokens)) {
+        lines.push(`| \`${key}\` | \`${value}\` |`);
+      }
+      lines.push('');
+    }
+
+    // Render any types not in TOKEN_TYPE_ORDER (future-proof)
     for (const [type, typeTokens] of Object.entries(tokensByType)) {
+      if (TOKEN_TYPE_ORDER.includes(type)) continue;
       lines.push(`### ${type.charAt(0).toUpperCase() + type.slice(1)}`);
       lines.push('');
       lines.push('| Token | Value |');
@@ -297,23 +436,217 @@ async function generateDesignMemory(
     }
   }
 
-  // Components
+  // =========================================================================
+  // LAYER 2-4: Component Library (grouped by tier)
+  // =========================================================================
   if (recipes.length > 0) {
-    lines.push('## Selected Components');
+    lines.push('## Layer 2-4: Component Library');
     lines.push('');
     lines.push(
       'Call `get_component_recipe(recipeId)` to get the full code template for any component.'
     );
     lines.push('');
 
-    for (const r of recipes) {
-      lines.push(`### ${r.name}`);
-      lines.push(`- **Type:** ${r.type}`);
-      lines.push(`- **ID:** \`${r.id}\``);
-      if (r.aiUsageRules) {
-        lines.push(`- **Usage:** ${r.aiUsageRules}`);
+    const tierOrder = ['atom', 'molecule', 'organism', 'template'] as const;
+    const tierLabels = {
+      atom: 'Atomic Components',
+      molecule: 'Molecular Components',
+      organism: 'Organisms',
+      template: 'Templates',
+    };
+
+    for (const tier of tierOrder) {
+      const tierRecipes = recipes.filter(
+        (r) => inferTier(r.type, (r as Record<string, unknown>).tier as string | null) === tier
+      );
+      if (tierRecipes.length === 0) continue;
+
+      lines.push(`### ${tierLabels[tier]}`);
+      lines.push('');
+
+      for (const r of tierRecipes) {
+        const rec = r as Record<string, unknown>;
+        lines.push(`#### ${r.name}`);
+        lines.push(`- **Type:** ${r.type}`);
+        lines.push(`- **Tier:** ${tier}`);
+        lines.push(`- **ID:** \`${r.id}\``);
+
+        // Variants
+        const variants = rec.variantsSchema as Record<
+          string,
+          { values: string[]; default: string }
+        > | null;
+        if (variants && Object.keys(variants).length > 0) {
+          lines.push('- **Variants:**');
+          for (const [dim, spec] of Object.entries(variants)) {
+            lines.push(`  - \`${dim}\`: ${spec.values.join(', ')} (default: ${spec.default})`);
+          }
+        }
+
+        // States
+        const states = rec.statesSchema as { states?: string[] } | null;
+        if (states?.states && states.states.length > 0) {
+          lines.push(`- **States:** ${states.states.join(', ')}`);
+        }
+
+        // Composition
+        const composed = rec.composedOf as Array<{
+          role: string;
+          componentType: string;
+          required: boolean;
+        }> | null;
+        if (composed && composed.length > 0) {
+          lines.push('- **Composed of:**');
+          for (const ref of composed) {
+            lines.push(
+              `  - \`${ref.role}\`: ${ref.componentType}${ref.required ? ' (required)' : ''}`
+            );
+          }
+        }
+
+        // Usage rules
+        if (r.aiUsageRules) {
+          lines.push(`- **Usage:** ${r.aiUsageRules}`);
+        }
+
+        lines.push('');
+      }
+    }
+  }
+
+  // =========================================================================
+  // LAYER 5: Guidelines & Documentation
+  // =========================================================================
+  const recipesWithGuidelines = recipes.filter(
+    (r) => (r as Record<string, unknown>).guidelinesJson
+  );
+  if (recipesWithGuidelines.length > 0) {
+    lines.push('## Layer 5: Component Guidelines');
+    lines.push('');
+
+    for (const r of recipesWithGuidelines) {
+      const g = (r as Record<string, unknown>).guidelinesJson as Record<string, unknown>;
+      if (!g) continue;
+
+      lines.push(`### ${r.name} Guidelines`);
+      lines.push('');
+
+      const whenToUse = g.whenToUse as string[] | undefined;
+      if (whenToUse?.length) {
+        lines.push('**When to use:**');
+        for (const item of whenToUse) lines.push(`- ${item}`);
+        lines.push('');
+      }
+
+      const whenNotToUse = g.whenNotToUse as string[] | undefined;
+      if (whenNotToUse?.length) {
+        lines.push('**When NOT to use:**');
+        for (const item of whenNotToUse) lines.push(`- ${item}`);
+        lines.push('');
+      }
+
+      const doPatterns = g.doPatterns as string[] | undefined;
+      if (doPatterns?.length) {
+        lines.push('**Do:**');
+        for (const item of doPatterns) lines.push(`- ${item}`);
+        lines.push('');
+      }
+
+      const dontPatterns = g.dontPatterns as string[] | undefined;
+      if (dontPatterns?.length) {
+        lines.push("**Don't:**");
+        for (const item of dontPatterns) lines.push(`- ${item}`);
+        lines.push('');
+      }
+
+      const a11y = g.accessibility as Record<string, unknown> | undefined;
+      if (a11y) {
+        lines.push('**Accessibility:**');
+        if (a11y.ariaRoles) lines.push(`- ARIA roles: ${(a11y.ariaRoles as string[]).join(', ')}`);
+        if (a11y.keyboardNav)
+          lines.push(`- Keyboard: ${(a11y.keyboardNav as string[]).join('; ')}`);
+        if (a11y.focusManagement) lines.push(`- Focus: ${a11y.focusManagement}`);
+        if (a11y.screenReader) lines.push(`- Screen reader: ${a11y.screenReader}`);
+        if (a11y.contrastNotes) lines.push(`- Contrast: ${a11y.contrastNotes}`);
+        lines.push('');
+      }
+
+      const content = g.contentGuidelines as Record<string, unknown> | undefined;
+      if (content) {
+        lines.push('**Content:**');
+        if (content.tone) lines.push(`- Tone: ${content.tone}`);
+        if (content.capitalization) lines.push(`- Capitalization: ${content.capitalization}`);
+        if (content.maxLength) lines.push(`- Max length: ${content.maxLength} characters`);
+        lines.push('');
+      }
+    }
+  }
+
+  // Accessibility Standards (global)
+  lines.push('## Accessibility Standards');
+  lines.push('');
+  lines.push('All generated UI must follow these accessibility requirements:');
+  lines.push('');
+  lines.push('- **Color contrast:** WCAG AA minimum 4.5:1 for normal text, 3:1 for large text');
+  lines.push('- **Focus indicators:** All interactive elements must have visible focus rings');
+  lines.push(
+    '- **Keyboard navigation:** All functionality available via keyboard (Tab, Enter, Space, Escape, Arrow keys)'
+  );
+  lines.push(
+    '- **ARIA labels:** Interactive elements without visible text must have aria-label or aria-labelledby'
+  );
+  lines.push(
+    '- **Semantic HTML:** Use native HTML elements (button, input, nav, etc.) before ARIA roles'
+  );
+  lines.push('- **Form labels:** Every input must have an associated label element');
+  lines.push('- **Image alt text:** All img elements must have meaningful alt attributes');
+  lines.push('- **Heading hierarchy:** Use h1-h6 in order without skipping levels');
+  lines.push('- **Motion safety:** Respect prefers-reduced-motion media query for animations');
+  lines.push('- **Touch targets:** Interactive elements must be at least 44x44px');
+  lines.push('');
+
+  // Voice & Tone
+  if (voiceTone) {
+    lines.push('## Voice & Tone');
+    lines.push('');
+
+    const attrs = voiceTone.voiceAttributes as string[] | undefined;
+    if (attrs?.length) {
+      lines.push(`**Voice:** ${attrs.join(', ')}`);
+      lines.push('');
+    }
+
+    const toneGuidelines = voiceTone.toneGuidelines as Record<string, string> | undefined;
+    if (toneGuidelines && Object.keys(toneGuidelines).length > 0) {
+      lines.push('**Tone by context:**');
+      for (const [context, tone] of Object.entries(toneGuidelines)) {
+        lines.push(`- **${context}:** ${tone}`);
       }
       lines.push('');
+    }
+
+    const rules = voiceTone.writingRules as string[] | undefined;
+    if (rules?.length) {
+      lines.push('**Writing rules:**');
+      for (const rule of rules) lines.push(`- ${rule}`);
+      lines.push('');
+    }
+
+    const terminology = voiceTone.terminology as
+      | { preferred?: Record<string, string>; avoided?: string[] }
+      | undefined;
+    if (terminology) {
+      if (terminology.preferred && Object.keys(terminology.preferred).length > 0) {
+        lines.push('**Preferred terms:**');
+        for (const [term, note] of Object.entries(terminology.preferred)) {
+          lines.push(`- Use "${term}" (${note})`);
+        }
+        lines.push('');
+      }
+      if (terminology.avoided?.length) {
+        lines.push(`**Avoid:** ${terminology.avoided.join(', ')}`);
+        lines.push('');
+      }
     }
   }
 
@@ -374,6 +707,8 @@ async function generateDesignMemory(
       driftScore,
       driftChanges,
       version: currentVersion,
+      tierCounts,
+      guidelineCoverage,
     },
   };
 }

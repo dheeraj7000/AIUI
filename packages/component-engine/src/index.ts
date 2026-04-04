@@ -5,6 +5,10 @@ export type {
   ComponentSelection,
   ResolvedComponent,
   ResolutionResult,
+  VariantDimension,
+  StateDef,
+  CompositionRef,
+  CompositionInfo,
 } from './resolver';
 
 // Validation

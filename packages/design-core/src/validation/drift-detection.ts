@@ -1,5 +1,6 @@
 export interface DriftChange {
   tokenKey: string;
+  tokenType?: string;
   type: 'added' | 'removed' | 'changed';
   oldValue?: string;
   newValue?: string;
@@ -32,13 +33,24 @@ export function detectDrift(
 
   let unchanged = 0;
 
+  const extractTokenType = (key: string): string | undefined => {
+    const dotIndex = key.indexOf('.');
+    return dotIndex > 0 ? key.substring(0, dotIndex) : undefined;
+  };
+
   // Check for changed and removed tokens
   for (const key of baselineKeys) {
     if (!currentKeys.has(key)) {
-      changes.push({ tokenKey: key, type: 'removed', oldValue: baseline[key] });
+      changes.push({
+        tokenKey: key,
+        tokenType: extractTokenType(key),
+        type: 'removed',
+        oldValue: baseline[key],
+      });
     } else if (current[key] !== baseline[key]) {
       changes.push({
         tokenKey: key,
+        tokenType: extractTokenType(key),
         type: 'changed',
         oldValue: baseline[key],
         newValue: current[key],
@@ -51,7 +63,12 @@ export function detectDrift(
   // Check for added tokens
   for (const key of currentKeys) {
     if (!baselineKeys.has(key)) {
-      changes.push({ tokenKey: key, type: 'added', newValue: current[key] });
+      changes.push({
+        tokenKey: key,
+        tokenType: extractTokenType(key),
+        type: 'added',
+        newValue: current[key],
+      });
     }
   }
 

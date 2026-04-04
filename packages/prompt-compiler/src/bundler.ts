@@ -4,14 +4,23 @@ import { validateTokens } from './validator';
 import type { TokenMap, MergeOptions } from './types';
 import type { ValidationResult } from './validator';
 
+export interface ComponentTierGroup {
+  atom: string[];
+  molecule: string[];
+  organism: string[];
+  template: string[];
+}
+
 export interface PromptBundle {
   project: string;
   framework: string;
   stylePack: string;
   tokens: Record<string, string | number | boolean>;
   allowedComponents: string[];
+  componentTiers: ComponentTierGroup;
   assets: Record<string, string>;
   rules: string[];
+  voiceTone: Record<string, unknown> | null;
   meta: {
     generatedAt: string;
     version: number;
@@ -27,8 +36,10 @@ export interface BundleInput {
   baseTokens: TokenMap;
   overrideTokens: TokenMap;
   selectedComponents: string[];
+  componentTiers?: ComponentTierGroup;
   assets: Record<string, string>;
   customRules?: string[];
+  voiceTone?: Record<string, unknown> | null;
   version?: number;
   mergeOptions?: MergeOptions;
 }
@@ -50,6 +61,10 @@ const DEFAULT_RULES = [
   'Use only approved components listed in allowedComponents',
   'Do not introduce new font families beyond those in tokens',
   'Follow the token naming convention for all design values',
+  'Use semantic HTML elements before ARIA roles',
+  'Ensure WCAG AA color contrast (4.5:1 minimum)',
+  'All interactive elements must be keyboard accessible',
+  'Respect prefers-reduced-motion for animations',
 ];
 
 /**
@@ -94,8 +109,10 @@ export function generateBundle(input: BundleInput): BundleResult {
     stylePack: input.stylePackId,
     tokens: { ...mergeResult.tokens } as Record<string, string | number | boolean>,
     allowedComponents: input.selectedComponents,
+    componentTiers: input.componentTiers ?? { atom: [], molecule: [], organism: [], template: [] },
     assets: input.assets,
     rules,
+    voiceTone: input.voiceTone ?? null,
   };
 
   // Step 5: Compute checksum over the body
