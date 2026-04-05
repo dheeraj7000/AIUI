@@ -4,8 +4,10 @@ import {
   updateMemberRole,
   removeMember,
   updateRoleSchema,
+  organizationMembers,
   type OrgRole,
 } from '@aiui/design-core';
+import { eq, and } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -16,19 +18,42 @@ function getDb() {
 type RouteContext = { params: Promise<{ orgId: string; userId: string }> };
 
 /**
+ * Resolve the acting user's role in the organization from the database.
+ */
+async function getActorRole(
+  db: ReturnType<typeof createDb>,
+  orgId: string,
+  userId: string
+): Promise<OrgRole | null> {
+  const [membership] = await db
+    .select({ role: organizationMembers.role })
+    .from(organizationMembers)
+    .where(
+      and(eq(organizationMembers.organizationId, orgId), eq(organizationMembers.userId, userId))
+    )
+    .limit(1);
+  return (membership?.role as OrgRole) ?? null;
+}
+
+/**
  * PATCH /api/organizations/[orgId]/members/[userId] — Update a member's role.
  */
 export async function PATCH(req: NextRequest, context: RouteContext) {
   const actorId = req.headers.get('x-user-id');
-  const actorRole = req.headers.get('x-user-role') as OrgRole | null;
-  if (!actorId || !actorRole) {
+  if (!actorId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const { orgId, userId: targetUserId } = await context.params;
-    const body = await req.json();
+    const db = getDb();
 
+    const actorRole = await getActorRole(db, orgId, actorId);
+    if (!actorRole) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json();
     const parsed = updateRoleSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -37,7 +62,6 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const db = getDb();
     const result = await updateMemberRole(
       db,
       orgId,
@@ -69,14 +93,19 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
  */
 export async function DELETE(req: NextRequest, context: RouteContext) {
   const actorId = req.headers.get('x-user-id');
-  const actorRole = req.headers.get('x-user-role') as OrgRole | null;
-  if (!actorId || !actorRole) {
+  if (!actorId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const { orgId, userId: targetUserId } = await context.params;
     const db = getDb();
+
+    const actorRole = await getActorRole(db, orgId, actorId);
+    if (!actorRole) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const result = await removeMember(db, orgId, targetUserId, actorRole);
 
     if ('error' in result) {

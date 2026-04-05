@@ -13,7 +13,7 @@ export interface InitOptions {
   registry?: string;
 }
 
-const DEFAULT_REGISTRY = 'http://localhost:3000';
+const DEFAULT_REGISTRY = process.env.AIUI_REGISTRY_URL ?? 'https://app.aiui.dev';
 const DEFAULT_PACK = 'saas-clean';
 
 export async function init(options: InitOptions): Promise<void> {
