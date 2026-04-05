@@ -3,7 +3,10 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 export function createDb(connectionString: string) {
-  const client = postgres(connectionString);
+  const isProduction = process.env.NODE_ENV === 'production';
+  const client = postgres(connectionString, {
+    ssl: isProduction ? 'require' : false,
+  });
   return drizzle(client, { schema });
 }
 

@@ -1,0 +1,41 @@
+# Production overrides — use with: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+services:
+  postgres:
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  mcp-server:
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://aiui:${POSTGRES_PASSWORD}@postgres:5432/aiui
+      MCP_CORS_ORIGINS: ${MCP_CORS_ORIGINS:-*}
+      MCP_RATE_LIMIT: ${MCP_RATE_LIMIT:-60}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://aiui:${POSTGRES_PASSWORD}@postgres:5432/aiui
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

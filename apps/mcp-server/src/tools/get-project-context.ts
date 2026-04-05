@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { getProjectContext } from '@aiui/design-core/src/operations/project-context';
+import { getProjectContext } from '@aiui/design-core';
 import { projects, designProfiles } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 

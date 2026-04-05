@@ -12,6 +12,9 @@ import type { AiuiMcpServer } from './server';
 // Configuration
 // ---------------------------------------------------------------------------
 
+const SERVER_START_TIME = Date.now();
+const TOOLS_COUNT = 10; // Number of registered MCP tools
+
 const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const CLEANUP_INTERVAL_MS = 60_000; // 1 minute
 const MAX_SESSIONS = parseInt(process.env.MCP_MAX_SESSIONS ?? '1000', 10);
@@ -100,25 +103,146 @@ export async function startHttpServer(port: number) {
   app.get('/health', (_req, res) => {
     res.json({
       status: 'ok',
+      version: process.env.npm_package_version || '0.1.0',
+      uptime_seconds: Math.floor((Date.now() - SERVER_START_TIME) / 1000),
+      tools_count: TOOLS_COUNT,
+      sessions_active: transports.size,
       transport: 'streamable-http',
-      sessions: transports.size,
     });
+  });
+
+  // Connection test endpoint — verify authentication without starting a session
+  app.get('/mcp/test', async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization || null;
+      const context = await authenticateRequest(authHeader);
+
+      if (!context) {
+        res.status(401).json({
+          error: 'Authentication required',
+          message: 'Provide an API key via Authorization: Bearer aiui_k_xxx',
+          setup_url: '/mcp/setup',
+        });
+        return;
+      }
+
+      res.json({
+        authenticated: true,
+        userId: context.userId,
+        organizationId: context.organizationId,
+        projectId: context.projectId || null,
+        scopes: context.scopes,
+      });
+    } catch {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Setup instructions endpoint — generate client configuration snippets
+  app.get('/mcp/setup', (req, res) => {
+    const baseUrl = (req.query.url as string) || `${req.protocol}://${req.get('host')}`;
+    const apiKey = (req.query.key as string) || 'aiui_k_YOUR_API_KEY';
+
+    const setup = {
+      claude_code: `claude mcp add --transport http aiui ${baseUrl}/mcp --header "Authorization:Bearer ${apiKey}"`,
+      cursor: {
+        mcpServers: {
+          aiui: {
+            type: 'streamable-http',
+            url: `${baseUrl}/mcp`,
+            headers: { Authorization: `Bearer ${apiKey}` },
+          },
+        },
+      },
+      vscode: {
+        'mcp.servers': {
+          aiui: {
+            type: 'streamable-http',
+            url: `${baseUrl}/mcp`,
+            headers: { Authorization: `Bearer ${apiKey}` },
+          },
+        },
+      },
+      windsurf: {
+        mcpServers: {
+          aiui: {
+            serverUrl: `${baseUrl}/mcp`,
+            headers: { Authorization: `Bearer ${apiKey}` },
+          },
+        },
+      },
+    };
+
+    const format = req.query.format as string;
+    if (format === 'markdown') {
+      let md = '# AIUI MCP Setup\n\n';
+      md += '## Claude Code\n```bash\n' + setup.claude_code + '\n```\n\n';
+      md +=
+        '## Cursor (.cursor/mcp.json)\n```json\n' +
+        JSON.stringify(setup.cursor, null, 2) +
+        '\n```\n\n';
+      md +=
+        '## VS Code (settings.json)\n```json\n' +
+        JSON.stringify(setup.vscode, null, 2) +
+        '\n```\n\n';
+      md += '## Windsurf\n```json\n' + JSON.stringify(setup.windsurf, null, 2) + '\n```\n';
+      res.type('text/markdown').send(md);
+    } else {
+      res.json(setup);
+    }
   });
 
   // CORS — configurable via MCP_CORS_ORIGINS env var
   const allowedOrigins = process.env.MCP_CORS_ORIGINS?.split(',').map((s) => s.trim()) ?? ['*'];
+  const corsAllowAll = allowedOrigins.includes('*');
 
   app.use('/mcp', (req: Request, res: Response, next: NextFunction) => {
-    const origin = req.headers.origin ?? '*';
-    const allowed = allowedOrigins.includes('*') || allowedOrigins.includes(origin);
-    res.setHeader('Access-Control-Allow-Origin', allowed ? origin : '');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Mcp-Session-Id');
-    res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id');
+    const origin = req.headers.origin;
+
+    if (corsAllowAll) {
+      // Permissive mode — allow any origin
+      res.setHeader('Access-Control-Allow-Origin', origin ?? '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Mcp-Session-Id');
+      res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id');
+      if (req.method === 'OPTIONS') {
+        res.status(204).end();
+        return;
+      }
+      next();
+      return;
+    }
+
+    // Strict mode — check origin against allowlist
+    res.setHeader('Vary', 'Origin');
+
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Mcp-Session-Id');
+      res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id');
+      if (req.method === 'OPTIONS') {
+        res.status(204).end();
+        return;
+      }
+      next();
+      return;
+    }
+
+    // Origin not allowed
     if (req.method === 'OPTIONS') {
+      // Omit CORS headers — browser will block the preflight
       res.status(204).end();
       return;
     }
+
+    if (origin) {
+      // Non-preflight from disallowed origin
+      res.status(403).json({ error: 'Origin not allowed' });
+      return;
+    }
+
+    // No Origin header (non-browser client) — allow through
     next();
   });
 

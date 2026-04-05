@@ -7,11 +7,16 @@ import { registerAssetManifest } from './asset-manifest';
 import { registerValidateUiOutput } from './validate-ui-output';
 import { registerDesignMemory } from './design-memory';
 import { registerDesignStudio } from './design-studio';
+import { registerWriteStylePack } from './write-style-pack';
+import { registerWriteTokens } from './write-tokens';
+import { registerWriteProject } from './write-project';
+import { registerFixCompliance } from './fix-compliance';
 
 /**
  * Register all AIUI tools with the MCP server.
  */
 export function registerAllTools(server: AiuiMcpServer) {
+  // Read tools
   registerGetProjectContext(server);
   registerResolveTag(server);
   registerComponentTools(server);
@@ -20,4 +25,10 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerValidateUiOutput(server);
   registerDesignMemory(server);
   registerDesignStudio(server);
+
+  // Write tools
+  registerWriteStylePack(server);
+  registerWriteTokens(server);
+  registerWriteProject(server);
+  registerFixCompliance(server);
 }

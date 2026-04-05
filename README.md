@@ -62,12 +62,7 @@ Edit `apps/web/.env.local`:
 
 ```env
 DATABASE_URL=postgresql://aiui:aiui@127.0.0.1:5432/aiui
-NEXT_PUBLIC_COGNITO_USER_POOL_ID=us-east-1_xxxxx
-NEXT_PUBLIC_COGNITO_CLIENT_ID=xxxxx
-NEXT_PUBLIC_COGNITO_REGION=us-east-1
 ```
-
-> Cognito values are placeholders. The app uses local auth (email/password with JWT) for development — sign-up and sign-in work without Cognito configured.
 
 ### 5. Build and run
 
@@ -91,8 +86,6 @@ packages/
   ui/               Shared React components (Tailwind + CVA)
   prompt-compiler/  Token merging, validation, Tailwind/CSS export
   component-engine/ Component resolution and rule validation
-
-infrastructure/     AWS CDK stacks (VPC, RDS, S3, CloudFront, Cognito, App Runner, Monitoring)
 ```
 
 ## Pages
@@ -131,7 +124,67 @@ AIUI exposes 10 tools via the Model Context Protocol:
 
 ## Using AIUI with Claude Code
 
-### Option A: Local MCP (development)
+### Option A: Remote MCP (recommended)
+
+Add AIUI to your AI coding assistant with a single command. No local setup required.
+
+**Claude Code:**
+
+```bash
+claude mcp add --transport http aiui https://your-aiui-host/mcp --header "Authorization:Bearer YOUR_API_KEY"
+```
+
+**Cursor** (`.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "aiui": {
+      "type": "streamable-http",
+      "url": "https://your-aiui-host/mcp",
+      "headers": { "Authorization": "Bearer YOUR_API_KEY" }
+    }
+  }
+}
+```
+
+**VS Code** (`settings.json`):
+
+```json
+{
+  "mcp.servers": {
+    "aiui": {
+      "type": "streamable-http",
+      "url": "https://your-aiui-host/mcp",
+      "headers": { "Authorization": "Bearer YOUR_API_KEY" }
+    }
+  }
+}
+```
+
+**Windsurf:**
+
+```json
+{
+  "mcpServers": {
+    "aiui": {
+      "serverUrl": "https://your-aiui-host/mcp",
+      "headers": { "Authorization": "Bearer YOUR_API_KEY" }
+    }
+  }
+}
+```
+
+Get your API key from the project integrations page, or visit `/mcp/setup` on your AIUI host to generate ready-to-paste configuration snippets.
+
+**Verify your connection:**
+
+```bash
+curl https://your-aiui-host/health
+curl https://your-aiui-host/mcp/test -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Option B: Local MCP (development)
 
 Add this `.mcp.json` to the project where you want Claude to use your design system:
 
@@ -172,26 +225,6 @@ Always follow the design rules defined there before building any UI.
 
 Now Claude automatically follows your design system when building UI.
 
-### Option B: Remote MCP (production)
-
-When deployed, add a single URL + API key:
-
-```json
-{
-  "mcpServers": {
-    "aiui": {
-      "type": "streamable-http",
-      "url": "https://mcp.aiui.dev/mcp",
-      "headers": {
-        "Authorization": "Bearer aiui_k_xxxxxxxxxxxx"
-      }
-    }
-  }
-}
-```
-
-API keys are generated from the project integrations page.
-
 ## Design Library
 
 The seed data includes 6 style packs:
@@ -227,15 +260,13 @@ MCP_SERVER_PORT=8080 DATABASE_URL="..." \
 
 ## Tech Stack
 
-| Layer          | Technology                                          |
-| -------------- | --------------------------------------------------- |
-| Framework      | Next.js 16 (React 19, Turbopack)                    |
-| Styling        | Tailwind CSS 4, CVA, tailwind-merge                 |
-| Database       | PostgreSQL 15 + Drizzle ORM                         |
-| Auth           | Local JWT (dev) / AWS Cognito (prod)                |
-| MCP            | @modelcontextprotocol/sdk (stdio + Streamable HTTP) |
-| Storage        | AWS S3 + CloudFront                                 |
-| Infrastructure | AWS CDK (7 stacks)                                  |
-| Monorepo       | pnpm workspaces + Turborepo                         |
-| Linting        | ESLint 10 + Prettier                                |
-| Testing        | Vitest                                              |
+| Layer     | Technology                                          |
+| --------- | --------------------------------------------------- |
+| Framework | Next.js 16 (React 19, Turbopack)                    |
+| Styling   | Tailwind CSS 4, CVA, tailwind-merge                 |
+| Database  | PostgreSQL 15 + Drizzle ORM                         |
+| Auth      | Local JWT (email/password + bcrypt)                 |
+| MCP       | @modelcontextprotocol/sdk (stdio + Streamable HTTP) |
+| Monorepo  | pnpm workspaces + Turborepo                         |
+| Linting   | ESLint 10 + Prettier                                |
+| Testing   | Vitest                                              |

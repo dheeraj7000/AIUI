@@ -24,6 +24,8 @@ export { designProfiles } from './design-profiles';
 export { promptBundles } from './prompt-bundles';
 export { invitations, invitationStatusEnum, invitationRoleEnum } from './invitations';
 export { apiKeys } from './api-keys';
+export { usageEvents, creditLedger } from './usage';
+export { packRegistry, packRatings } from './marketplace';
 
 // Relations
 export {

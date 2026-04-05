@@ -1,6 +1,6 @@
 import { verifyApiKey, type ApiKeyContext } from '@aiui/design-core';
 import { getDb } from './db';
-import { log } from './errors';
+import { log, ToolError } from './errors';
 
 /**
  * Verify a Bearer token from the Authorization header.
@@ -24,5 +24,15 @@ export async function authenticateRequest(
   } catch (error) {
     log('error', 'API key verification failed', { error: String(error) });
     return null;
+  }
+}
+
+/**
+ * Check that the required scope is present in the provided scopes list.
+ * Throws a ToolError if the scope is missing.
+ */
+export function requireScope(scopes: string[], required: string): void {
+  if (!scopes.includes(required)) {
+    throw new ToolError(`Insufficient scope: requires '${required}'`, 'FORBIDDEN');
   }
 }

@@ -1,28 +1,54 @@
 {
   "name": "@aiui/mcp-server",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "AIUI Design System MCP server — connect Claude, Cursor, Windsurf, Copilot, and Cline to your design system",
+  "type": "module",
+  "bin": {
+    "aiui-mcp-server": "./dist/index.js"
+  },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
+    "build:tsc": "tsc",
+    "prepublishOnly": "pnpm run build",
     "start": "tsx src/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "drizzle-orm": "^0.45.2",
+    "express": "^5.2.1",
+    "postgres": "^3.4.8",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
     "@aiui/component-engine": "workspace:*",
     "@aiui/design-core": "workspace:*",
     "@aiui/prompt-compiler": "workspace:*",
     "@aiui/types": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.12.1",
-    "drizzle-orm": "^0.45.2",
-    "express": "^5.2.1",
-    "zod": "^4.3.6"
-  },
-  "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
+    "tsup": "^8.4.0",
     "tsx": "^4.21.0"
-  }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "aiui",
+    "design-system",
+    "claude",
+    "cursor",
+    "windsurf",
+    "copilot",
+    "cline",
+    "model-context-protocol"
+  ],
+  "license": "MIT"
 }
