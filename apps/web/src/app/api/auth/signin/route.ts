@@ -3,6 +3,7 @@ import { createDb, users } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { createToken } from '@/lib/jwt';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -16,6 +17,18 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+    }
+
+    // Rate limit by email (5 attempts per minute)
+    const rateLimited = checkRateLimit(`signin:${email.toLowerCase()}`);
+    if (rateLimited) {
+      return NextResponse.json(
+        { error: rateLimited.error },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateLimited.retryAfter) },
+        }
+      );
     }
 
     const db = getDb();

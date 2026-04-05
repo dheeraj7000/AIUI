@@ -94,11 +94,12 @@ export async function signUp(
 /**
  * No-op for local auth — sign-up is auto-confirmed.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export async function confirmSignUp(
   email: string,
   code: string
 ): Promise<{ isSignUpComplete: boolean }> {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   return { isSignUpComplete: true };
 }
 
@@ -123,12 +124,13 @@ export async function forgotPassword(
 /**
  * No-op for local auth.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export async function confirmForgotPassword(
   email: string,
   code: string,
   newPassword: string
 ): Promise<void> {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   // no-op
 }
 
@@ -148,8 +150,32 @@ export async function getSession(forceRefresh = false): Promise<AuthSession | nu
 }
 
 /**
- * Return the current session (no real refresh for local auth).
+ * Refresh the current session by exchanging the access token for a new pair.
  */
 export async function refreshSession(): Promise<AuthSession | null> {
-  return currentSession;
+  if (!currentSession?.accessToken) return null;
+
+  try {
+    const res = await fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${currentSession.accessToken}`,
+      },
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+
+    currentSession = {
+      accessToken: data.accessToken,
+      idToken: data.idToken,
+      refreshToken: '',
+      expiresAt: data.expiresAt,
+    };
+
+    return currentSession;
+  } catch {
+    return null;
+  }
 }

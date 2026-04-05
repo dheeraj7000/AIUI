@@ -3,11 +3,30 @@ import { createDb, users } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { createToken } from '@/lib/jwt';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('DATABASE_URL is not set');
   return createDb(url);
+}
+
+const PASSWORD_MIN_LENGTH = 8;
+
+function validatePassword(password: string): string | null {
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return `Password must be at least ${PASSWORD_MIN_LENGTH} characters`;
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!/[a-z]/.test(password)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  if (!/[0-9]/.test(password)) {
+    return 'Password must contain at least one number';
+  }
+  return null;
 }
 
 export async function POST(req: NextRequest) {
@@ -16,6 +35,24 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+    }
+
+    // Rate limit by email (5 attempts per minute)
+    const rateLimited = checkRateLimit(`signup:${email.toLowerCase()}`);
+    if (rateLimited) {
+      return NextResponse.json(
+        { error: rateLimited.error },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateLimited.retryAfter) },
+        }
+      );
+    }
+
+    // Validate password complexity
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     const db = getDb();

@@ -21,13 +21,9 @@ const ISSUER = 'aiui-local';
 
 function getSecret(): Uint8Array {
   const key = process.env.JWT_SECRET ?? DEFAULT_SECRET;
-  if (
-    key === DEFAULT_SECRET &&
-    process.env.NODE_ENV === 'production' &&
-    typeof globalThis.fetch !== 'undefined' // skip during build (no runtime)
-  ) {
-    console.warn(
-      'WARNING: JWT_SECRET is not set — using insecure default. Set JWT_SECRET in production.'
+  if (key === DEFAULT_SECRET && process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'FATAL: JWT_SECRET is not set. Set the JWT_SECRET environment variable before running in production.'
     );
   }
   return new TextEncoder().encode(key);
