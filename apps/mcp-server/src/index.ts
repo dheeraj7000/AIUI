@@ -6,7 +6,8 @@ import { log } from './lib/errors';
 
 async function main() {
   const port = process.env.MCP_SERVER_PORT ? parseInt(process.env.MCP_SERVER_PORT, 10) : null;
-  const apiKey = process.env.AIUI_API_KEY;
+  const apiKeyFlag = process.argv.find((a) => a.startsWith('--api-key='))?.split('=')[1];
+  const apiKey = apiKeyFlag ?? process.env.AIUI_API_KEY;
   const isLocal = process.argv.includes('--local');
 
   if (port) {

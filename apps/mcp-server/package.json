@@ -52,5 +52,13 @@
     "cline",
     "model-context-protocol"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/dkumar70/AIUI"
+  },
+  "homepage": "https://gitlab.com/dkumar70/AIUI",
+  "bugs": {
+    "url": "https://gitlab.com/dkumar70/AIUI/-/issues"
+  }
 }
