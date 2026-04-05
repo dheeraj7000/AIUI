@@ -1,8 +1,7 @@
 import type { AuthUser, AuthSession } from '@/types/auth';
 
 // ---------------------------------------------------------------------------
-// Local auth — replaces Cognito for local development.
-// All operations go through /api/auth/* endpoints.
+// Local auth — all operations go through /api/auth/* endpoints.
 // ---------------------------------------------------------------------------
 
 // Session stored in memory on the client side
@@ -10,9 +9,9 @@ let currentUser: AuthUser | null = null;
 let currentSession: AuthSession | null = null;
 
 /**
- * No-op — Cognito configuration is not needed for local auth.
+ * No-op — reserved for future auth provider configuration.
  */
-export function configureCognito(): void {
+export function configureAuth(): void {
   // intentionally empty
 }
 

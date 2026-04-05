@@ -13,7 +13,7 @@ import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AuthState, AuthUser, AuthSession } from '@/types/auth';
 import {
-  configureCognito,
+  configureAuth,
   getCurrentUser,
   getSession,
   refreshSession,
@@ -24,7 +24,13 @@ import {
   forgotPassword as authForgotPassword,
   confirmForgotPassword as authConfirmForgotPassword,
 } from '@/lib/auth';
-import { persistSession, getPersistedSession, clearSession } from '@/lib/session';
+import {
+  persistSession,
+  getPersistedSession,
+  clearSession,
+  setActiveOrgId,
+  getActiveOrgId,
+} from '@/lib/session';
 import {
   onSessionMessage,
   broadcastSignOut,
@@ -136,7 +142,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await authSignOut();
     } catch {
-      // Best-effort Cognito sign-out
+      // Best-effort sign-out
     }
     setUser(null);
     setSession(null);
@@ -235,7 +241,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function init() {
       try {
-        configureCognito();
+        configureAuth();
 
         // Attempt to read a persisted session from cookies for fast restore
         const persisted = getPersistedSession();
@@ -249,9 +255,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           persistSession(currentSession);
           scheduleRefresh(currentSession);
         } else if (persisted && persisted.expiresAt > Date.now()) {
-          // Tokens exist in cookies but Amplify has no in-memory session
+          // Tokens exist in cookies but no in-memory session
           // (e.g. page refresh). Use the persisted session as a fallback
-          // while we try to refresh from Cognito.
+          // while we try to refresh.
           setSession(persisted);
           try {
             const refreshed = await refreshSession();
@@ -291,6 +297,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Auth actions
   // -----------------------------------------------------------------------
 
+  const ensureOrg = useCallback(async (userId: string, email: string, token: string) => {
+    if (getActiveOrgId()) return;
+    try {
+      const res = await fetch('/api/auth/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ userId, email }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.orgId) setActiveOrgId(data.orgId);
+      }
+    } catch {
+      /* non-blocking */
+    }
+  }, []);
+
   const handleSignIn = useCallback(
     async (email: string, password: string) => {
       setError(null);
@@ -303,6 +326,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (currentSession) {
             persistSession(currentSession);
             broadcastSessionUpdate();
+            if (currentUser) {
+              await ensureOrg(currentUser.id, currentUser.email, currentSession.accessToken);
+            }
           }
           scheduleRefresh(currentSession);
         }
@@ -313,7 +339,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw err;
       }
     },
-    [scheduleRefresh]
+    [scheduleRefresh, ensureOrg]
   );
 
   const handleSignUp = useCallback(
@@ -328,6 +354,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (currentSession) {
             persistSession(currentSession);
             broadcastSessionUpdate();
+            if (currentUser) {
+              await ensureOrg(currentUser.id, currentUser.email, currentSession.accessToken);
+            }
           }
           scheduleRefresh(currentSession);
         }
@@ -338,7 +367,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw err;
       }
     },
-    [scheduleRefresh]
+    [scheduleRefresh, ensureOrg]
   );
 
   const handleConfirmSignUp = useCallback(async (email: string, code: string) => {
@@ -355,7 +384,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const handleSignOut = useCallback(async () => {
     setError(null);
     try {
-      // Cognito sign-out
+      // Sign out
       await authSignOut();
       // Clear local state
       setUser(null);

@@ -3,9 +3,6 @@
  * Extracts dimensions, color palettes, font properties, and MIME information.
  */
 
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { createS3Client } from './s3';
-
 // ---------- Type definitions ----------
 
 export interface ImageMetadata {
@@ -210,50 +207,6 @@ export async function extractMetadata(
     const message = err instanceof Error ? err.message : 'Unknown extraction error';
     return { ...base, extractionError: message };
   }
-}
-
-/**
- * Fetch a file from S3 and extract its metadata.
- * Primary entry point called after upload confirmation.
- */
-export async function extractMetadataFromS3(
-  storageKey: string,
-  mimeType: string,
-  assetType: string,
-  bucket?: string
-): Promise<AssetMetadata> {
-  const s3 = createS3Client();
-  const bucketName = bucket ?? process.env.S3_ASSETS_BUCKET;
-
-  if (!bucketName) {
-    return {
-      fileSize: 0,
-      mimeType,
-      extractedAt: new Date().toISOString(),
-      extractionError: 'S3_ASSETS_BUCKET not configured',
-    };
-  }
-
-  const response = await s3.send(new GetObjectCommand({ Bucket: bucketName, Key: storageKey }));
-
-  const stream = response.Body;
-  if (!stream) {
-    return {
-      fileSize: 0,
-      mimeType,
-      extractedAt: new Date().toISOString(),
-      extractionError: 'Empty response from S3',
-    };
-  }
-
-  const chunks: Uint8Array[] = [];
-  // @ts-expect-error — S3 body is an async iterable in Node environments
-  for await (const chunk of stream) {
-    chunks.push(chunk);
-  }
-  const buffer = Buffer.concat(chunks);
-
-  return extractMetadata(buffer, mimeType, assetType);
 }
 
 // ---------- Helpers ----------

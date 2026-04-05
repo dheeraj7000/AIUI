@@ -39,8 +39,8 @@ function buildCookie(name: string, value: string, maxAgeSec?: number): string {
  * Store access and ID tokens as cookies so the auth middleware can read them
  * on subsequent page loads.
  *
- * @param accessToken - Cognito access token (JWT)
- * @param idToken     - Cognito ID token (JWT)
+ * @param accessToken - Access token (JWT)
+ * @param idToken     - ID token (JWT)
  * @param maxAgeSec   - Cookie lifetime in seconds (default: 1 hour)
  */
 export function persistTokens(accessToken: string, idToken: string, maxAgeSec = 3600): void {

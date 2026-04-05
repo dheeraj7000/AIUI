@@ -7,7 +7,7 @@ import { assets } from '@aiui/design-core';
 export function registerAssetManifest(server: AiuiMcpServer) {
   server.registerTool(
     'get_asset_manifest',
-    'Return a categorized list of project assets with CloudFront public URLs and metadata.',
+    'Return a categorized list of project assets with public URLs and metadata.',
     {
       projectId: z.string().uuid().describe('The project ID'),
     },

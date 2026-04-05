@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  createDb,
-  createS3Client,
-  deleteObject,
-  getAssetById,
-  deleteAsset,
-} from '@aiui/design-core';
+import { createDb, getAssetById, deleteAsset } from '@aiui/design-core';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -41,7 +35,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
 }
 
 /**
- * DELETE /api/assets/[id] — Delete asset record and S3 object.
+ * DELETE /api/assets/[id] — Delete asset record.
  */
 export async function DELETE(req: NextRequest, context: RouteContext) {
   const userId = req.headers.get('x-user-id');
@@ -56,17 +50,6 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
     if (!result) {
       return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
-    }
-
-    // Clean up S3 object — log but don't fail if already missing
-    try {
-      const bucket = process.env.S3_ASSETS_BUCKET;
-      if (bucket) {
-        const s3 = createS3Client();
-        await deleteObject(s3, bucket, result.storageKey);
-      }
-    } catch (s3Error) {
-      console.warn('Failed to delete S3 object (may already be removed):', s3Error);
     }
 
     return new NextResponse(null, { status: 204 });

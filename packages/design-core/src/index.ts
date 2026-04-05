@@ -43,15 +43,6 @@ export type {
   AssetValidationResult,
 } from './validation/asset-validation';
 
-// S3 storage
-export {
-  createS3Client,
-  buildStorageKey,
-  generatePresignedUploadUrl,
-  deleteObject,
-} from './storage/s3';
-export type { PresignedUploadParams, PresignedUploadResult } from './storage/s3';
-
 // Database schema and connection
 export { createDb } from './db';
 export type { Database } from './db';
@@ -193,22 +184,11 @@ export type { OrgRole } from './lib/permissions';
 // Metadata extraction
 export {
   extractMetadata,
-  extractMetadataFromS3,
   extractImageMetadata,
   extractSvgMetadata,
   extractFontMetadata,
 } from './storage/metadata';
 export type { ImageMetadata, SvgMetadata, FontMetadata, AssetMetadata } from './storage/metadata';
-
-// CDN / CloudFront
-export {
-  generatePublicUrl,
-  getCachePolicy,
-  invalidateCache,
-  invalidateAndDelete,
-  setObjectCacheHeaders,
-} from './storage/cdn';
-export type { CachePolicy } from './storage/cdn';
 
 // Design profile validation
 export {
@@ -325,3 +305,27 @@ export {
   parseTailwindConfig,
 } from './importers';
 export type { ImportFormat, ImportResult, FigmaExtractionResult } from './importers';
+
+// Usage tracking
+export {
+  trackUsage,
+  checkLimit,
+  getUsage,
+  getUsageHistory,
+  ensureLedger,
+  TIER_LIMITS,
+} from './operations/usage';
+
+// Marketplace
+export { publishPack, searchPacks, getMarketplacePack, ratePack } from './operations/marketplace';
+export { publishPackSchema, searchPacksSchema, ratePackSchema } from './validation/marketplace';
+export type { PublishPackInput, SearchPacksInput, RatePackInput } from './validation/marketplace';
+
+// Registry
+export { serializePackForRegistry, getRegistryIndex } from './operations/registry';
+export {
+  registryItemSchema,
+  registryIndexItemSchema,
+  registryTokenSchema,
+} from './validation/registry';
+export type { RegistryItem, RegistryIndexItem, RegistryToken } from './validation/registry';
