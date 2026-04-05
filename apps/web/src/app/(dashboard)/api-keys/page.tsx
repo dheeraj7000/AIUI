@@ -48,14 +48,15 @@ function formatDate(iso: string | null): string {
 }
 
 function mcpSnippet(rawKey: string): string {
+  const host = typeof window !== 'undefined' ? window.location.origin : 'https://app.aiui.dev';
   return JSON.stringify(
     {
       mcpServers: {
         aiui: {
-          command: 'npx',
-          args: ['-y', '@aiui/mcp-server@latest'],
-          env: {
-            AIUI_API_KEY: rawKey,
+          type: 'streamable-http',
+          url: `${host}/mcp`,
+          headers: {
+            Authorization: `Bearer ${rawKey}`,
           },
         },
       },

@@ -2,7 +2,7 @@ const stats = [
   { value: '190+', label: 'Design tokens' },
   { value: '57', label: 'Component recipes' },
   { value: '6', label: 'Style packs' },
-  { value: '10', label: 'MCP tools' },
+  { value: '12', label: 'MCP tools' },
 ];
 
 export function StatsBar() {

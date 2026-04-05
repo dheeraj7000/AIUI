@@ -277,8 +277,12 @@ export default async function ProjectDetailPage(props: RouteContext) {
 }`}
               </pre>
               <p className="mt-2 text-xs text-gray-400">
+                <a href="/quick-setup" className="text-blue-600 hover:underline">
+                  Quick Setup
+                </a>{' '}
+                — get an API key and connect in 30 seconds. Or{' '}
                 <a href="/api-keys" className="text-blue-600 hover:underline">
-                  Generate an API key
+                  manage API keys
                 </a>{' '}
                 to replace <code className="rounded bg-gray-100 px-1">YOUR_API_KEY</code> above.
               </p>

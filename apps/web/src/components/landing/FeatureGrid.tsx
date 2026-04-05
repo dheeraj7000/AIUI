@@ -51,9 +51,9 @@ const features: Feature[] = [
     bgColor: 'bg-amber-100',
   },
   {
-    title: 'Zero Install',
+    title: 'Quick Setup',
     description:
-      'One JSON config block. No npm install. No build step. Add it to your project and it works immediately.',
+      'Get your API key, paste one config block, and start building. CLI-free onboarding in under 60 seconds.',
     icon: Zap,
     color: 'text-cyan-600',
     bgColor: 'bg-cyan-100',

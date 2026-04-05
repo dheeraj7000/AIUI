@@ -10,7 +10,7 @@ AIUI lets you choose styles, components, and design tokens from a visual console
 - **Component Recipes** — code templates with props schemas and AI usage rules
 - **Design Memory** — syncs your design context into any project so Claude follows it automatically
 - **Token Compliance** — validates generated code against your approved tokens
-- **MCP Integration** — Claude Code reads your design system via 10 MCP tools
+- **MCP Integration** — Claude Code reads your design system via 12 MCP tools
 
 ## Prerequisites
 
@@ -107,20 +107,24 @@ packages/
 
 ## MCP Tools
 
-AIUI exposes 10 tools via the Model Context Protocol:
+AIUI exposes 12 tools via the Model Context Protocol:
 
-| Tool                   | Description                                 |
-| ---------------------- | ------------------------------------------- |
-| `get_project_context`  | Load project design profile by slug         |
-| `get_design_memory`    | Get the full design memory markdown         |
-| `sync_design_memory`   | Generate `.aiui/` files in a target project |
-| `open_design_studio`   | Get a URL to the visual design configurator |
-| `get_theme_tokens`     | Export tokens as Tailwind / CSS / JSON      |
-| `list_components`      | Browse all component recipes                |
-| `get_component_recipe` | Get full code template + props + AI rules   |
-| `get_asset_manifest`   | Get project assets with CDN URLs            |
-| `validate_ui_output`   | Check generated code for design compliance  |
-| `resolve_tag`          | Resolve tags to associated resources        |
+| Tool                    | Description                                 |
+| ----------------------- | ------------------------------------------- |
+| `get_project_context`   | Load project design profile by slug         |
+| `get_design_memory`     | Get the full design memory markdown         |
+| `sync_design_memory`    | Generate `.aiui/` files in a target project |
+| `open_design_studio`    | Get a URL to the visual design configurator |
+| `get_theme_tokens`      | Export tokens as Tailwind / CSS / JSON      |
+| `list_components`       | Browse all component recipes                |
+| `get_component_recipe`  | Get full code template + props + AI rules   |
+| `get_asset_manifest`    | Get project assets with public URLs         |
+| `validate_ui_output`    | Check generated code for design compliance  |
+| `resolve_tag`           | Resolve tags to associated resources        |
+| `create_style_pack`     | Create a new style pack with tokens         |
+| `update_tokens`         | Modify tokens in a style pack               |
+| `apply_style_pack`      | Assign a pack to a project and compile      |
+| `fix_compliance_issues` | Auto-fix token violations in generated code |
 
 ## Using AIUI with Claude Code
 

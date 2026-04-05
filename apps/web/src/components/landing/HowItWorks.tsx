@@ -12,27 +12,27 @@ interface Step {
 const steps: Step[] = [
   {
     number: '1',
-    title: 'Pick your design system',
+    title: 'Get your API key',
     description:
-      'Choose from 6 style packs, each with 30+ tokens for colors, typography, spacing, shadows, and radii.',
-    icon: Palette,
-    detail: 'Browse packs like Minimal, Bold, Corporate, Playful, and more in the Visual Studio.',
+      'Visit /quick-setup, enter your email, and receive an API key instantly. No credit card required.',
+    icon: Key,
+    detail: 'Keys are scoped to your workspace and can be rotated any time from the dashboard.',
   },
   {
     number: '2',
-    title: 'Generate your API key',
+    title: 'Add one MCP config',
     description:
-      'One click from the dashboard. Your key connects Claude to your personal design profile.',
-    icon: Key,
-    detail: 'Keys are scoped to your workspace and can be rotated at any time.',
+      'Paste a single JSON block into your .mcp.json file. Works with Claude Code, Cursor, Windsurf, and more.',
+    icon: FileJson,
+    detail: 'Connects your AI tool to your design tokens, components, and rules via MCP.',
   },
   {
     number: '3',
-    title: 'Add one config block',
+    title: 'Sync your design memory',
     description:
-      "Drop this JSON into your project's .mcp.json file. That's it. Claude now follows your design system.",
-    icon: FileJson,
-    detail: '',
+      'Ask Claude to sync your design system. It writes .aiui/ files into your project so every conversation follows your rules.',
+    icon: Palette,
+    detail: 'Design tokens, component recipes, and style rules persist across all sessions.',
   },
 ];
 
@@ -84,8 +84,8 @@ export function HowItWorks() {
                     <p className="mt-2 text-xs text-gray-400 max-w-xs mx-auto">{step.detail}</p>
                   )}
 
-                  {/* Code block for step 3 */}
-                  {step.number === '3' && (
+                  {/* Code block for step 2 */}
+                  {step.number === '2' && (
                     <div className="mt-5 mx-auto max-w-sm rounded-lg bg-gray-950 p-4 text-left overflow-x-auto shadow-lg">
                       <pre className="text-xs leading-relaxed font-mono">
                         <code>

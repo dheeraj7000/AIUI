@@ -30,6 +30,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <span>57 components</span>
             <span className="h-1 w-1 rounded-full bg-blue-300" />
             <span>6 style packs</span>
+            <span className="h-1 w-1 rounded-full bg-blue-300" />
+            <span>12 MCP tools</span>
           </div>
         </div>
       </div>

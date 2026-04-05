@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 const navLinks = [
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
+  { label: 'Quick Setup', href: '/quick-setup' },
   { label: 'Pricing', href: '#pricing' },
 ];
 
@@ -45,7 +46,7 @@ export function LandingNav() {
             Sign In
           </Link>
           <Link
-            href="/sign-up"
+            href="/quick-setup"
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
           >
             Get Started
@@ -85,7 +86,7 @@ export function LandingNav() {
                 Sign In
               </Link>
               <Link
-                href="/sign-up"
+                href="/quick-setup"
                 className="rounded-lg bg-blue-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
               >
                 Get Started

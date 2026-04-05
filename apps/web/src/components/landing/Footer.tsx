@@ -4,36 +4,33 @@ const footerSections = [
   {
     title: 'Product',
     links: [
+      { label: 'Style Packs', href: '/style-packs' },
+      { label: 'Components', href: '/components' },
       { label: 'Visual Studio', href: '/studio' },
-      { label: 'Style Packs', href: '/studio' },
-      { label: 'Component Recipes', href: '/studio' },
-      { label: 'Pricing', href: '#pricing' },
+      { label: 'Import', href: '/import' },
+    ],
+  },
+  {
+    title: 'Developers',
+    links: [
+      { label: 'Quick Setup', href: '/quick-setup' },
+      { label: 'API Keys', href: '/api-keys' },
+      { label: 'MCP Tools', href: '/projects' },
+      { label: 'GitHub', href: 'https://gitlab.com/dkumar70/AIUI', external: true },
     ],
   },
   {
     title: 'Resources',
     links: [
-      { label: 'Documentation', href: '/docs' },
-      { label: 'API Reference', href: '/docs' },
-      { label: 'Changelog', href: '/changelog' },
-      { label: 'Status', href: '/status' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'About', href: '/about' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Documentation', href: '/quick-setup' },
+      { label: 'Self-Hosting', href: '/quick-setup' },
+      { label: 'Status', href: '/api/health' },
     ],
   },
   {
     title: 'Connect',
     links: [
-      { label: 'GitLab', href: 'https://gitlab.com/nicholasthompson/aiui', external: true },
-      { label: 'Discord', href: '#', external: true },
-      { label: 'Twitter', href: '#', external: true },
+      { label: 'GitLab', href: 'https://gitlab.com/dkumar70/AIUI', external: true },
       { label: 'Email', href: 'mailto:hello@aiui.dev', external: true },
     ],
   },

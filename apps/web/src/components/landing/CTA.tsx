@@ -53,13 +53,13 @@ export function CTA() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
-                href="/studio"
+                href="/quick-setup"
                 className="w-full sm:w-auto rounded-lg bg-blue-600 px-6 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-xl"
               >
                 Get Started Free
               </Link>
               <a
-                href="https://gitlab.com/nicholasthompson/aiui"
+                href="https://gitlab.com/dkumar70/AIUI"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3.5 text-center text-sm font-semibold text-gray-300 transition-all hover:border-gray-500 hover:text-white"

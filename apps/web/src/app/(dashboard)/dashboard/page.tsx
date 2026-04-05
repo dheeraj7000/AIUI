@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createDb, stylePacks, componentRecipes, projects } from '@aiui/design-core';
 import { count } from 'drizzle-orm';
-import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox } from 'lucide-react';
+import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Zap, Download } from 'lucide-react';
 
 export const metadata = { title: 'Dashboard - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -92,6 +92,45 @@ export default async function DashboardPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Link
+            href="/quick-setup"
+            className="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50">
+                <Zap size={20} className="text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Quick Setup</h3>
+                <p className="text-xs text-gray-500">
+                  Get an API key and connect your AI assistant in 30 seconds
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href="/import"
+            className="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50">
+                <Download size={20} className="text-teal-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Import Tokens</h3>
+                <p className="text-xs text-gray-500">
+                  Import design tokens from Figma, CSS, or Tailwind
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
 
       <div className="mt-10">

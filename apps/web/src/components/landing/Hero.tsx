@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Check, Copy } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 
 const configSnippet = `{
   "mcpServers": {
@@ -18,7 +18,7 @@ const configSnippet = `{
 
 const trustItems = [
   { label: 'Works with Claude Code', value: null },
-  { label: 'MCP tools', value: '10' },
+  { label: 'MCP tools', value: '12' },
   { label: 'Components', value: '57' },
 ];
 
@@ -75,17 +75,18 @@ export function Hero() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
-                href="/studio"
+                href="/quick-setup"
                 className="w-full sm:w-auto rounded-lg bg-white px-6 py-3.5 text-center text-sm font-semibold text-blue-700 shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-50 hover:shadow-xl"
               >
                 Get Started Free
               </Link>
               <a
-                href="#how-it-works"
+                href="https://gitlab.com/dkumar70/AIUI"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-6 py-3.5 text-center text-sm font-semibold text-white transition-all hover:bg-white/10"
               >
-                <Play className="h-4 w-4" />
-                Watch Demo
+                View Source
               </a>
             </div>
           </div>
