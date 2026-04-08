@@ -5,8 +5,8 @@
       "args": ["mcp"]
     },
     "aiui": {
-      "command": "npx",
-      "args": ["tsx", "/home/AIUI/apps/mcp-server/src/index.ts"],
+      "command": "node",
+      "args": ["/home/AIUI/apps/mcp-server/dist/index.js", "--local"],
       "env": {
         "DATABASE_URL": "postgresql://aiui:aiui@127.0.0.1:5432/aiui"
       }

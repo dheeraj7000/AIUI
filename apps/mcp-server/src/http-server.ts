@@ -144,11 +144,13 @@ export async function startHttpServer(port: number) {
     const apiKey = (req.query.key as string) || 'aiui_k_YOUR_API_KEY';
 
     const setup = {
+      one_liner: `claude mcp add --transport http aiui ${baseUrl}/mcp --header "Authorization:Bearer ${apiKey}"`,
+      npx: `npx @aiui/mcp-server --api-key=${apiKey}`,
       claude_code: `claude mcp add --transport http aiui ${baseUrl}/mcp --header "Authorization:Bearer ${apiKey}"`,
       cursor: {
         mcpServers: {
           aiui: {
-            type: 'streamable-http',
+            type: 'http',
             url: `${baseUrl}/mcp`,
             headers: { Authorization: `Bearer ${apiKey}` },
           },
@@ -157,7 +159,7 @@ export async function startHttpServer(port: number) {
       vscode: {
         'mcp.servers': {
           aiui: {
-            type: 'streamable-http',
+            type: 'http',
             url: `${baseUrl}/mcp`,
             headers: { Authorization: `Bearer ${apiKey}` },
           },
