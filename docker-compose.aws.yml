@@ -5,14 +5,22 @@
 
 services:
   # Override local postgres — using Neon (external)
-  # Set entrypoint to /bin/true so it starts and exits immediately
+  # Replace with a no-op container that satisfies depends_on health checks
   postgres:
-    entrypoint: ["echo", "skipped"]
+    image: alpine:3
+    entrypoint: ["sleep", "infinity"]
     restart: "no"
+    volumes: []
     healthcheck:
       test: ["CMD-SHELL", "true"]
       interval: 1s
+      timeout: 1s
       retries: 1
+      start_period: 0s
+    deploy:
+      resources:
+        limits:
+          memory: 4M
 
   mcp-server:
     image: ${ECR_REGISTRY}/aiui-mcp:${IMAGE_TAG:-latest}
