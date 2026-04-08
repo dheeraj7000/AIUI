@@ -32,6 +32,12 @@ variable "gitlab_project" {
   type        = string
 }
 
+variable "domain_name" {
+  description = "Domain name for HTTPS (e.g., aiui.store). Leave empty to skip SSL."
+  type        = string
+  default     = ""
+}
+
 variable "database_url" {
   description = "Neon PostgreSQL connection string"
   type        = string

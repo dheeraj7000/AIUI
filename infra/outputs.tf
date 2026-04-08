@@ -25,20 +25,30 @@ output "ssh_command" {
 
 output "web_url" {
   description = "Web application URL"
-  value       = "http://${module.alb.alb_dns_name}"
+  value       = var.domain_name != "" ? "https://${var.domain_name}" : "http://${module.alb.alb_dns_name}"
 }
 
 output "mcp_url" {
   description = "MCP server URL"
-  value       = "http://${module.alb.alb_dns_name}/mcp"
+  value       = var.domain_name != "" ? "https://${var.domain_name}/mcp" : "http://${module.alb.alb_dns_name}/mcp"
 }
 
 output "health_url" {
   description = "MCP health check URL"
-  value       = "http://${module.alb.alb_dns_name}/health"
+  value       = var.domain_name != "" ? "https://${var.domain_name}/health" : "http://${module.alb.alb_dns_name}/health"
 }
 
 output "gitlab_deploy_role_arn" {
   description = "ARN of the GitLab CI deploy role (set as CI/CD variable)"
   value       = module.iam.gitlab_deploy_role_arn
+}
+
+output "cert_validation_records" {
+  description = "Add these DNS records in your domain registrar to validate the SSL certificate"
+  value       = module.alb.cert_validation_records
+}
+
+output "domain_cname_target" {
+  description = "Point your domain (CNAME) to this ALB DNS name"
+  value       = module.alb.alb_dns_name
 }

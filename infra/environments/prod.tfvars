@@ -6,6 +6,9 @@ instance_type = "t3.micro"
 gitlab_group   = "dkumar70"
 gitlab_project = "dkumar70/AIUI"
 
+# Domain + HTTPS
+domain_name = "aiui.store"
+
 # Restrict SSH to your IP (replace with your IP/32)
 # ssh_allowed_cidr = "1.2.3.4/32"
 

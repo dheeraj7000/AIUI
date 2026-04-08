@@ -18,3 +18,9 @@ variable "security_group_id" {
   description = "ALB security group ID"
   type        = string
 }
+
+variable "domain_name" {
+  description = "Primary domain name for the ALB (e.g., aiui.store)"
+  type        = string
+  default     = ""
+}

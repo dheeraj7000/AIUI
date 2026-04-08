@@ -78,6 +78,7 @@ module "alb" {
   vpc_id            = module.networking.vpc_id
   subnet_ids        = module.networking.public_subnet_ids
   security_group_id = module.networking.alb_security_group_id
+  domain_name       = var.domain_name
 }
 
 module "ec2" {
