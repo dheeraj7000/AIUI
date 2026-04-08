@@ -16,6 +16,12 @@ import { startupBoldV1 } from './seed-data/startup-bold-v1';
 import { shadcnEssentials } from './seed-data/shadcn-essentials';
 import { magicuiEffects } from './seed-data/magicui-effects';
 import { communityCreative } from './seed-data/community-creative';
+import { dashboardDarkV1 } from './seed-data/dashboard-dark-v1';
+import { ecommerceProV1 } from './seed-data/ecommerce-pro-v1';
+import { healthcareCleanV1 } from './seed-data/healthcare-clean-v1';
+import { aiStudioV1 } from './seed-data/ai-studio-v1';
+import { mobileFirstV1 } from './seed-data/mobile-first-v1';
+import { minimalMonoV1 } from './seed-data/minimal-mono-v1';
 
 const SEED_PACKS = [
   saasCleanV1,
@@ -24,6 +30,12 @@ const SEED_PACKS = [
   shadcnEssentials,
   magicuiEffects,
   communityCreative,
+  dashboardDarkV1,
+  ecommerceProV1,
+  healthcareCleanV1,
+  aiStudioV1,
+  mobileFirstV1,
+  minimalMonoV1,
 ];
 
 async function seed() {
