@@ -16,23 +16,20 @@ const footerSections = [
       { label: 'Quick Setup', href: '/quick-setup' },
       { label: 'API Keys', href: '/api-keys' },
       { label: 'MCP Tools', href: '/projects' },
-      { label: 'GitHub', href: 'https://gitlab.com/dkumar70/AIUI', external: true },
+      { label: 'Documentation', href: '/docs' },
     ],
   },
   {
     title: 'Resources',
     links: [
-      { label: 'Documentation', href: '/quick-setup' },
+      { label: 'Documentation', href: '/docs' },
       { label: 'Self-Hosting', href: '/quick-setup' },
       { label: 'Status', href: '/api/health' },
     ],
   },
   {
     title: 'Connect',
-    links: [
-      { label: 'GitLab', href: 'https://gitlab.com/dkumar70/AIUI', external: true },
-      { label: 'Email', href: 'mailto:hello@aiui.dev', external: true },
-    ],
+    links: [{ label: 'Email', href: 'mailto:hello@aiui.dev', external: true }],
   },
 ];
 

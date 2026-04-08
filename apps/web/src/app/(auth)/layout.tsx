@@ -14,16 +14,21 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             Control how AI builds your UI. Pick a design system, get a config block, and Claude
             follows it everywhere.
           </p>
-          <div className="mt-8 rounded-lg bg-white/10 backdrop-blur-sm p-4 font-mono text-sm text-blue-100">
-            <pre>{`{
-  "mcpServers": {
-    "aiui": {
-      "type": "http",
-      "url": "https://aiui.store/mcp"
-    }
-  }
-}`}</pre>
-          </div>
+          <h2 className="mt-10 text-xl font-semibold">Design systems that work everywhere</h2>
+          <ul className="mt-5 space-y-3 text-blue-100 leading-relaxed">
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-300" />
+              Consistent tokens across every AI tool
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-300" />
+              One source of truth for your design system
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-300" />
+              Works with Claude, Cursor, VS Code, and more
+            </li>
+          </ul>
           <div className="mt-8 flex items-center gap-6 text-sm text-blue-200">
             <span>190+ tokens</span>
             <span className="h-1 w-1 rounded-full bg-blue-300" />

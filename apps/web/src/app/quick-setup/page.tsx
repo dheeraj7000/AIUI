@@ -108,146 +108,73 @@ export default function QuickSetupPage() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: 640,
-        margin: '60px auto',
-        padding: '0 24px',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-      }}
-    >
-      <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>AIUI Quick Setup</h1>
-      <p style={{ color: '#666', marginBottom: 32 }}>
+    <div className="mx-auto max-w-2xl px-6 py-16">
+      <h1 className="text-2xl font-bold text-gray-900">AIUI Quick Setup</h1>
+      <p className="mt-2 text-gray-500 mb-8">
         Get an API key and connect your AI coding assistant in 30 seconds.
       </p>
 
       {step === 'email' && (
-        <form onSubmit={handleSubmit}>
-          {error && (
-            <div
-              style={{
-                padding: '12px 16px',
-                background: '#fef2f2',
-                color: '#dc2626',
-                borderRadius: 8,
-                marginBottom: 16,
-                fontSize: 14,
-              }}
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 mb-4">
+                {error}
+              </div>
+            )}
+
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-base focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none mb-4"
+            />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Min 8 characters"
+              className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-base focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none mb-6"
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 text-base font-semibold transition-colors"
             >
-              {error}
-            </div>
-          )}
-
-          <label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6 }}>
-            Email
-          </label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              border: '1px solid #d1d5db',
-              borderRadius: 8,
-              fontSize: 16,
-              marginBottom: 16,
-              boxSizing: 'border-box',
-            }}
-          />
-
-          <label style={{ display: 'block', fontSize: 14, fontWeight: 500, marginBottom: 6 }}>
-            Password
-          </label>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Min 8 characters"
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              border: '1px solid #d1d5db',
-              borderRadius: 8,
-              fontSize: 16,
-              marginBottom: 24,
-              boxSizing: 'border-box',
-            }}
-          />
-
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '12px 24px',
-              background: '#2563eb',
-              color: 'white',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Get API Key
-          </button>
-        </form>
+              Get API Key
+            </button>
+          </form>
+        </div>
       )}
 
       {step === 'loading' && (
-        <div style={{ textAlign: 'center', padding: '40px 0', color: '#666' }}>
-          Setting up your account...
-        </div>
+        <div className="text-center py-10 text-gray-500">Setting up your account...</div>
       )}
 
       {step === 'done' && result && (
         <div>
-          <div
-            style={{
-              padding: '16px 20px',
-              background: '#f0fdf4',
-              border: '1px solid #bbf7d0',
-              borderRadius: 8,
-              marginBottom: 24,
-            }}
-          >
-            <div style={{ fontWeight: 600, color: '#166534', marginBottom: 4 }}>Your API Key</div>
-            <code
-              style={{
-                fontSize: 14,
-                wordBreak: 'break-all',
-                display: 'block',
-                marginBottom: 8,
-              }}
-            >
-              {result.apiKey}
-            </code>
+          <div className="rounded-lg bg-green-50 border border-green-200 px-5 py-4 mb-6">
+            <div className="font-semibold text-green-800 mb-1">Your API Key</div>
+            <code className="text-sm break-all block mb-2">{result.apiKey}</code>
             <button
               onClick={() => copyToClipboard(result.apiKey, 'key')}
-              style={{
-                padding: '6px 12px',
-                background: '#166534',
-                color: 'white',
-                border: 'none',
-                borderRadius: 6,
-                fontSize: 13,
-                cursor: 'pointer',
-              }}
+              className="bg-green-800 hover:bg-green-900 text-white rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {copied === 'key' ? 'Copied!' : 'Copy'}
             </button>
-            <p style={{ fontSize: 13, color: '#666', marginTop: 8, marginBottom: 0 }}>
+            <p className="text-xs text-gray-500 mt-2 mb-0">
               Save this key — it will not be shown again.
             </p>
           </div>
 
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
-            Connect Your AI Assistant
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Connect Your AI Assistant</h2>
 
           <SetupBlock
             title="Claude Code"
@@ -316,43 +243,17 @@ function SetupBlock({
   id: string;
 }) {
   return (
-    <div style={{ marginBottom: 20 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 6,
-        }}
-      >
-        <span style={{ fontSize: 14, fontWeight: 600 }}>{title}</span>
+    <div className="mb-5">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-sm font-semibold text-gray-900">{title}</span>
         <button
           onClick={() => onCopy(code, id)}
-          style={{
-            padding: '4px 10px',
-            background: '#f3f4f6',
-            border: '1px solid #d1d5db',
-            borderRadius: 6,
-            fontSize: 12,
-            cursor: 'pointer',
-          }}
+          className="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors"
         >
           {copied === id ? 'Copied!' : 'Copy'}
         </button>
       </div>
-      <pre
-        style={{
-          padding: '12px 16px',
-          background: '#1e293b',
-          color: '#e2e8f0',
-          borderRadius: 8,
-          fontSize: 13,
-          overflow: 'auto',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all',
-          margin: 0,
-        }}
-      >
+      <pre className="rounded-lg bg-slate-800 text-slate-200 px-4 py-3 text-[13px] overflow-auto whitespace-pre-wrap break-all m-0">
         {code}
       </pre>
     </div>

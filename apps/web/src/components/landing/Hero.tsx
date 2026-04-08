@@ -4,29 +4,20 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Check, Copy } from 'lucide-react';
 
-const configSnippet = `{
-  "mcpServers": {
-    "aiui": {
-      "type": "http",
-      "url": "https://aiui.store/mcp",
-      "headers": {
-        "Authorization": "Bearer aiui_k_..."
-      }
-    }
-  }
-}`;
+const installCommand = 'claude mcp add aiui';
 
 const trustItems = [
-  { label: 'Works with Claude Code', value: null },
-  { label: 'MCP tools', value: '12' },
-  { label: 'Components', value: '57' },
+  { label: 'Works with Claude', value: null },
+  { label: 'Works with Cursor', value: null },
+  { label: 'Works with Windsurf', value: null },
+  { label: 'Works with VS Code', value: null },
 ];
 
 export function Hero() {
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
-    navigator.clipboard.writeText(configSnippet).then(() => {
+    navigator.clipboard.writeText(installCommand).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -63,15 +54,15 @@ export function Hero() {
               AI Design Control Layer
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Control how AI{' '}
+              Your Design System,{' '}
               <span className="bg-gradient-to-r from-blue-200 to-violet-200 bg-clip-text text-transparent">
-                builds your UI
+                Always in Sync
               </span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-blue-100 max-w-xl mx-auto lg:mx-0">
-              Pick your design system from a visual console. Add one JSON config block to your
-              project. Claude follows your tokens, components, and rules in every conversation. Zero
-              install required.
+              Every AI tool generates UI differently. AIUI ensures your tokens, components, and
+              design rules are followed in every conversation -- so your product stays consistent no
+              matter who (or what) builds it.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
@@ -81,20 +72,18 @@ export function Hero() {
                 Get Started Free
               </Link>
               <a
-                href="https://gitlab.com/dkumar70/AIUI"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#how-it-works"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-6 py-3.5 text-center text-sm font-semibold text-white transition-all hover:bg-white/10"
               >
-                View Source
+                See How It Works
               </a>
             </div>
           </div>
 
-          {/* Right: code preview */}
+          {/* Right: install command */}
           <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
             <div className="rounded-xl bg-gray-950 shadow-2xl shadow-blue-900/30 border border-white/10 overflow-hidden">
-              {/* Editor title bar */}
+              {/* Terminal title bar */}
               <div className="flex items-center justify-between px-4 py-3 bg-gray-900/80 border-b border-white/5">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
@@ -102,13 +91,13 @@ export function Hero() {
                     <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
                     <div className="h-3 w-3 rounded-full bg-green-500/80" />
                   </div>
-                  <span className="ml-2 text-xs text-gray-400 font-mono">.mcp.json</span>
+                  <span className="ml-2 text-xs text-gray-400 font-mono">Terminal</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleCopy}
                   className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-200"
-                  aria-label="Copy config"
+                  aria-label="Copy install command"
                 >
                   {copied ? (
                     <>
@@ -123,47 +112,17 @@ export function Hero() {
                   )}
                 </button>
               </div>
-              {/* Code content */}
-              <div className="p-5 overflow-x-auto">
-                <pre className="text-sm leading-relaxed font-mono">
+              {/* Command content */}
+              <div className="p-6">
+                <pre className="text-base leading-relaxed font-mono">
                   <code>
-                    <span className="text-gray-500">{'{'}</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'  '}</span>
-                    <span className="text-blue-400">{'"mcpServers"'}</span>
-                    <span className="text-gray-500">: {'{'}</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'    '}</span>
-                    <span className="text-green-400">{'"aiui"'}</span>
-                    <span className="text-gray-500">: {'{'}</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'      '}</span>
-                    <span className="text-blue-400">{'"type"'}</span>
-                    <span className="text-gray-500">: </span>
-                    <span className="text-amber-300">{'"http"'}</span>
-                    <span className="text-gray-500">,</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'      '}</span>
-                    <span className="text-blue-400">{'"url"'}</span>
-                    <span className="text-gray-500">: </span>
-                    <span className="text-amber-300">{'"https://aiui.store/mcp"'}</span>
-                    <span className="text-gray-500">,</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'      '}</span>
-                    <span className="text-blue-400">{'"headers"'}</span>
-                    <span className="text-gray-500">: {'{ '}</span>
-                    <span className="text-blue-400">{'"Authorization"'}</span>
-                    <span className="text-gray-500">: </span>
-                    <span className="text-amber-300">{'"Bearer aiui_k_..."'}</span>
-                    <span className="text-gray-500">{' }'}</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'    }'}</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'  }'}</span>
-                    {'\n'}
-                    <span className="text-gray-500">{'}'}</span>
+                    <span className="text-gray-500">$</span>{' '}
+                    <span className="text-green-400">claude mcp add aiui</span>
                   </code>
                 </pre>
+                <p className="mt-4 text-sm text-gray-500">
+                  One command. That&apos;s it. Your design system is now connected.
+                </p>
               </div>
             </div>
             {/* Glow effect behind code block */}

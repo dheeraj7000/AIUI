@@ -1,4 +1,4 @@
-import { Palette, Key, FileJson } from 'lucide-react';
+import { Palette, Plug, Rocket } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 interface Step {
@@ -12,27 +12,27 @@ interface Step {
 const steps: Step[] = [
   {
     number: '1',
-    title: 'Get your API key',
+    title: 'Define your design system',
     description:
-      'Visit /quick-setup, enter your email, and receive an API key instantly. No credit card required.',
-    icon: Key,
-    detail: 'Keys are scoped to your workspace and can be rotated any time from the dashboard.',
+      'Import your tokens, pick a style pack, or build from scratch in the visual studio. No credit card required.',
+    icon: Palette,
+    detail: 'Colors, typography, spacing, components, and rules -- all in one place.',
   },
   {
     number: '2',
-    title: 'Add one MCP config',
+    title: 'Connect your IDE',
     description:
-      'Paste a single JSON block into your .mcp.json file. Works with Claude Code, Cursor, Windsurf, and more.',
-    icon: FileJson,
-    detail: 'Connects your AI tool to your design tokens, components, and rules via MCP.',
+      'One command connects Claude, Cursor, or VS Code to your design system. Setup takes under a minute.',
+    icon: Plug,
+    detail: 'Works with any MCP-compatible AI tool, automatically stays in sync.',
   },
   {
     number: '3',
-    title: 'Sync your design memory',
+    title: 'Ship consistent UIs',
     description:
-      'Ask Claude to sync your design system. It writes .aiui/ files into your project so every conversation follows your rules.',
-    icon: Palette,
-    detail: 'Design tokens, component recipes, and style rules persist across all sessions.',
+      'Every AI-generated component follows your tokens, patterns, and rules. Your product stays on-brand across every screen.',
+    icon: Rocket,
+    detail: 'Design decisions persist across all sessions and team members.',
   },
 ];
 
@@ -84,30 +84,13 @@ export function HowItWorks() {
                     <p className="mt-2 text-xs text-gray-400 max-w-xs mx-auto">{step.detail}</p>
                   )}
 
-                  {/* Code block for step 2 */}
+                  {/* Terminal command for step 2 */}
                   {step.number === '2' && (
                     <div className="mt-5 mx-auto max-w-sm rounded-lg bg-gray-950 p-4 text-left overflow-x-auto shadow-lg">
                       <pre className="text-xs leading-relaxed font-mono">
                         <code>
-                          <span className="text-gray-500">{'// .mcp.json'}</span>
-                          {'\n'}
-                          <span className="text-gray-500">{'{'}</span>
-                          {'\n'}
-                          <span className="text-gray-500">{'  '}</span>
-                          <span className="text-blue-400">{'"mcpServers"'}</span>
-                          <span className="text-gray-500">: {'{'}</span>
-                          {'\n'}
-                          <span className="text-gray-500">{'    '}</span>
-                          <span className="text-green-400">{'"aiui"'}</span>
-                          <span className="text-gray-500">: {'{ '}</span>
-                          <span className="text-blue-400">{'"url"'}</span>
-                          <span className="text-gray-500">: </span>
-                          <span className="text-amber-300">{'"..."'}</span>
-                          <span className="text-gray-500">{' }'}</span>
-                          {'\n'}
-                          <span className="text-gray-500">{'  }'}</span>
-                          {'\n'}
-                          <span className="text-gray-500">{'}'}</span>
+                          <span className="text-gray-500">$</span>{' '}
+                          <span className="text-green-400">claude mcp add aiui</span>
                         </code>
                       </pre>
                     </div>
