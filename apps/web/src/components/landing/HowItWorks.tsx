@@ -38,17 +38,17 @@ const steps: Step[] = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-gray-50 py-20 sm:py-24">
+    <section id="how-it-works" className="bg-zinc-950 py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
+          <p className="text-sm font-semibold uppercase tracking-wide text-lime-400">
             How It Works
           </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="mt-2 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
             Up and running in 3 steps
           </h2>
-          <p className="mt-4 text-lg leading-8 text-gray-600">
+          <p className="mt-4 text-lg leading-8 text-zinc-400">
             No packages to install. No build plugins to configure. Just your design decisions,
             delivered to Claude.
           </p>
@@ -59,8 +59,8 @@ export function HowItWorks() {
           {/* Connecting line (desktop) */}
           <div className="absolute top-16 left-0 right-0 hidden lg:block">
             <div className="mx-auto flex max-w-4xl items-center justify-between px-16">
-              <div className="h-px flex-1 bg-gradient-to-r from-blue-300 to-blue-400" />
-              <div className="h-px flex-1 bg-gradient-to-r from-blue-400 to-violet-400" />
+              <div className="h-px flex-1 bg-gradient-to-r from-lime-500 to-cyan-500" />
+              <div className="h-px flex-1 bg-gradient-to-r from-cyan-500 to-lime-500" />
             </div>
           </div>
 
@@ -70,18 +70,18 @@ export function HowItWorks() {
               return (
                 <div key={step.number} className="relative text-center lg:text-center">
                   {/* Step number */}
-                  <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-lg font-bold text-white shadow-lg shadow-blue-600/20">
+                  <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-lime-500 to-cyan-500 text-lg font-bold text-white shadow-lg shadow-lime-500/20">
                     {step.number}
                   </div>
                   <div className="mt-2 inline-flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-gray-400" />
+                    <Icon className="h-5 w-5 text-zinc-400" />
                   </div>
-                  <h3 className="mt-2 text-xl font-semibold text-gray-900">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-600 max-w-xs mx-auto">
+                  <h3 className="mt-2 text-xl font-semibold text-white">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-zinc-400 max-w-xs mx-auto">
                     {step.description}
                   </p>
                   {step.detail && (
-                    <p className="mt-2 text-xs text-gray-400 max-w-xs mx-auto">{step.detail}</p>
+                    <p className="mt-2 text-xs text-zinc-500 max-w-xs mx-auto">{step.detail}</p>
                   )}
 
                   {/* Terminal command for step 2 */}
@@ -90,7 +90,7 @@ export function HowItWorks() {
                       <pre className="text-xs leading-relaxed font-mono">
                         <code>
                           <span className="text-gray-500">$</span>{' '}
-                          <span className="text-green-400">claude mcp add aiui</span>
+                          <span className="text-lime-400">claude mcp add aiui</span>
                         </code>
                       </pre>
                     </div>

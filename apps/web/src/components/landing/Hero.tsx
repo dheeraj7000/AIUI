@@ -24,23 +24,24 @@ export function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700">
+    <section className="relative overflow-hidden bg-zinc-950">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-violet-400/10 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="absolute inset-0 bg-grid" />
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-lime-500/5 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-cyan-400/5 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-lime-500/5 blur-3xl" />
         {/* Floating token cards */}
-        <div className="absolute top-20 left-[10%] hidden lg:block rounded-lg bg-white/10 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-blue-200 border border-white/10 rotate-[-6deg]">
+        <div className="absolute top-20 left-[10%] hidden lg:block rounded-lg bg-zinc-800/60 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-zinc-400 border border-zinc-700/50 rotate-[-6deg]">
           color.primary.600
         </div>
-        <div className="absolute top-40 right-[8%] hidden lg:block rounded-lg bg-white/10 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-blue-200 border border-white/10 rotate-[4deg]">
+        <div className="absolute top-40 right-[8%] hidden lg:block rounded-lg bg-zinc-800/60 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-zinc-400 border border-zinc-700/50 rotate-[4deg]">
           radius.lg: 12px
         </div>
-        <div className="absolute bottom-32 left-[15%] hidden lg:block rounded-lg bg-white/10 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-blue-200 border border-white/10 rotate-[3deg]">
+        <div className="absolute bottom-32 left-[15%] hidden lg:block rounded-lg bg-zinc-800/60 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-zinc-400 border border-zinc-700/50 rotate-[3deg]">
           shadow.md
         </div>
-        <div className="absolute bottom-24 right-[12%] hidden lg:block rounded-lg bg-white/10 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-blue-200 border border-white/10 rotate-[-3deg]">
+        <div className="absolute bottom-24 right-[12%] hidden lg:block rounded-lg bg-zinc-800/60 backdrop-blur-sm px-3 py-1.5 text-xs font-mono text-zinc-400 border border-zinc-700/50 rotate-[-3deg]">
           font.heading: Inter
         </div>
       </div>
@@ -49,17 +50,20 @@ export function Hero() {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* Left: copy */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-blue-100 backdrop-blur-sm border border-white/10 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-lime-500/10 px-4 py-1.5 text-sm font-medium text-lime-400 backdrop-blur-sm border border-lime-500/20 mb-6">
               <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
               AI Design Control Layer
             </div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1
+              className="text-5xl font-extrabold tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl"
+              style={{ lineHeight: '1.1' }}
+            >
               Your Design System,{' '}
-              <span className="bg-gradient-to-r from-blue-200 to-violet-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
                 Always in Sync
               </span>
             </h1>
-            <p className="mt-6 text-lg leading-8 text-blue-100 max-w-xl mx-auto lg:mx-0">
+            <p className="mt-6 text-lg leading-8 text-zinc-400 max-w-xl mx-auto lg:mx-0">
               Every AI tool generates UI differently. AIUI ensures your tokens, components, and
               design rules are followed in every conversation -- so your product stays consistent no
               matter who (or what) builds it.
@@ -67,13 +71,13 @@ export function Hero() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
                 href="/quick-setup"
-                className="w-full sm:w-auto rounded-lg bg-white px-6 py-3.5 text-center text-sm font-semibold text-blue-700 shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-50 hover:shadow-xl"
+                className="w-full sm:w-auto rounded-lg bg-lime-500 px-6 py-3.5 text-center text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all hover:bg-lime-400 hover:shadow-xl"
               >
                 Get Started Free
               </Link>
               <a
                 href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-6 py-3.5 text-center text-sm font-semibold text-white transition-all hover:bg-white/10"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-700 px-6 py-3.5 text-center text-sm font-semibold text-zinc-300 transition-all hover:bg-zinc-800"
               >
                 See How It Works
               </a>
@@ -82,7 +86,7 @@ export function Hero() {
 
           {/* Right: install command */}
           <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-            <div className="rounded-xl bg-gray-950 shadow-2xl shadow-blue-900/30 border border-white/10 overflow-hidden">
+            <div className="rounded-xl bg-gray-950 shadow-2xl shadow-lime-500/10 border border-zinc-800 overflow-hidden">
               {/* Terminal title bar */}
               <div className="flex items-center justify-between px-4 py-3 bg-gray-900/80 border-b border-white/5">
                 <div className="flex items-center gap-2">
@@ -117,7 +121,7 @@ export function Hero() {
                 <pre className="text-base leading-relaxed font-mono">
                   <code>
                     <span className="text-gray-500">$</span>{' '}
-                    <span className="text-green-400">claude mcp add aiui</span>
+                    <span className="text-lime-400">claude mcp add aiui</span>
                   </code>
                 </pre>
                 <p className="mt-4 text-sm text-gray-500">
@@ -126,15 +130,15 @@ export function Hero() {
               </div>
             </div>
             {/* Glow effect behind code block */}
-            <div className="absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-r from-blue-500/20 to-violet-500/20 blur-2xl" />
+            <div className="absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-r from-lime-500/15 to-cyan-500/15 blur-2xl" />
           </div>
         </div>
 
         {/* Trust indicators */}
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-white/10 pt-8">
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-zinc-800 pt-8">
           {trustItems.map((item) => (
-            <div key={item.label} className="flex items-center gap-2 text-sm text-blue-200">
-              <Check className="h-4 w-4 text-blue-300" />
+            <div key={item.label} className="flex items-center gap-2 text-sm text-zinc-500">
+              <Check className="h-4 w-4 text-zinc-600" />
               {item.value && <span className="font-semibold text-white">{item.value}</span>}
               {item.label}
             </div>
