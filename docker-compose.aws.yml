@@ -20,7 +20,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 4M
+          memory: 6M
 
   mcp-server:
     image: ${ECR_REGISTRY}/aiui-mcp:${IMAGE_TAG:-latest}
