@@ -97,6 +97,43 @@ The deploy pipeline (`.gitlab-ci.yml`) runs automatically after tests pass on ma
 - `AWS_DEPLOY_ROLE_ARN` — from `terraform output gitlab_deploy_role_arn`
 - `ECR_REGISTRY` — from `terraform output ecr_web_url | cut -d/ -f1`
 
+## Manual Deploy Pipeline (commit → rebuild → deploy)
+
+When you make code changes and want to deploy manually:
+
+```bash
+# 1. Commit and push
+git add -A
+git commit -m "your change"
+git push origin main
+
+# 2. Login to ECR
+ECR_REGISTRY=731732766290.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+# 3. Rebuild images (from repo root)
+docker build -f apps/web/Dockerfile -t $ECR_REGISTRY/aiui-web:latest .
+docker build -f apps/mcp-server/Dockerfile -t $ECR_REGISTRY/aiui-mcp:latest .
+
+# 4. Push to ECR
+docker push $ECR_REGISTRY/aiui-web:latest
+docker push $ECR_REGISTRY/aiui-mcp:latest
+
+# 5. Deploy to EC2 (pulls new images and restarts)
+ssh -i infra/aiui-key.pem ec2-user@$(cd infra && terraform output -raw ec2_public_ip) \
+  "cd /opt/aiui && \
+   sudo git pull origin main && \
+   sudo aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY && \
+   sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.aws.yml pull web mcp-server && \
+   sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.aws.yml up -d web mcp-server"
+
+# 6. Verify
+curl -sf https://aiui.store/api/health
+curl -sf https://aiui.store/health
+```
+
+Once GitLab CI/CD variables are set, pushes to `main` will auto-deploy via `.gitlab-ci.yml`.
+
 ## SSH Access
 
 ```bash
