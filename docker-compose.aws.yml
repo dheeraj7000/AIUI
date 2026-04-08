@@ -4,10 +4,15 @@
 # Requires ECR_REGISTRY env var (e.g., 123456789.dkr.ecr.us-east-1.amazonaws.com)
 
 services:
-  # Disable local postgres — using Neon (external)
+  # Override local postgres — using Neon (external)
+  # Set entrypoint to /bin/true so it starts and exits immediately
   postgres:
-    profiles:
-      - disabled
+    entrypoint: ["echo", "skipped"]
+    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "true"]
+      interval: 1s
+      retries: 1
 
   mcp-server:
     image: ${ECR_REGISTRY}/aiui-mcp:${IMAGE_TAG:-latest}
