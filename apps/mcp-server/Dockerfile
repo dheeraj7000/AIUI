@@ -40,13 +40,25 @@ ENV MCP_SERVER_PORT=8080
 RUN addgroup --system --gid 1001 aiui && \
     adduser --system --uid 1001 --ingroup aiui aiui
 
-# Copy built artifacts and production deps
+# Copy package.json files for module resolution
+COPY --from=prod-deps --chown=aiui:aiui /app/package.json ./package.json
+COPY --from=prod-deps --chown=aiui:aiui /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=prod-deps --chown=aiui:aiui /app/apps/mcp-server/package.json ./apps/mcp-server/package.json
+COPY --from=prod-deps --chown=aiui:aiui /app/packages/types/package.json ./packages/types/package.json
+COPY --from=prod-deps --chown=aiui:aiui /app/packages/design-core/package.json ./packages/design-core/package.json
+COPY --from=prod-deps --chown=aiui:aiui /app/packages/prompt-compiler/package.json ./packages/prompt-compiler/package.json
+COPY --from=prod-deps --chown=aiui:aiui /app/packages/component-engine/package.json ./packages/component-engine/package.json
+
+# Copy production deps (root + workspace node_modules)
+COPY --from=prod-deps --chown=aiui:aiui /app/node_modules ./node_modules
+COPY --from=prod-deps --chown=aiui:aiui /app/apps/mcp-server/node_modules ./apps/mcp-server/node_modules
+
+# Copy built artifacts
 COPY --from=builder --chown=aiui:aiui /app/apps/mcp-server/dist ./apps/mcp-server/dist
 COPY --from=builder --chown=aiui:aiui /app/packages/types/dist ./packages/types/dist
 COPY --from=builder --chown=aiui:aiui /app/packages/design-core/dist ./packages/design-core/dist
 COPY --from=builder --chown=aiui:aiui /app/packages/prompt-compiler/dist ./packages/prompt-compiler/dist
 COPY --from=builder --chown=aiui:aiui /app/packages/component-engine/dist ./packages/component-engine/dist
-COPY --from=prod-deps --chown=aiui:aiui /app/node_modules ./node_modules
 
 USER aiui
 EXPOSE 8080
