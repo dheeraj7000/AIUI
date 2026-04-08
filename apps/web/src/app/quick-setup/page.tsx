@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { LandingNav } from '@/components/landing/LandingNav';
+import { Footer } from '@/components/landing/Footer';
 
 type Step = 'email' | 'loading' | 'done';
 
@@ -108,123 +111,133 @@ export default function QuickSetupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-16">
-      <h1 className="text-2xl font-bold text-gray-900">AIUI Quick Setup</h1>
-      <p className="mt-2 text-gray-500 mb-8">
-        Get an API key and connect your AI coding assistant in 30 seconds.
-      </p>
+    <div className="bg-zinc-950 min-h-screen">
+      <LandingNav />
+      <div className="mx-auto max-w-2xl px-6 py-16">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 text-zinc-400 hover:text-white text-sm mb-6 transition-colors"
+        >
+          &larr; Back to home
+        </Link>
+        <h1 className="text-3xl font-bold text-white">AIUI Quick Setup</h1>
+        <p className="mt-2 text-zinc-400 mb-8">
+          Get an API key and connect your AI coding assistant in 30 seconds.
+        </p>
 
-      {step === 'email' && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <form onSubmit={handleSubmit}>
-            {error && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 mb-4">
-                {error}
-              </div>
-            )}
+        {step === 'email' && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <div className="rounded-lg bg-red-950/50 px-4 py-3 text-sm text-red-400 mb-4">
+                  {error}
+                </div>
+              )}
 
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-base focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none mb-4"
-            />
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500 px-3.5 py-2.5 text-base focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none mb-4"
+              />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min 8 characters"
-              className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-base focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none mb-6"
-            />
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">Password</label>
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min 8 characters"
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500 px-3.5 py-2.5 text-base focus:ring-2 focus:ring-lime-500/20 focus:border-lime-500 outline-none mb-6"
+              />
 
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 text-base font-semibold transition-colors"
-            >
-              Get API Key
-            </button>
-          </form>
-        </div>
-      )}
-
-      {step === 'loading' && (
-        <div className="text-center py-10 text-gray-500">Setting up your account...</div>
-      )}
-
-      {step === 'done' && result && (
-        <div>
-          <div className="rounded-lg bg-green-50 border border-green-200 px-5 py-4 mb-6">
-            <div className="font-semibold text-green-800 mb-1">Your API Key</div>
-            <code className="text-sm break-all block mb-2">{result.apiKey}</code>
-            <button
-              onClick={() => copyToClipboard(result.apiKey, 'key')}
-              className="bg-green-800 hover:bg-green-900 text-white rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
-            >
-              {copied === 'key' ? 'Copied!' : 'Copy'}
-            </button>
-            <p className="text-xs text-gray-500 mt-2 mb-0">
-              Save this key — it will not be shown again.
-            </p>
+              <button
+                type="submit"
+                className="w-full bg-lime-500 hover:bg-lime-400 text-zinc-950 rounded-lg px-4 py-2.5 text-base font-semibold transition-colors"
+              >
+                Get API Key
+              </button>
+            </form>
           </div>
+        )}
 
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Connect Your AI Assistant</h2>
+        {step === 'loading' && (
+          <div className="text-center py-10 text-zinc-400">Setting up your account...</div>
+        )}
 
-          <SetupBlock
-            title="Claude Code"
-            code={`claude mcp add --transport http aiui ${result.mcpUrl} --header "Authorization:Bearer ${result.apiKey}"`}
-            copied={copied}
-            onCopy={copyToClipboard}
-            id="claude"
-          />
+        {step === 'done' && result && (
+          <div>
+            <div className="rounded-lg bg-lime-950/30 border border-lime-500/30 px-5 py-4 mb-6">
+              <div className="font-semibold text-lime-400 mb-1">Your API Key</div>
+              <code className="text-sm break-all block mb-2 text-lime-400">{result.apiKey}</code>
+              <button
+                onClick={() => copyToClipboard(result.apiKey, 'key')}
+                className="bg-lime-600 hover:bg-lime-500 text-zinc-950 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+              >
+                {copied === 'key' ? 'Copied!' : 'Copy'}
+              </button>
+              <p className="text-xs text-zinc-400 mt-2 mb-0">
+                Save this key — it will not be shown again.
+              </p>
+            </div>
 
-          <SetupBlock
-            title="Cursor (.cursor/mcp.json)"
-            code={JSON.stringify(
-              {
-                mcpServers: {
-                  aiui: {
-                    type: 'http',
-                    url: result.mcpUrl,
-                    headers: { Authorization: `Bearer ${result.apiKey}` },
+            <h2 className="text-lg font-semibold text-white mb-3">Connect Your AI Assistant</h2>
+
+            <SetupBlock
+              title="Claude Code"
+              code={`claude mcp add --transport http aiui ${result.mcpUrl} --header "Authorization:Bearer ${result.apiKey}"`}
+              copied={copied}
+              onCopy={copyToClipboard}
+              id="claude"
+            />
+
+            <SetupBlock
+              title="Cursor (.cursor/mcp.json)"
+              code={JSON.stringify(
+                {
+                  mcpServers: {
+                    aiui: {
+                      type: 'http',
+                      url: result.mcpUrl,
+                      headers: { Authorization: `Bearer ${result.apiKey}` },
+                    },
                   },
                 },
-              },
-              null,
-              2
-            )}
-            copied={copied}
-            onCopy={copyToClipboard}
-            id="cursor"
-          />
+                null,
+                2
+              )}
+              copied={copied}
+              onCopy={copyToClipboard}
+              id="cursor"
+            />
 
-          <SetupBlock
-            title="VS Code (settings.json)"
-            code={JSON.stringify(
-              {
-                'mcp.servers': {
-                  aiui: {
-                    type: 'http',
-                    url: result.mcpUrl,
-                    headers: { Authorization: `Bearer ${result.apiKey}` },
+            <SetupBlock
+              title="VS Code (settings.json)"
+              code={JSON.stringify(
+                {
+                  'mcp.servers': {
+                    aiui: {
+                      type: 'http',
+                      url: result.mcpUrl,
+                      headers: { Authorization: `Bearer ${result.apiKey}` },
+                    },
                   },
                 },
-              },
-              null,
-              2
-            )}
-            copied={copied}
-            onCopy={copyToClipboard}
-            id="vscode"
-          />
-        </div>
-      )}
+                null,
+                2
+              )}
+              copied={copied}
+              onCopy={copyToClipboard}
+              id="vscode"
+            />
+          </div>
+        )}
+      </div>
+      <Footer />
     </div>
   );
 }
@@ -245,10 +258,10 @@ function SetupBlock({
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-sm font-semibold text-gray-900">{title}</span>
+        <span className="text-sm font-semibold text-zinc-200">{title}</span>
         <button
           onClick={() => onCopy(code, id)}
-          className="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors"
+          className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-md px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors"
         >
           {copied === id ? 'Copied!' : 'Copy'}
         </button>

@@ -9,7 +9,7 @@ const navLinks = [
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Docs', href: '/docs' },
   { label: 'Quick Setup', href: '/quick-setup' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Contact', href: '#contact' },
 ];
 
 export function LandingNav() {
