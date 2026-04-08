@@ -19,6 +19,7 @@ const PUBLIC_PAGE_PREFIXES = [
   '/import',
   '/api-keys',
   '/quick-setup',
+  '/profile',
   '/docs',
   '/_next',
   '/favicon.ico',

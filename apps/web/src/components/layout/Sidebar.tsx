@@ -10,8 +10,12 @@ import {
   Key,
   Download,
   Zap,
+  User,
+  LogOut,
+  ExternalLink,
   type LucideIcon,
 } from 'lucide-react';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface NavItem {
   label: string;
@@ -63,6 +67,14 @@ function NavLink({
 
 export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
+
+  const userEmail = user?.email ?? '';
+
+  const handleSignOut = async () => {
+    onClose?.();
+    await signOut();
+  };
 
   return (
     <nav className="flex h-full w-60 flex-col border-r border-zinc-800 bg-zinc-900">
@@ -107,6 +119,35 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
             onClose={onClose}
           />
         ))}
+      </div>
+
+      {/* User section */}
+      <div className="border-t border-zinc-800 px-3 py-3">
+        {userEmail && <p className="mb-2 truncate px-2 text-xs text-zinc-500">{userEmail}</p>}
+        <div className="flex items-center gap-1">
+          <Link
+            href="/profile"
+            onClick={onClose}
+            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
+          >
+            <User size={14} />
+            Profile
+          </Link>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
+          >
+            <LogOut size={14} />
+            Sign Out
+          </button>
+        </div>
+        <Link
+          href="/"
+          className="mt-2 flex items-center gap-1 px-2 text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+        >
+          <ExternalLink size={12} />
+          aiui.store
+        </Link>
       </div>
     </nav>
   );
