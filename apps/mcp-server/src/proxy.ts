@@ -13,7 +13,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { log } from './lib/errors';
 
-const DEFAULT_API_URL = 'https://mcp.aiui.dev/mcp';
+const DEFAULT_API_URL = 'https://aiui.store/mcp';
 
 export async function startProxy(apiKey: string): Promise<void> {
   const apiUrl = process.env.AIUI_API_URL ?? DEFAULT_API_URL;

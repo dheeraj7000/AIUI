@@ -18,8 +18,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <pre>{`{
   "mcpServers": {
     "aiui": {
-      "type": "streamable-http",
-      "url": "https://mcp.aiui.dev/mcp"
+      "type": "http",
+      "url": "https://aiui.store/mcp"
     }
   }
 }`}</pre>

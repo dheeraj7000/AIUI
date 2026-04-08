@@ -7,8 +7,8 @@ import { Copy, Check, ExternalLink } from 'lucide-react';
 const configSnippet = `{
   "mcpServers": {
     "aiui": {
-      "type": "streamable-http",
-      "url": "https://mcp.aiui.dev/mcp",
+      "type": "http",
+      "url": "https://aiui.store/mcp",
       "headers": {
         "Authorization": "Bearer aiui_k_..."
       }
@@ -117,13 +117,13 @@ export function CTA() {
                     <span className="text-gray-500">{'      '}</span>
                     <span className="text-blue-400">{'"type"'}</span>
                     <span className="text-gray-500">: </span>
-                    <span className="text-amber-300">{'"streamable-http"'}</span>
+                    <span className="text-amber-300">{'"http"'}</span>
                     <span className="text-gray-500">,</span>
                     {'\n'}
                     <span className="text-gray-500">{'      '}</span>
                     <span className="text-blue-400">{'"url"'}</span>
                     <span className="text-gray-500">: </span>
-                    <span className="text-amber-300">{'"https://mcp.aiui.dev/mcp"'}</span>
+                    <span className="text-amber-300">{'"https://aiui.store/mcp"'}</span>
                     <span className="text-gray-500">,</span>
                     {'\n'}
                     <span className="text-gray-500">{'      '}</span>

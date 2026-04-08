@@ -51,7 +51,7 @@ program
   .option('--files <glob>', 'Files to scan', 'src/**/*.{tsx,jsx,ts,js,css,html}')
   .option('--tokens <path>', 'Path to tokens.json', '.aiui/tokens.json')
   .option('--api-key <key>', 'AIUI API key')
-  .option('--api-url <url>', 'AIUI API URL', 'https://mcp.aiui.dev')
+  .option('--api-url <url>', 'AIUI API URL', 'https://aiui.store')
   .option('--project <slug>', 'Project slug (with --api-key)')
   .option('--format <fmt>', 'Output: text | json | github', 'text')
   .option('--strict', 'Exit 1 on any violation')

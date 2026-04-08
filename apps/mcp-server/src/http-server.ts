@@ -107,7 +107,7 @@ export async function startHttpServer(port: number) {
       uptime_seconds: Math.floor((Date.now() - SERVER_START_TIME) / 1000),
       tools_count: TOOLS_COUNT,
       sessions_active: transports.size,
-      transport: 'streamable-http',
+      transport: 'http',
     });
   });
 

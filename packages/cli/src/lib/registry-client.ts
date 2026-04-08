@@ -31,7 +31,7 @@ export interface RegistryIndexItem {
   componentCount: number;
 }
 
-const DEFAULT_REGISTRY = process.env.AIUI_REGISTRY_URL ?? 'https://app.aiui.dev';
+const DEFAULT_REGISTRY = process.env.AIUI_REGISTRY_URL ?? 'https://aiui.store';
 
 /**
  * Resolve a pack identifier to a registry URL.

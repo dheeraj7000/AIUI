@@ -20,7 +20,7 @@ export default function QuickSetupPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const mcpUrl =
-    typeof window !== 'undefined' ? `${window.location.origin}/mcp` : 'https://app.aiui.dev/mcp';
+    typeof window !== 'undefined' ? `${window.location.origin}/mcp` : 'https://aiui.store/mcp';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -263,7 +263,7 @@ export default function QuickSetupPage() {
               {
                 mcpServers: {
                   aiui: {
-                    type: 'streamable-http',
+                    type: 'http',
                     url: result.mcpUrl,
                     headers: { Authorization: `Bearer ${result.apiKey}` },
                   },
@@ -283,7 +283,7 @@ export default function QuickSetupPage() {
               {
                 'mcp.servers': {
                   aiui: {
-                    type: 'streamable-http',
+                    type: 'http',
                     url: result.mcpUrl,
                     headers: { Authorization: `Bearer ${result.apiKey}` },
                   },

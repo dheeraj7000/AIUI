@@ -267,8 +267,8 @@ export default async function ProjectDetailPage(props: RouteContext) {
                 {`{
   "mcpServers": {
     "aiui": {
-      "type": "streamable-http",
-      "url": "${process.env.NEXT_PUBLIC_MCP_URL ?? 'https://mcp.aiui.dev/mcp'}",
+      "type": "http",
+      "url": "${process.env.NEXT_PUBLIC_MCP_URL ?? 'https://aiui.store/mcp'}",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }
