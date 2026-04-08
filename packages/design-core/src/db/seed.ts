@@ -22,6 +22,8 @@ import { healthcareCleanV1 } from './seed-data/healthcare-clean-v1';
 import { aiStudioV1 } from './seed-data/ai-studio-v1';
 import { mobileFirstV1 } from './seed-data/mobile-first-v1';
 import { minimalMonoV1 } from './seed-data/minimal-mono-v1';
+import { uiversePrimitivesV1 } from './seed-data/uiverse-primitives-v1';
+import { uiverseEffectsV1 } from './seed-data/uiverse-effects-v1';
 
 const SEED_PACKS = [
   saasCleanV1,
@@ -36,6 +38,8 @@ const SEED_PACKS = [
   aiStudioV1,
   mobileFirstV1,
   minimalMonoV1,
+  uiversePrimitivesV1,
+  uiverseEffectsV1,
 ];
 
 async function seed() {
