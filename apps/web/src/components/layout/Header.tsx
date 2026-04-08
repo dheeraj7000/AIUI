@@ -21,14 +21,14 @@ function Breadcrumbs() {
   };
 
   return (
-    <div className="flex items-center gap-1 text-sm text-gray-500">
+    <div className="flex items-center gap-1 text-sm text-zinc-400">
       {segments.map((segment, i) => {
         const label = labels[segment] || segment;
         const isLast = i === segments.length - 1;
         return (
           <span key={i} className="flex items-center gap-1">
-            {i > 0 && <span className="text-gray-300">/</span>}
-            <span className={isLast ? 'font-medium text-gray-900' : ''}>{label}</span>
+            {i > 0 && <span className="text-zinc-600">/</span>}
+            <span className={isLast ? 'font-medium text-white' : ''}>{label}</span>
           </span>
         );
       })}
@@ -42,11 +42,11 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   return (
-    <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4">
+    <header className="flex h-14 items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4">
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-gray-500 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 md:hidden"
+          className="rounded-lg p-2 text-zinc-400 transition-all duration-200 hover:bg-zinc-800 hover:text-white md:hidden"
           aria-label="Open menu"
         >
           <Menu size={20} />
@@ -54,7 +54,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         <Breadcrumbs />
       </div>
       <div className="flex items-center gap-3">
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white transition-all duration-200 hover:shadow-md">
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-lime-500 to-cyan-500 text-zinc-950 transition-all duration-200 hover:shadow-md">
           <CircleUser size={18} strokeWidth={1.5} />
         </button>
       </div>

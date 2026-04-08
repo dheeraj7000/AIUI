@@ -80,8 +80,8 @@ export default async function ComponentBrowserPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900">Components</h1>
-      <p className="mt-2 text-sm text-gray-600">
+      <h1 className="text-2xl font-bold text-white">Components</h1>
+      <p className="mt-2 text-sm text-zinc-400">
         Browse {recipes.length} component recipes from your design library.
       </p>
 

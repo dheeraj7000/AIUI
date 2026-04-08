@@ -43,6 +43,26 @@ export const frameworkTargetEnum = pgEnum('framework_target', [
   'react-tailwind',
 ]);
 
+export const graphNodeTypeEnum = pgEnum('graph_node_type', [
+  'page',
+  'component',
+  'token',
+  'style-pack',
+  'project',
+  'route',
+  'api-endpoint',
+]);
+
+export const graphEdgeTypeEnum = pgEnum('graph_edge_type', [
+  'uses',
+  'contains',
+  'links-to',
+  'derives-from',
+  'overrides',
+  'imports',
+  'styled-by',
+]);
+
 export const componentTypeEnum = pgEnum('component_type', [
   // Existing section-level types
   'hero',

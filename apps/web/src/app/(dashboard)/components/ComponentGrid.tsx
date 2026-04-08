@@ -38,17 +38,17 @@ const typeIcons: Record<string, LucideIcon> = {
 };
 
 const typeColors: Record<string, string> = {
-  hero: 'bg-violet-50 text-violet-700',
-  pricing: 'bg-green-50 text-green-700',
-  faq: 'bg-amber-50 text-amber-700',
-  footer: 'bg-gray-100 text-gray-700',
-  header: 'bg-blue-50 text-blue-700',
-  cta: 'bg-rose-50 text-rose-700',
-  testimonial: 'bg-cyan-50 text-cyan-700',
-  feature: 'bg-indigo-50 text-indigo-700',
-  contact: 'bg-teal-50 text-teal-700',
-  card: 'bg-orange-50 text-orange-700',
-  navigation: 'bg-sky-50 text-sky-700',
+  hero: 'bg-violet-500/10 text-violet-400',
+  pricing: 'bg-green-500/10 text-green-400',
+  faq: 'bg-amber-500/10 text-amber-400',
+  footer: 'bg-zinc-800 text-zinc-300',
+  header: 'bg-blue-500/10 text-blue-400',
+  cta: 'bg-rose-500/10 text-rose-400',
+  testimonial: 'bg-cyan-500/10 text-cyan-400',
+  feature: 'bg-indigo-500/10 text-indigo-400',
+  contact: 'bg-teal-500/10 text-teal-400',
+  card: 'bg-orange-500/10 text-orange-400',
+  navigation: 'bg-sky-500/10 text-sky-400',
 };
 
 export interface RecipeItem {
@@ -122,14 +122,14 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
           onClick={() => handleTypeChange('All')}
           className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
             activeType === 'All'
-              ? 'border-gray-900 bg-gray-900 text-white shadow-sm'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:shadow-sm'
+              ? 'border-lime-500 bg-lime-500 text-zinc-950 shadow-sm'
+              : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:shadow-sm'
           }`}
         >
           All
           <span
             className={`ml-0.5 rounded-full px-1.5 py-px text-[10px] ${
-              activeType === 'All' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+              activeType === 'All' ? 'bg-black/20 text-zinc-950' : 'bg-zinc-800 text-zinc-500'
             }`}
           >
             {recipes.length}
@@ -145,15 +145,15 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
               onClick={() => handleTypeChange(t)}
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 isActive
-                  ? 'border-gray-900 bg-gray-900 text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:shadow-sm'
+                  ? 'border-lime-500 bg-lime-500 text-zinc-950 shadow-sm'
+                  : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:shadow-sm'
               }`}
             >
               <TypeIcon size={12} />
               {t}
               <span
                 className={`ml-0.5 rounded-full px-1.5 py-px text-[10px] ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                  isActive ? 'bg-black/20 text-zinc-950' : 'bg-zinc-800 text-zinc-500'
                 }`}
               >
                 {typeCounts[t] ?? 0}
@@ -169,7 +169,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
           <Link
             key={recipe.id}
             href={`/components/${recipe.id}`}
-            className="group rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            className="group rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
           >
             {/* Visual preview thumbnail */}
             <div className="p-3 pb-0">
@@ -184,18 +184,18 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
 
             {/* Info */}
             <div className="px-4 pb-4 pt-3">
-              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-gray-700">
+              <h3 className="text-sm font-semibold text-white group-hover:text-zinc-200">
                 {recipe.name}
               </h3>
               <div className="mt-1.5 flex items-center gap-2">
                 <span
-                  className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${typeColors[recipe.type] ?? 'bg-gray-100 text-gray-600'}`}
+                  className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${typeColors[recipe.type] ?? 'bg-zinc-800 text-zinc-400'}`}
                 >
                   {recipe.type}
                 </span>
                 {recipe.packName && (
-                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                    <span className="inline-block h-1 w-1 rounded-full bg-gray-300" />
+                  <span className="flex items-center gap-1 text-[11px] text-zinc-500">
+                    <span className="inline-block h-1 w-1 rounded-full bg-zinc-600" />
                     {recipe.packName}
                   </span>
                 )}
@@ -208,8 +208,8 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
       {/* Empty state */}
       {pageItems.length === 0 && (
         <div className="mt-12 flex flex-col items-center text-center">
-          <Puzzle size={32} className="text-gray-300" />
-          <p className="mt-2 text-sm text-gray-500">No components found for this type.</p>
+          <Puzzle size={32} className="text-zinc-600" />
+          <p className="mt-2 text-sm text-zinc-400">No components found for this type.</p>
         </div>
       )}
 
@@ -219,7 +219,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage <= 1}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 text-zinc-400 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft size={16} />
           </button>
@@ -231,8 +231,8 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
                 onClick={() => setPage(p)}
                 className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
                   p === safePage
-                    ? 'bg-gray-900 text-white'
-                    : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                    ? 'bg-lime-500 text-zinc-950'
+                    : 'border border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
                 }`}
               >
                 {p}
@@ -243,7 +243,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage >= totalPages}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 text-zinc-400 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight size={16} />
           </button>
@@ -252,7 +252,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
 
       {/* Page info */}
       {filtered.length > ITEMS_PER_PAGE && (
-        <p className="mt-2 text-center text-xs text-gray-400">
+        <p className="mt-2 text-center text-xs text-zinc-500">
           Showing {start + 1}&ndash;{Math.min(start + ITEMS_PER_PAGE, filtered.length)} of{' '}
           {filtered.length} components
         </p>

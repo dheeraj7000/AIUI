@@ -7,6 +7,8 @@ export {
   resourceTypeEnum,
   frameworkTargetEnum,
   componentTypeEnum,
+  graphNodeTypeEnum,
+  graphEdgeTypeEnum,
 } from './enums';
 
 // Tables
@@ -26,6 +28,7 @@ export { invitations, invitationStatusEnum, invitationRoleEnum } from './invitat
 export { apiKeys } from './api-keys';
 export { usageEvents, creditLedger } from './usage';
 export { packRegistry, packRatings } from './marketplace';
+export { graphNodes, graphEdges } from './graph';
 
 // Relations
 export {

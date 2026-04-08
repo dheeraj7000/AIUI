@@ -12,7 +12,7 @@ export function AppShell({ children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-zinc-950">
       {/* Desktop sidebar */}
       <div className="hidden md:block">
         <div className="shadow-sm">
@@ -24,7 +24,7 @@ export function AppShell({ children }: AppShellProps) {
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
             onClick={() => setSidebarOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 z-50 w-60 shadow-xl transition-transform duration-300">

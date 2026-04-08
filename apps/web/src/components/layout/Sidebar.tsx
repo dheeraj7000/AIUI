@@ -51,11 +51,11 @@ function NavLink({
       onClick={onClose}
       className={`mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
         active
-          ? 'bg-blue-50 text-blue-700 shadow-sm'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          ? 'bg-lime-500/10 text-lime-400 shadow-sm'
+          : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
       }`}
     >
-      <Icon size={18} className={active ? 'text-blue-600' : 'text-gray-400'} />
+      <Icon size={18} className={active ? 'text-lime-400' : 'text-zinc-500'} />
       {item.label}
     </Link>
   );
@@ -65,14 +65,16 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex h-full w-60 flex-col border-r border-gray-200 bg-white">
-      <div className="flex h-14 items-center border-b border-gray-200 px-4">
-        <Link href="/dashboard" className="text-lg font-bold text-gray-900 tracking-tight">
-          AIUI
+    <nav className="flex h-full w-60 flex-col border-r border-zinc-800 bg-zinc-900">
+      <div className="flex h-14 items-center border-b border-zinc-800 px-4">
+        <Link href="/dashboard" className="text-lg font-bold tracking-tight">
+          <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+            AIUI
+          </span>
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
           Main
         </div>
         {mainItems.map((item) => (
@@ -83,7 +85,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
             onClose={onClose}
           />
         ))}
-        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
           Design
         </div>
         {designItems.map((item) => (
@@ -94,7 +96,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
             onClose={onClose}
           />
         ))}
-        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
           Integration
         </div>
         {integrationItems.map((item) => (

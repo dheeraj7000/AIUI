@@ -321,6 +321,16 @@ export { publishPack, searchPacks, getMarketplacePack, ratePack } from './operat
 export { publishPackSchema, searchPacksSchema, ratePackSchema } from './validation/marketplace';
 export type { PublishPackInput, SearchPacksInput, RatePackInput } from './validation/marketplace';
 
+// Graph operations
+export {
+  getProjectGraph,
+  createGraphNode,
+  createGraphEdge,
+  deleteGraphNode,
+  deleteGraphEdge,
+  autoGenerateGraph,
+} from './operations/graph';
+
 // Registry
 export { serializePackForRegistry, getRegistryIndex } from './operations/registry';
 export {

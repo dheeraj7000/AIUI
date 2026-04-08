@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { Network } from 'lucide-react';
 import {
   createDb,
   projects,
@@ -123,6 +124,13 @@ export default async function ProjectDetailPage(props: RouteContext) {
             </span>
           </div>
         </div>
+        <Link
+          href={`/projects/${project.slug}/graph`}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+        >
+          <Network size={16} className="text-gray-500" />
+          View Graph
+        </Link>
       </div>
 
       {/* Stats */}

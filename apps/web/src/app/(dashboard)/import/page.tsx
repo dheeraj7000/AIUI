@@ -102,10 +102,10 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
   const totalCount = data.stats.total ?? data.tokens.length;
 
   return (
-    <div className="mt-6 space-y-4 rounded-xl border border-gray-200 bg-white p-6">
+    <div className="mt-6 space-y-4 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
       {/* Stats badges */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+        <span className="rounded-full bg-lime-500/10 px-3 py-1 text-xs font-semibold text-lime-400">
           {totalCount} total tokens
         </span>
         {statEntries.map(([key, val]) => {
@@ -113,7 +113,7 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
           return (
             <span
               key={key}
-              className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700"
+              className="flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-800 px-3 py-1 text-xs font-medium text-zinc-300"
             >
               <Icon size={12} />
               {val} {key}
@@ -125,7 +125,7 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
       {/* Color swatches */}
       {colorTokens.length > 0 && (
         <div>
-          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Colors
           </h4>
           <div className="flex flex-wrap gap-3">
@@ -138,7 +138,7 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
               />
             ))}
             {colorTokens.length > 24 && (
-              <span className="flex items-center text-xs text-gray-400">
+              <span className="flex items-center text-xs text-zinc-500">
                 +{colorTokens.length - 24} more
               </span>
             )}
@@ -149,7 +149,7 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
       {/* Font samples */}
       {fontTokens.length > 0 && (
         <div>
-          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Fonts
           </h4>
           <div className="flex flex-wrap gap-3">
@@ -167,14 +167,14 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
 
       {/* Warnings */}
       {data.warnings.length > 0 && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-amber-800">
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-amber-400">
             <AlertTriangle size={16} />
             {data.warnings.length} warning{data.warnings.length !== 1 ? 's' : ''}
           </div>
           <ul className="mt-2 space-y-1">
             {data.warnings.map((w, i) => (
-              <li key={i} className="text-xs text-amber-700">
+              <li key={i} className="text-xs text-amber-400/80">
                 {w}
               </li>
             ))}
@@ -256,7 +256,7 @@ function FigmaTab() {
   return (
     <div className="space-y-4">
       <div>
-        <label htmlFor="figma-url" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="figma-url" className="block text-sm font-medium text-zinc-400">
           Figma File URL
         </label>
         <input
@@ -265,12 +265,12 @@ function FigmaTab() {
           placeholder="https://www.figma.com/file/..."
           value={fileUrl}
           onChange={(e) => setFileUrl(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
         />
       </div>
 
       <div>
-        <label htmlFor="figma-token" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="figma-token" className="block text-sm font-medium text-zinc-400">
           Personal Access Token
         </label>
         <input
@@ -279,13 +279,13 @@ function FigmaTab() {
           placeholder="figd_..."
           value={figmaToken}
           onChange={(e) => setFigmaToken(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
         />
         <a
           href="https://www.figma.com/developers/api#access-tokens"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1.5 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+          className="mt-1.5 inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300"
         >
           Get your token
           <ExternalLink size={10} />
@@ -293,13 +293,13 @@ function FigmaTab() {
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
           {error}
         </div>
       )}
 
       {state === 'success' && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-400">
           <CheckCircle2 size={16} />
           Import successful! Redirecting...
         </div>
@@ -310,7 +310,7 @@ function FigmaTab() {
           <button
             onClick={handlePreview}
             disabled={!fileUrl || !figmaToken || state === 'loading'}
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {state === 'loading' && <Loader2 size={16} className="animate-spin" />}
             Preview
@@ -321,7 +321,7 @@ function FigmaTab() {
           <>
             <button
               onClick={handleImport}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm transition-colors hover:bg-lime-400"
             >
               Import Tokens
             </button>
@@ -330,7 +330,7 @@ function FigmaTab() {
                 setState('idle');
                 setPreview(null);
               }}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 shadow-sm transition-colors hover:bg-zinc-700"
             >
               Cancel
             </button>
@@ -338,7 +338,7 @@ function FigmaTab() {
         )}
 
         {state === 'importing' && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-zinc-400">
             <Loader2 size={16} className="animate-spin" />
             Importing tokens...
           </div>
@@ -434,7 +434,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
   return (
     <div className="space-y-4">
       <div>
-        <label htmlFor={`${format}-content`} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={`${format}-content`} className="block text-sm font-medium text-zinc-400">
           Paste your {FORMAT_LABELS[format]}
         </label>
         <textarea
@@ -443,12 +443,12 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
           placeholder={FORMAT_PLACEHOLDERS[format]}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 font-mono text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 font-mono text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
         />
       </div>
 
       <div>
-        <label htmlFor={`${format}-name`} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={`${format}-name`} className="block text-sm font-medium text-zinc-400">
           Style Pack Name
         </label>
         <input
@@ -457,18 +457,18 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
           placeholder="My Imported Tokens"
           value={packName}
           onChange={(e) => setPackName(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
         />
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
           {error}
         </div>
       )}
 
       {state === 'success' && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-400">
           <CheckCircle2 size={16} />
           Import successful! Redirecting...
         </div>
@@ -479,7 +479,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
           <button
             onClick={handlePreview}
             disabled={!content || state === 'loading'}
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {state === 'loading' && <Loader2 size={16} className="animate-spin" />}
             Parse & Preview
@@ -491,7 +491,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
             <button
               onClick={handleImport}
               disabled={!packName}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm transition-colors hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Import Tokens
             </button>
@@ -500,7 +500,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
                 setState('idle');
                 setPreview(null);
               }}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 shadow-sm transition-colors hover:bg-zinc-700"
             >
               Cancel
             </button>
@@ -508,7 +508,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
         )}
 
         {state === 'importing' && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-zinc-400">
             <Loader2 size={16} className="animate-spin" />
             Importing tokens...
           </div>
@@ -530,17 +530,17 @@ export default function ImportPage() {
   return (
     <div>
       <div className="flex items-center gap-3">
-        <Download size={24} className="text-gray-900" />
+        <Download size={24} className="text-white" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Import Design Tokens</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-white">Import Design Tokens</h1>
+          <p className="mt-1 text-sm text-zinc-400">
             Import from Figma, CSS variables, Tokens Studio, or Tailwind config
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="mt-8 border-b border-gray-200">
+      <div className="mt-8 border-b border-zinc-800">
         <nav className="-mb-px flex gap-6">
           {TABS.map((tab) => {
             const Icon = tab.icon;
@@ -551,8 +551,8 @@ export default function ImportPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    ? 'border-lime-500 text-lime-400'
+                    : 'border-transparent text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
                 }`}
               >
                 <Icon size={16} />
