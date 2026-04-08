@@ -16,7 +16,6 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/mcp-server/node_modules ./apps/mcp-server/node_modules || true
 COPY . .
 RUN pnpm --filter @aiui/mcp-server... build
 
@@ -29,7 +28,7 @@ COPY packages/types/package.json packages/types/
 COPY packages/design-core/package.json packages/design-core/
 COPY packages/prompt-compiler/package.json packages/prompt-compiler/
 COPY packages/component-engine/package.json packages/component-engine/
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts && pnpm rebuild sharp 2>/dev/null || true
 
 # -- Runner --
 FROM node:20-alpine AS runner

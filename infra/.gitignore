@@ -1,0 +1,13 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+
+# SSH keys
+*.pem
+
+# Secrets — never commit tfvars with credentials
+# (prod.tfvars is safe because secrets are passed via env vars)
+secret.tfvars

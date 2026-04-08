@@ -430,7 +430,7 @@ async function serializePackForRegistry(db: Database, slug: string): Promise<Reg
 
 **Depends on:** #3 (Remote HTTP MCP — must be production-ready before hosting)
 
-**What:** Make the MCP server deployable as a standalone hosted service. Docker Compose for self-hosting. Minimal API key generation page. Deploy docs for Railway/Fly.io/Render.
+**What:** Make the MCP server deployable as a standalone hosted service. Docker Compose for local dev. Minimal API key generation page. AWS deployment infrastructure.
 
 **Why:** The fastest path to users is a hosted URL and an API key. Developers don't want to open a web dashboard — they want `https://mcp.aiui.dev/mcp` and a Bearer token.
 
@@ -441,9 +441,7 @@ async function serializePackForRegistry(db: Database, slug: string): Promise<Reg
 - `docker-compose.yml` (root)
 - `docker-compose.prod.yml` (production overrides)
 - `apps/web/src/app/quick-setup/page.tsx`
-- `docs/deploy-railway.md`
-- `docs/deploy-fly.md`
-- `docs/self-hosting.md`
+- `docs/deploy-aws.md`
 
 #### Docker Compose (`docker-compose.yml`):
 
@@ -493,16 +491,14 @@ volumes:
 
 #### Deploy docs:
 
-- **Railway** (`docs/deploy-railway.md`): Step-by-step with `railway.json` config, env var setup, Postgres addon, one-click deploy button
-- **Fly.io** (`docs/deploy-fly.md`): `fly.toml` config, Fly Postgres setup, volume configuration
-- **Self-hosting** (`docs/self-hosting.md`): Prerequisites, `docker compose up` walkthrough, env var reference table (every variable, description, default), DB migration, health checks, backup
+- **AWS** (`docs/deploy-aws.md`): ECS/Fargate deployment, RDS PostgreSQL, ALB routing, environment variables, health checks, CI/CD pipeline
 
 #### Acceptance criteria:
 
 - `docker compose up` starts MCP + Postgres, seeds DB, serves on :8080
 - Quick-setup page: email → API key → one-liner MCP commands
 - `GET /health` returns OK with version and session count
-- Deploy docs are complete for Railway and Fly.io
+- AWS deployment docs are complete
 - All env vars documented with defaults
 
 ---

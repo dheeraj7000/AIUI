@@ -1,0 +1,32 @@
+node_modules/
+.next/
+.turbo/
+dist/
+coverage/
+.git/
+.github/
+.vscode/
+.idea/
+.DS_Store
+
+# Infrastructure
+infra/
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.tfvars
+
+# Dev / CI artifacts
+spoq/
+.claude/
+.aiui/
+docs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Docker-in-docker
+docker-compose*.yml
+Dockerfile

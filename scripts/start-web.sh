@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copy static assets into standalone output for Render deployment
+# Copy static assets into standalone output for production deployment
 cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static 2>/dev/null || true
 cp -r apps/web/public apps/web/.next/standalone/apps/web/public 2>/dev/null || true
 

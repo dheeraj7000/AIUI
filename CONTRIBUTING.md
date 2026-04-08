@@ -66,7 +66,7 @@ Use conventional commits:
 ```
 feat: add style pack registry API
 fix: handle empty token arrays in compiler
-docs: update deployment guide for Fly.io
+docs: update AWS deployment guide
 refactor: extract shared auth helper for LLM routes
 ```
 
