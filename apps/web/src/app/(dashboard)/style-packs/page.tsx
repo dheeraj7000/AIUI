@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { createDb, stylePacks, styleTokens, componentRecipes } from '@aiui/design-core';
-import { eq, count, inArray } from 'drizzle-orm';
+import { eq, count, inArray, or } from 'drizzle-orm';
 import {
   Layers,
   LayoutGrid,
@@ -12,6 +12,7 @@ import {
   Download,
 } from 'lucide-react';
 import { TokenStrip } from '@/components/ui/TokenPreview';
+import { getUserOrg } from '@/lib/get-user-org';
 
 export const metadata = { title: 'Style Packs - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,21 @@ function getDb() {
 
 async function getStylePacks() {
   const db = getDb();
-  const packs = await db.select().from(stylePacks).orderBy(stylePacks.createdAt);
+  const userOrg = await getUserOrg();
+  const orgId = userOrg?.organizationId;
+
+  // Show packs belonging to the user's org OR public packs (seed data)
+  const packs = orgId
+    ? await db
+        .select()
+        .from(stylePacks)
+        .where(or(eq(stylePacks.organizationId, orgId), eq(stylePacks.isPublic, true)))
+        .orderBy(stylePacks.createdAt)
+    : await db
+        .select()
+        .from(stylePacks)
+        .where(eq(stylePacks.isPublic, true))
+        .orderBy(stylePacks.createdAt);
 
   // Fetch preview tokens for all packs in one query (color, font, radius types)
   const packIds = packs.map((p) => p.id);

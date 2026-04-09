@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { createDb, stylePacks, componentRecipes, projects } from '@aiui/design-core';
-import { count } from 'drizzle-orm';
-import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Zap, Download } from 'lucide-react';
+import { count, eq, or } from 'drizzle-orm';
+import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Key, Download } from 'lucide-react';
+import { getUserOrg } from '@/lib/get-user-org';
 
 export const metadata = { title: 'Dashboard - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -14,11 +15,44 @@ function getDb() {
 
 async function getStats() {
   const db = getDb();
-  const [packCount] = await db.select({ count: count() }).from(stylePacks);
-  const [recipeCount] = await db.select({ count: count() }).from(componentRecipes);
-  const [projectCount] = await db.select({ count: count() }).from(projects);
+  const userOrg = await getUserOrg();
+  const orgId = userOrg?.organizationId;
 
-  const recentProjects = await db.select().from(projects).orderBy(projects.createdAt).limit(6);
+  // Style packs: user's org packs + public packs
+  const [packCount] = orgId
+    ? await db
+        .select({ count: count() })
+        .from(stylePacks)
+        .where(or(eq(stylePacks.organizationId, orgId), eq(stylePacks.isPublic, true)))
+    : await db.select({ count: count() }).from(stylePacks).where(eq(stylePacks.isPublic, true));
+
+  // Component recipes: scoped to org or null org (public seed data)
+  const [recipeCount] = orgId
+    ? await db
+        .select({ count: count() })
+        .from(componentRecipes)
+        .innerJoin(stylePacks, eq(componentRecipes.stylePackId, stylePacks.id))
+        .where(or(eq(stylePacks.organizationId, orgId), eq(stylePacks.isPublic, true)))
+    : await db
+        .select({ count: count() })
+        .from(componentRecipes)
+        .innerJoin(stylePacks, eq(componentRecipes.stylePackId, stylePacks.id))
+        .where(eq(stylePacks.isPublic, true));
+
+  // Projects: scoped to org
+  const [projectCount] = orgId
+    ? await db.select({ count: count() }).from(projects).where(eq(projects.organizationId, orgId))
+    : [{ count: 0 }];
+
+  // Recent projects: scoped to org
+  const recentProjects = orgId
+    ? await db
+        .select()
+        .from(projects)
+        .where(eq(projects.organizationId, orgId))
+        .orderBy(projects.createdAt)
+        .limit(6)
+    : [];
 
   return {
     packs: packCount?.count ?? 0,
@@ -99,17 +133,17 @@ export default async function DashboardPage() {
         <h2 className="text-lg font-semibold text-white">Quick Actions</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Link
-            href="/quick-setup"
+            href="/api-keys"
             className="group rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
-                <Zap size={20} className="text-amber-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime-500/10">
+                <Key size={20} className="text-lime-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Quick Setup</h3>
+                <h3 className="text-sm font-semibold text-white">API Keys</h3>
                 <p className="text-xs text-zinc-400">
-                  Get an API key and connect your AI assistant in 30 seconds
+                  Create an API key and connect your AI coding assistant
                 </p>
               </div>
             </div>

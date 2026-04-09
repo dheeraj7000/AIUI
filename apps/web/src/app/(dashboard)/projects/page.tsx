@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { createDb, projects, stylePacks } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
+import { getUserOrg } from '@/lib/get-user-org';
 
 export const metadata = { title: 'Projects - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,11 @@ function getDb() {
 
 async function getProjects() {
   const db = getDb();
+  const userOrg = await getUserOrg();
+  const orgId = userOrg?.organizationId;
+
+  if (!orgId) return [];
+
   const all = await db
     .select({
       id: projects.id,
@@ -26,6 +32,7 @@ async function getProjects() {
     })
     .from(projects)
     .leftJoin(stylePacks, eq(projects.activeStylePackId, stylePacks.id))
+    .where(eq(projects.organizationId, orgId))
     .orderBy(projects.createdAt);
   return all;
 }

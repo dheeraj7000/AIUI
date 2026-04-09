@@ -18,7 +18,7 @@ const PUBLIC_PAGE_PREFIXES = [
   '/studio',
   '/import',
   '/api-keys',
-  '/quick-setup',
+  '/quick-setup', // redirects to /api-keys
   '/profile',
   '/docs',
   '/_next',

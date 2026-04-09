@@ -1,6 +1,7 @@
 import { createDb, componentRecipes, stylePacks, styleTokens } from '@aiui/design-core';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, or, and } from 'drizzle-orm';
 import { ComponentGrid, type RecipeItem } from './ComponentGrid';
+import { getUserOrg } from '@/lib/get-user-org';
 
 export const metadata = { title: 'Components - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -13,8 +14,15 @@ function getDb() {
 
 async function getRecipesWithColors(): Promise<RecipeItem[]> {
   const db = getDb();
+  const userOrg = await getUserOrg();
+  const orgId = userOrg?.organizationId;
 
-  // Fetch all recipes joined with packs
+  // Only show components from packs belonging to user's org or public packs
+  const packFilter = orgId
+    ? or(eq(stylePacks.organizationId, orgId), eq(stylePacks.isPublic, true))
+    : eq(stylePacks.isPublic, true);
+
+  // Fetch recipes joined with packs, filtered by org or public
   const recipes = await db
     .select({
       id: componentRecipes.id,
@@ -29,7 +37,7 @@ async function getRecipesWithColors(): Promise<RecipeItem[]> {
       packCategory: stylePacks.category,
     })
     .from(componentRecipes)
-    .leftJoin(stylePacks, eq(componentRecipes.stylePackId, stylePacks.id))
+    .innerJoin(stylePacks, and(eq(componentRecipes.stylePackId, stylePacks.id), packFilter))
     .orderBy(componentRecipes.name);
 
   // Collect unique non-null pack IDs to fetch their color tokens

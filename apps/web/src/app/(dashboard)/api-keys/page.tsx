@@ -2,7 +2,20 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { getPersistedAccessToken, getActiveOrgId } from '@/lib/session';
-import { Key, Copy, Check, Trash2, Loader2, ShieldAlert, Plus, KeyRound } from 'lucide-react';
+import {
+  Key,
+  Copy,
+  Check,
+  Trash2,
+  Loader2,
+  ShieldAlert,
+  Plus,
+  KeyRound,
+  ChevronDown,
+  ChevronRight,
+  Terminal,
+  Monitor,
+} from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -28,6 +41,8 @@ interface CreatedKeyResponse {
   createdAt: string;
 }
 
+type IdeTab = 'claude-code' | 'cursor' | 'vscode' | 'windsurf';
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -47,8 +62,12 @@ function formatDate(iso: string | null): string {
   });
 }
 
+function getMcpHost(): string {
+  return typeof window !== 'undefined' ? window.location.origin : 'https://aiui.store';
+}
+
 function mcpSnippet(rawKey: string): string {
-  const host = typeof window !== 'undefined' ? window.location.origin : 'https://aiui.store';
+  const host = getMcpHost();
   return JSON.stringify(
     {
       mcpServers: {
@@ -63,6 +82,188 @@ function mcpSnippet(rawKey: string): string {
     },
     null,
     2
+  );
+}
+
+function getIdeConfig(tab: IdeTab, rawKey: string): string {
+  const host = getMcpHost();
+
+  switch (tab) {
+    case 'claude-code':
+      return `claude mcp add --transport http aiui ${host}/mcp --header "Authorization:Bearer ${rawKey}"`;
+
+    case 'cursor':
+      return JSON.stringify(
+        {
+          mcpServers: {
+            aiui: {
+              type: 'http',
+              url: `${host}/mcp`,
+              headers: {
+                Authorization: `Bearer ${rawKey}`,
+              },
+            },
+          },
+        },
+        null,
+        2
+      );
+
+    case 'vscode':
+      return JSON.stringify(
+        {
+          'mcp.servers': {
+            aiui: {
+              type: 'http',
+              url: `${host}/mcp`,
+              headers: {
+                Authorization: `Bearer ${rawKey}`,
+              },
+            },
+          },
+        },
+        null,
+        2
+      );
+
+    case 'windsurf':
+      return JSON.stringify(
+        {
+          mcpServers: {
+            aiui: {
+              type: 'http',
+              url: `${host}/mcp`,
+              headers: {
+                Authorization: `Bearer ${rawKey}`,
+              },
+            },
+          },
+        },
+        null,
+        2
+      );
+  }
+}
+
+const IDE_TABS: { id: IdeTab; label: string; file: string }[] = [
+  { id: 'claude-code', label: 'Claude Code', file: 'Terminal command' },
+  { id: 'cursor', label: 'Cursor', file: '.cursor/mcp.json' },
+  { id: 'vscode', label: 'VS Code', file: 'settings.json' },
+  { id: 'windsurf', label: 'Windsurf', file: '.windsurf/mcp.json' },
+];
+
+// ---------------------------------------------------------------------------
+// IDE Setup Section (reusable)
+// ---------------------------------------------------------------------------
+
+function IdeSetupSection({
+  rawKey,
+  variant,
+}: {
+  rawKey: string;
+  variant: 'inline' | 'collapsible';
+}) {
+  const [activeTab, setActiveTab] = useState<IdeTab>('claude-code');
+  const [copiedIde, setCopiedIde] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+
+  async function copyIdeConfig(tab: IdeTab) {
+    try {
+      await navigator.clipboard.writeText(getIdeConfig(tab, rawKey));
+      setCopiedIde(tab);
+      setTimeout(() => setCopiedIde(null), 2000);
+    } catch {
+      // Clipboard write can fail in some contexts
+    }
+  }
+
+  const content = (
+    <div className="mt-3">
+      {/* Tab buttons */}
+      <div className="flex flex-wrap gap-1.5">
+        {IDE_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              activeTab === tab.id
+                ? 'border border-lime-500 bg-lime-500/10 text-lime-400'
+                : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-300'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Active tab content */}
+      <div className="mt-3">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs text-zinc-500">
+            {IDE_TABS.find((t) => t.id === activeTab)?.file}
+          </span>
+          <button
+            onClick={() => copyIdeConfig(activeTab)}
+            className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-300"
+          >
+            {copiedIde === activeTab ? (
+              <>
+                <Check size={12} className="text-green-500" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy size={12} />
+                Copy
+              </>
+            )}
+          </button>
+        </div>
+        <pre className="overflow-x-auto rounded-lg border border-zinc-700 bg-zinc-800 p-3 font-mono text-xs text-zinc-300 whitespace-pre-wrap break-all">
+          {getIdeConfig(activeTab, rawKey)}
+        </pre>
+      </div>
+    </div>
+  );
+
+  if (variant === 'inline') {
+    return (
+      <div className="mt-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Monitor size={16} className="text-lime-400" />
+          <span className="text-sm font-medium text-lime-300">IDE Setup</span>
+        </div>
+        {content}
+      </div>
+    );
+  }
+
+  // Collapsible variant
+  return (
+    <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-center justify-between px-5 py-4 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-lime-500/10">
+            <Terminal size={18} className="text-lime-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">IDE Setup Instructions</h3>
+            <p className="text-xs text-zinc-400">
+              Connect Claude Code, Cursor, VS Code, or Windsurf to your design system
+            </p>
+          </div>
+        </div>
+        {expanded ? (
+          <ChevronDown size={18} className="text-zinc-400" />
+        ) : (
+          <ChevronRight size={18} className="text-zinc-400" />
+        )}
+      </button>
+      {expanded && <div className="px-5 pb-5">{content}</div>}
+    </div>
   );
 }
 
@@ -299,6 +500,9 @@ export default function ApiKeysPage() {
             </pre>
           </div>
 
+          {/* IDE Setup section (inline, shown after key creation) */}
+          <IdeSetupSection rawKey={createdKey.rawKey} variant="inline" />
+
           <button
             onClick={() => setCreatedKey(null)}
             className="mt-4 rounded-lg border border-amber-500/30 bg-zinc-800 px-4 py-2 text-sm font-medium text-amber-300 transition-all duration-200 hover:bg-zinc-700"
@@ -446,6 +650,9 @@ export default function ApiKeysPage() {
           </table>
         </div>
       ) : null}
+
+      {/* Collapsible IDE Setup Instructions (always visible when keys exist) */}
+      {keys.length > 0 && <IdeSetupSection rawKey={`YOUR_API_KEY`} variant="collapsible" />}
     </div>
   );
 }
