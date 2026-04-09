@@ -2,9 +2,20 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { getProjectContext } from '@aiui/design-core';
+import { getProjectContext, autoGenerateGraph } from '@aiui/design-core';
 import { projects, designProfiles } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
+import { getContext } from '../lib/context';
+
+/**
+ * Convert a slug to title case: "my-app" -> "My App", "marketplace" -> "Marketplace"
+ */
+function slugToTitle(slug: string): string {
+  return slug
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
 export function registerGetProjectContext(server: AiuiMcpServer) {
   server.registerTool(
@@ -14,10 +25,42 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
     async (args) => {
       const db = getDb();
       const slug = args.slug as string;
-      const context = await getProjectContext(db, slug);
+      let context = await getProjectContext(db, slug);
+      let autoCreated = false;
 
       if (!context) {
-        throw new NotFoundError('Project', slug);
+        // Attempt to auto-create the project if we have auth context
+        const authCtx = getContext();
+        if (!authCtx?.organizationId) {
+          throw new NotFoundError('Project', slug);
+        }
+
+        // Insert the new project
+        await db.insert(projects).values({
+          name: slugToTitle(slug),
+          slug,
+          organizationId: authCtx.organizationId,
+          frameworkTarget: 'nextjs-tailwind',
+        });
+
+        // Retry fetching the context after creation
+        context = await getProjectContext(db, slug);
+        if (!context) {
+          throw new NotFoundError('Project', slug);
+        }
+
+        // Auto-generate an initial graph for the new project
+        const [newProject] = await db
+          .select({ id: projects.id })
+          .from(projects)
+          .where(eq(projects.slug, slug))
+          .limit(1);
+
+        if (newProject) {
+          await autoGenerateGraph(db, newProject.id);
+        }
+
+        autoCreated = true;
       }
 
       // Check if the design profile's compilationValid is false (stale memory)
@@ -48,6 +91,7 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
         ...context,
         staleMemory,
         ...(staleMessage ? { staleMessage } : {}),
+        ...(autoCreated ? { _created: true } : {}),
       };
     }
   );

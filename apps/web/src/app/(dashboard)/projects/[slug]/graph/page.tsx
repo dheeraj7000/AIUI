@@ -35,18 +35,18 @@ export default async function ProjectGraphPage(props: RouteContext) {
       {/* Breadcrumb and header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-1.5 text-sm text-gray-400">
-            <Link href="/projects" className="hover:text-gray-600">
+          <div className="flex items-center gap-1.5 text-sm text-zinc-400">
+            <Link href="/projects" className="hover:text-zinc-200">
               Projects
             </Link>
             <span>/</span>
-            <Link href={`/projects/${project.slug}`} className="hover:text-gray-600">
+            <Link href={`/projects/${project.slug}`} className="hover:text-zinc-200">
               {project.name}
             </Link>
             <span>/</span>
-            <span className="text-gray-600">Graph</span>
+            <span className="text-zinc-300">Graph</span>
           </div>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900">Project Graph</h1>
+          <h1 className="mt-1 text-2xl font-bold text-white">Project Graph</h1>
         </div>
       </div>
 

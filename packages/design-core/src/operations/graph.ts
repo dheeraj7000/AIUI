@@ -1,5 +1,12 @@
-import { eq } from 'drizzle-orm';
-import { graphNodes, graphEdges, stylePacks, styleTokens, componentRecipes } from '../db/schema';
+import { eq, or, inArray } from 'drizzle-orm';
+import {
+  graphNodes,
+  graphEdges,
+  stylePacks,
+  styleTokens,
+  componentRecipes,
+  projects,
+} from '../db/schema';
 import type { Database } from '../db';
 
 /**
@@ -96,16 +103,51 @@ export async function deleteGraphEdge(db: Database, edgeId: string) {
  * Auto-generate a graph from existing project data.
  * Clears any existing graph, then creates nodes for style packs, tokens,
  * and component recipes, along with edges connecting them.
+ *
+ * Scoping: includes the project's active style pack (if set) plus all public
+ * style packs so the graph is useful even for newly created projects.
  */
 export async function autoGenerateGraph(db: Database, projectId: string) {
   // Clear existing graph for this project
   await db.delete(graphEdges).where(eq(graphEdges.projectId, projectId));
   await db.delete(graphNodes).where(eq(graphNodes.projectId, projectId));
 
-  // Query project's style packs, tokens, and component recipes
-  const packs = await db.select().from(stylePacks);
-  const tokens = await db.select().from(styleTokens);
-  const recipes = await db.select().from(componentRecipes);
+  // Look up the project to find its activeStylePackId
+  const [project] = await db
+    .select({ activeStylePackId: projects.activeStylePackId })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
+
+  // Build a filter for relevant style packs:
+  // - the project's active style pack (if any)
+  // - all public style packs
+  let packs: (typeof stylePacks.$inferSelect)[];
+  if (project?.activeStylePackId) {
+    packs = await db
+      .select()
+      .from(stylePacks)
+      .where(or(eq(stylePacks.id, project.activeStylePackId), eq(stylePacks.isPublic, true)));
+  } else {
+    packs = await db.select().from(stylePacks).where(eq(stylePacks.isPublic, true));
+  }
+
+  // If no packs found, return an empty graph gracefully
+  if (packs.length === 0) {
+    return getProjectGraph(db, projectId);
+  }
+
+  const packIds = packs.map((p) => p.id);
+
+  // Only fetch tokens and recipes linked to the relevant packs
+  const tokens = await db
+    .select()
+    .from(styleTokens)
+    .where(inArray(styleTokens.stylePackId, packIds));
+  const recipes = await db
+    .select()
+    .from(componentRecipes)
+    .where(inArray(componentRecipes.stylePackId, packIds));
 
   const nodeMap = new Map<string, string>();
 
