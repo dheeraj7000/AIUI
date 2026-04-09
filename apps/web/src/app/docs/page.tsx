@@ -23,9 +23,9 @@ export default function DocsPage() {
       <LandingNav />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="lg:grid lg:grid-cols-[220px_1fr] lg:gap-12 xl:grid-cols-[260px_1fr] xl:gap-16">
+        <div className="md:grid md:grid-cols-[200px_1fr] md:gap-8 lg:grid-cols-[220px_1fr] lg:gap-12 xl:grid-cols-[260px_1fr] xl:gap-16">
           {/* Sidebar navigation */}
-          <aside className="hidden lg:block">
+          <aside className="hidden md:block">
             <nav className="sticky top-24">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
                 On this page

@@ -605,7 +605,7 @@ export function ProjectGraph({ projectId }: ProjectGraphProps) {
     <div className="flex gap-0 overflow-hidden rounded-lg border border-gray-200">
       {/* Main graph area */}
       <div className="relative flex-1">
-        <div ref={containerRef} className="h-[600px] w-full bg-zinc-900">
+        <div ref={containerRef} className="h-80 sm:h-96 md:h-[600px] w-full bg-zinc-900">
           <canvas
             ref={canvasRef}
             className="h-full w-full cursor-grab active:cursor-grabbing"

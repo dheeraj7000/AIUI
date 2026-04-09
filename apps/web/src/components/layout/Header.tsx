@@ -93,7 +93,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </button>
 
         {dropdownOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900 shadow-2xl">
+          <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900 shadow-2xl">
             {userEmail && (
               <div className="truncate border-b border-zinc-800 px-3 py-2 text-xs text-zinc-500">
                 {userEmail}

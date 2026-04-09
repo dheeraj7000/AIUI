@@ -61,7 +61,7 @@ export default function ProfilePage() {
 
       {/* User Info Card */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-lime-500 to-cyan-500 text-2xl font-bold text-zinc-950">
             {userInitial}
           </div>

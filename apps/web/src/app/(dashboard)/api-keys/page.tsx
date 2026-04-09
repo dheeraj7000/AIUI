@@ -373,8 +373,8 @@ export default function ApiKeysPage() {
           </p>
         </div>
       ) : keys.length > 0 ? (
-        <div className="mt-8 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm">
-          <table className="w-full text-left text-sm">
+        <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm">
+          <table className="w-full min-w-[600px] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-800/50">
                 <th className="px-4 py-3 font-medium text-zinc-400">Name</th>

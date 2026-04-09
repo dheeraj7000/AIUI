@@ -51,7 +51,7 @@ export function CodeComparison() {
         </div>
 
         {/* Comparison blocks */}
-        <div className="mt-16 grid gap-6 lg:grid-cols-2">
+        <div className="mt-16 grid gap-6 md:grid-cols-2">
           {/* Without AIUI */}
           <div className="rounded-2xl border-2 border-red-500/30 bg-red-950/30 overflow-hidden">
             <div className="flex items-center gap-2 border-b border-red-500/20 bg-red-950/50 px-5 py-3">
