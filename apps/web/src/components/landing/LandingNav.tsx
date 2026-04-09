@@ -8,7 +8,6 @@ const navLinks = [
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Docs', href: '/docs' },
-  { label: 'Quick Setup', href: '/quick-setup' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -47,7 +46,7 @@ export function LandingNav() {
             Sign In
           </Link>
           <Link
-            href="/quick-setup"
+            href="/sign-up"
             className="rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm transition-colors hover:bg-lime-400"
           >
             Get Started
@@ -87,7 +86,7 @@ export function LandingNav() {
                 Sign In
               </Link>
               <Link
-                href="/quick-setup"
+                href="/sign-up"
                 className="rounded-lg bg-lime-500 px-3 py-2 text-center text-sm font-medium text-zinc-950 hover:bg-lime-400"
               >
                 Get Started

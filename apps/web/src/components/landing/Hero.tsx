@@ -70,7 +70,7 @@ export function Hero() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
-                href="/quick-setup"
+                href="/sign-up"
                 className="w-full sm:w-auto rounded-lg bg-lime-500 px-6 py-3.5 text-center text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all hover:bg-lime-400 hover:shadow-xl"
               >
                 Get Started Free

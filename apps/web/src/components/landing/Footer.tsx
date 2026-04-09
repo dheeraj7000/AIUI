@@ -13,7 +13,6 @@ const footerSections = [
   {
     title: 'Developers',
     links: [
-      { label: 'Quick Setup', href: '/quick-setup' },
       { label: 'API Keys', href: '/api-keys' },
       { label: 'MCP Tools', href: '/projects' },
       { label: 'Documentation', href: '/docs' },
@@ -23,7 +22,7 @@ const footerSections = [
     title: 'Resources',
     links: [
       { label: 'Documentation', href: '/docs' },
-      { label: 'Self-Hosting', href: '/quick-setup' },
+      { label: 'Self-Hosting', href: '/docs' },
       { label: 'Status', href: '/api/health' },
     ],
   },

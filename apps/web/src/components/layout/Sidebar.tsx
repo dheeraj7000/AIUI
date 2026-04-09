@@ -9,7 +9,6 @@ import {
   LayoutGrid,
   Key,
   Download,
-  Zap,
   User,
   LogOut,
   ExternalLink,
@@ -34,10 +33,7 @@ const designItems: NavItem[] = [
   { label: 'Import', href: '/import', icon: Download },
 ];
 
-const integrationItems: NavItem[] = [
-  { label: 'Quick Setup', href: '/quick-setup', icon: Zap },
-  { label: 'API Keys', href: '/api-keys', icon: Key },
-];
+const integrationItems: NavItem[] = [{ label: 'API Keys', href: '/api-keys', icon: Key }];
 
 function NavLink({
   item,
