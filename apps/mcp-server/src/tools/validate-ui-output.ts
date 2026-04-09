@@ -4,6 +4,7 @@ import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
 import { projects, styleTokens, designProfiles, computeTokensHash } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
+import { getContext } from '../lib/context';
 
 interface Violation {
   type:
@@ -351,6 +352,12 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
       const code = args.code as string;
 
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+
+      // Verify project org matches auth context
+      const authCtx = getContext();
+      if (authCtx?.organizationId && project?.organizationId !== authCtx.organizationId) {
+        throw new NotFoundError('Project', projectId);
+      }
 
       if (!project || !project.activeStylePackId) {
         throw new NotFoundError('Project', projectId);

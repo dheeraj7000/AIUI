@@ -83,6 +83,19 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
         autoCreated = true;
       }
 
+      // Verify the project belongs to the authenticated org
+      const authCtx2 = getContext();
+      if (authCtx2?.organizationId) {
+        const [projRecord] = await db
+          .select({ organizationId: projects.organizationId })
+          .from(projects)
+          .where(eq(projects.slug, slug))
+          .limit(1);
+        if (projRecord && projRecord.organizationId !== authCtx2.organizationId) {
+          throw new NotFoundError('Project', slug);
+        }
+      }
+
       // Check if the design profile's compilationValid is false (stale memory)
       const [project] = await db
         .select({ id: projects.id })

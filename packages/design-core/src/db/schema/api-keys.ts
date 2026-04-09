@@ -27,5 +27,6 @@ export const apiKeys = pgTable(
     index('api_keys_user_id_idx').on(table.userId),
     index('api_keys_org_id_idx').on(table.organizationId),
     index('api_keys_prefix_idx').on(table.keyPrefix),
+    index('api_keys_user_active_idx').on(table.userId),
   ]
 );

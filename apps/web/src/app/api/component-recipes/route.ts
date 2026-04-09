@@ -5,6 +5,7 @@ import {
   listRecipes,
   createRecipeSchema,
   listRecipesSchema,
+  verifyOrgMembership,
 } from '@aiui/design-core';
 
 function getDb() {
@@ -50,6 +51,10 @@ export async function GET(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const result = await listRecipes(db, orgId, parsed.data);
     return NextResponse.json(result);
   } catch (error) {
@@ -84,6 +89,10 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const recipe = await createRecipe(db, parsed.data, organizationId);
     return NextResponse.json(recipe, { status: 201 });
   } catch (error) {

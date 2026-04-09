@@ -47,12 +47,18 @@ export function registerFixCompliance(server: AiuiMcpServer) {
         .select({
           id: projects.id,
           activeStylePackId: projects.activeStylePackId,
+          organizationId: projects.organizationId,
         })
         .from(projects)
         .where(eq(projects.slug, projectSlug))
         .limit(1);
 
       if (!project) {
+        throw new NotFoundError('Project', projectSlug);
+      }
+
+      // Verify project org matches auth context
+      if (ctx?.organizationId && project.organizationId !== ctx.organizationId) {
         throw new NotFoundError('Project', projectSlug);
       }
 

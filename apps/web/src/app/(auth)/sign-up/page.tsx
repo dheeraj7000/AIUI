@@ -114,8 +114,14 @@ export default function SignUpPage() {
             className={inputClass}
             placeholder="you@example.com"
             autoComplete="email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'email-error' : undefined}
           />
-          {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>}
+          {errors.email && (
+            <p id="email-error" className="mt-1.5 text-xs text-red-600">
+              {errors.email}
+            </p>
+          )}
         </div>
 
         <div>
@@ -130,8 +136,14 @@ export default function SignUpPage() {
             className={inputClass}
             placeholder="At least 8 characters"
             autoComplete="new-password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'password-error' : undefined}
           />
-          {errors.password && <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>}
+          {errors.password && (
+            <p id="password-error" className="mt-1.5 text-xs text-red-600">
+              {errors.password}
+            </p>
+          )}
         </div>
 
         <div>
@@ -149,9 +161,13 @@ export default function SignUpPage() {
             className={inputClass}
             placeholder="Re-enter your password"
             autoComplete="new-password"
+            aria-invalid={!!errors.confirmPassword}
+            aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
           />
           {errors.confirmPassword && (
-            <p className="mt-1.5 text-xs text-red-600">{errors.confirmPassword}</p>
+            <p id="confirm-password-error" className="mt-1.5 text-xs text-red-600">
+              {errors.confirmPassword}
+            </p>
           )}
         </div>
 

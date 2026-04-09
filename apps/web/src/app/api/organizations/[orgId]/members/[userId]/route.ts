@@ -8,6 +8,7 @@ import {
   type OrgRole,
 } from '@aiui/design-core';
 import { eq, and } from 'drizzle-orm';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -42,6 +43,14 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   const actorId = req.headers.get('x-user-id');
   if (!actorId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rateLimited = checkRateLimit(`members:${actorId}`, RATE_LIMITS.members);
+  if (rateLimited) {
+    return NextResponse.json(
+      { error: rateLimited.error },
+      { status: 429, headers: { 'Retry-After': String(rateLimited.retryAfter) } }
+    );
   }
 
   try {
@@ -95,6 +104,14 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   const actorId = req.headers.get('x-user-id');
   if (!actorId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rateLimited = checkRateLimit(`members:${actorId}`, RATE_LIMITS.members);
+  if (rateLimited) {
+    return NextResponse.json(
+      { error: rateLimited.error },
+      { status: 429, headers: { 'Retry-After': String(rateLimited.retryAfter) } }
+    );
   }
 
   try {

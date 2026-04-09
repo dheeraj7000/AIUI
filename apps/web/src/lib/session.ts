@@ -120,16 +120,27 @@ export function getPersistedSession(): AuthSession | null {
 
 /**
  * Remove all auth cookies and localStorage entries to fully clear the session.
+ *
+ * This clears client-readable cookies via document.cookie and also calls the
+ * signout API to expire the HttpOnly server-set cookies that JavaScript cannot
+ * access directly.
  */
 export function clearSession(): void {
   if (typeof document !== 'undefined') {
-    // Expire cookies by setting max-age=0
+    // Expire client-readable cookies by setting max-age=0
     document.cookie = buildCookie(ACCESS_TOKEN_COOKIE, '', 0);
     document.cookie = buildCookie(ID_TOKEN_COOKIE, '', 0);
   }
 
   if (typeof localStorage !== 'undefined') {
     localStorage.removeItem(ACTIVE_ORG_KEY);
+  }
+
+  // Clear HttpOnly cookies via server endpoint (fire-and-forget)
+  if (typeof fetch !== 'undefined') {
+    fetch('/api/auth/signout', { method: 'POST' }).catch(() => {
+      // Best-effort — if this fails the cookies will expire naturally
+    });
   }
 }
 

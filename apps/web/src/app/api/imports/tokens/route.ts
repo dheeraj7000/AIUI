@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, createStylePack, bulkImportTokens, parseTokens } from '@aiui/design-core';
+import {
+  createDb,
+  createStylePack,
+  bulkImportTokens,
+  parseTokens,
+  verifyOrgMembership,
+} from '@aiui/design-core';
 import { assignStylePack } from '@aiui/design-core/src/operations/project-style-pack';
 
 function getDb() {
@@ -47,6 +53,10 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const stylePack = await createStylePack(
       db,

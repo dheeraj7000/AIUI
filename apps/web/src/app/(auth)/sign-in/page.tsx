@@ -99,8 +99,14 @@ export default function SignInPage() {
             className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
             placeholder="you@example.com"
             autoComplete="email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'email-error' : undefined}
           />
-          {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>}
+          {errors.email && (
+            <p id="email-error" className="mt-1.5 text-xs text-red-600">
+              {errors.email}
+            </p>
+          )}
         </div>
 
         <div>
@@ -122,8 +128,14 @@ export default function SignInPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
             autoComplete="current-password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'password-error' : undefined}
           />
-          {errors.password && <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>}
+          {errors.password && (
+            <p id="password-error" className="mt-1.5 text-xs text-red-600">
+              {errors.password}
+            </p>
+          )}
         </div>
 
         <button

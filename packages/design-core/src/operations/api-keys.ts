@@ -105,6 +105,67 @@ export async function revokeApiKey(db: Database, keyId: string, userId: string):
 }
 
 /**
+ * Rotate an API key atomically: create a new key with the same bindings, then revoke the old one.
+ * Returns the new raw key (shown once to the user).
+ */
+export async function rotateApiKey(
+  db: Database,
+  keyId: string,
+  userId: string
+): Promise<ApiKeyWithRaw | null> {
+  // Fetch the existing key
+  const [existing] = await db
+    .select({
+      id: apiKeys.id,
+      userId: apiKeys.userId,
+      organizationId: apiKeys.organizationId,
+      projectId: apiKeys.projectId,
+      name: apiKeys.name,
+      scopes: apiKeys.scopes,
+      revokedAt: apiKeys.revokedAt,
+    })
+    .from(apiKeys)
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.userId, userId)))
+    .limit(1);
+
+  if (!existing) return null;
+  if (existing.revokedAt) return null;
+
+  // Atomic: create new + revoke old in a transaction
+  const rawKey = generateRawKey();
+  const keyHash = hashKey(rawKey);
+  const keyPrefix = extractPrefix(rawKey);
+
+  const result = await db.transaction(async (tx) => {
+    // Create the new key with same bindings
+    const [newKey] = await tx
+      .insert(apiKeys)
+      .values({
+        userId: existing.userId,
+        organizationId: existing.organizationId,
+        projectId: existing.projectId,
+        name: existing.name,
+        keyHash,
+        keyPrefix,
+        scopes: (existing.scopes as string[]) ?? ['mcp:read', 'mcp:write'],
+      })
+      .returning({
+        id: apiKeys.id,
+        name: apiKeys.name,
+        scopes: apiKeys.scopes,
+        createdAt: apiKeys.createdAt,
+      });
+
+    // Revoke the old key
+    await tx.update(apiKeys).set({ revokedAt: new Date() }).where(eq(apiKeys.id, keyId));
+
+    return newKey;
+  });
+
+  return { ...result, rawKey, keyPrefix };
+}
+
+/**
  * Verify an API key. Returns the key context if valid, null otherwise.
  * Also updates lastUsedAt.
  */
@@ -137,12 +198,13 @@ export async function verifyApiKey(db: Database, rawKey: string): Promise<ApiKey
   if (key.revokedAt) return null;
   if (key.expiresAt && key.expiresAt < new Date()) return null;
 
-  // Update lastUsedAt (fire and forget)
+  // Update lastUsedAt in the background — log errors instead of swallowing them
   db.update(apiKeys)
     .set({ lastUsedAt: new Date() })
     .where(eq(apiKeys.id, key.id))
-    .then(() => {})
-    .catch(() => {});
+    .catch((err) => {
+      console.error(`Failed to update lastUsedAt for API key ${key.id}:`, err);
+    });
 
   return {
     keyId: key.id,

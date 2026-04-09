@@ -89,12 +89,12 @@ async function getProject(slug: string) {
 }
 
 const tokenTypeColors: Record<string, string> = {
-  color: 'bg-pink-50 text-pink-700',
-  radius: 'bg-blue-50 text-blue-700',
-  font: 'bg-amber-50 text-amber-700',
-  spacing: 'bg-green-50 text-green-700',
-  shadow: 'bg-purple-50 text-purple-700',
-  elevation: 'bg-indigo-50 text-indigo-700',
+  color: 'bg-pink-500/10 text-pink-400',
+  radius: 'bg-blue-500/10 text-blue-400',
+  font: 'bg-amber-500/10 text-amber-400',
+  spacing: 'bg-green-500/10 text-green-400',
+  shadow: 'bg-purple-500/10 text-purple-400',
+  elevation: 'bg-indigo-500/10 text-indigo-400',
 };
 
 type RouteContext = { params: Promise<{ slug: string }> };
@@ -113,89 +113,89 @@ export default async function ProjectDetailPage(props: RouteContext) {
     <div>
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
+          <h1 className="text-2xl font-bold text-white">{project.name}</h1>
           {project.description && (
-            <p className="mt-1 text-sm text-gray-500">{project.description}</p>
+            <p className="mt-1 text-sm text-zinc-500">{project.description}</p>
           )}
-          <div className="mt-2 flex gap-2 text-xs text-gray-400">
+          <div className="mt-2 flex gap-2 text-xs text-zinc-500">
             <span>/{project.slug}</span>
-            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">
+            <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-400">
               {project.frameworkTarget}
             </span>
           </div>
         </div>
         <Link
           href={`/projects/${project.slug}/graph`}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
         >
-          <Network size={16} className="text-gray-500" />
+          <Network size={16} className="text-zinc-500" />
           View Graph
         </Link>
       </div>
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <div className="text-2xl font-bold text-gray-900">{project.tokens.length}</div>
-          <div className="text-sm text-gray-500">Tokens</div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+          <div className="text-2xl font-bold text-white">{project.tokens.length}</div>
+          <div className="text-sm text-zinc-500">Tokens</div>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <div className="text-2xl font-bold text-gray-900">{project.selectedRecipes.length}</div>
-          <div className="text-sm text-gray-500">Components</div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+          <div className="text-2xl font-bold text-white">{project.selectedRecipes.length}</div>
+          <div className="text-sm text-zinc-500">Components</div>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <div className="text-2xl font-bold text-gray-900">{project.assetCount}</div>
-          <div className="text-sm text-gray-500">Assets</div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+          <div className="text-2xl font-bold text-white">{project.assetCount}</div>
+          <div className="text-sm text-zinc-500">Assets</div>
         </div>
       </div>
 
       {/* Style Pack */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">Style Pack</h2>
+        <h2 className="text-lg font-semibold text-white">Style Pack</h2>
         {project.pack ? (
           <div className="mt-3 space-y-4">
             <Link
               href={`/style-packs/${project.pack.id}`}
-              className="block rounded-lg border border-gray-200 bg-white p-4 hover:shadow-sm"
+              className="block rounded-xl border border-zinc-800 bg-zinc-900 p-4 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="font-medium text-gray-900">{project.pack.name}</span>
-                  <span className="ml-2 text-xs text-gray-400">
+                  <span className="font-medium text-white">{project.pack.name}</span>
+                  <span className="ml-2 text-xs text-zinc-500">
                     {project.pack.category} · v{project.pack.version}
                   </span>
                 </div>
-                <span className="text-xs text-blue-600">View pack</span>
+                <span className="text-xs text-lime-400">View pack</span>
               </div>
               {project.pack.description && (
-                <p className="mt-1 text-sm text-gray-500">{project.pack.description}</p>
+                <p className="mt-1 text-sm text-zinc-500">{project.pack.description}</p>
               )}
             </Link>
 
             {/* Token preview */}
             {Object.entries(tokensByType).map(([type, typeTokens]) => (
-              <div key={type} className="rounded-lg border border-gray-200 bg-white p-4">
-                <h3 className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <div key={type} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                <h3 className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                   <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${tokenTypeColors[type] ?? 'bg-gray-100 text-gray-700'}`}
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${tokenTypeColors[type] ?? 'bg-zinc-800 text-zinc-300'}`}
                   >
                     {type}
                   </span>
-                  <span className="text-xs text-gray-400">{typeTokens.length}</span>
+                  <span className="text-xs text-zinc-500">{typeTokens.length}</span>
                 </h3>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {typeTokens.map((t) => (
                     <div
                       key={t.tokenKey}
-                      className="flex items-center gap-1.5 rounded border border-gray-100 px-2 py-1"
+                      className="flex items-center gap-1.5 rounded border border-zinc-800 px-2 py-1"
                     >
                       {type === 'color' && (
                         <div
-                          className="h-3 w-3 rounded-sm border border-gray-200"
+                          className="h-3 w-3 rounded-sm border border-zinc-800"
                           style={{ backgroundColor: t.tokenValue }}
                         />
                       )}
-                      <span className="text-xs text-gray-600">{t.tokenKey.split('.').pop()}</span>
+                      <span className="text-xs text-zinc-400">{t.tokenKey.split('.').pop()}</span>
                     </div>
                   ))}
                 </div>
@@ -203,11 +203,11 @@ export default async function ProjectDetailPage(props: RouteContext) {
             ))}
           </div>
         ) : (
-          <div className="mt-3 rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center">
-            <p className="text-sm text-gray-500">No style pack assigned.</p>
+          <div className="mt-3 rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-6 text-center">
+            <p className="text-sm text-zinc-500">No style pack assigned.</p>
             <Link
               href="/style-packs"
-              className="mt-1 inline-block text-sm text-blue-600 hover:underline"
+              className="mt-1 inline-block text-sm text-lime-400 hover:underline"
             >
               Browse style packs
             </Link>
@@ -217,28 +217,28 @@ export default async function ProjectDetailPage(props: RouteContext) {
 
       {/* Components */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">Components</h2>
+        <h2 className="text-lg font-semibold text-white">Components</h2>
         {project.selectedRecipes.length > 0 ? (
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {project.selectedRecipes.map((r) => (
               <Link
                 key={r.id}
                 href={`/components/${r.id}`}
-                className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm hover:shadow-sm"
+                className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm hover:shadow-md"
               >
-                <span className="font-medium text-gray-900">{r.name}</span>
-                <span className="ml-2 rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-700">
+                <span className="font-medium text-white">{r.name}</span>
+                <span className="ml-2 rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-400">
                   {r.type}
                 </span>
               </Link>
             ))}
           </div>
         ) : (
-          <div className="mt-3 rounded-lg border border-dashed border-gray-300 bg-white p-6 text-center">
-            <p className="text-sm text-gray-500">No components selected.</p>
+          <div className="mt-3 rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-6 text-center">
+            <p className="text-sm text-zinc-500">No components selected.</p>
             <Link
               href="/components"
-              className="mt-1 inline-block text-sm text-blue-600 hover:underline"
+              className="mt-1 inline-block text-sm text-lime-400 hover:underline"
             >
               Browse components
             </Link>
@@ -248,30 +248,30 @@ export default async function ProjectDetailPage(props: RouteContext) {
 
       {/* Integration */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">Claude Integration</h2>
+        <h2 className="text-lg font-semibold text-white">Claude Integration</h2>
         <div className="mt-3 space-y-4">
           {/* Step 1: MCP Config */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-zinc-950">
                 1
               </span>
-              <h3 className="text-sm font-semibold text-gray-900">Add MCP Server</h3>
+              <h3 className="text-sm font-semibold text-white">Add MCP Server</h3>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Add to <code className="rounded bg-gray-100 px-1 py-0.5 text-xs">.mcp.json</code> in
+            <p className="mt-2 text-sm text-zinc-500">
+              Add to <code className="rounded bg-zinc-800 px-1 py-0.5 text-xs">.mcp.json</code> in
               your target project:
             </p>
 
             {/* Remote MCP (recommended) */}
             <div className="mt-3">
               <div className="mb-2 flex items-center gap-2">
-                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                <span className="rounded-full bg-lime-500/10 px-2 py-0.5 text-xs font-medium text-lime-400">
                   Recommended
                 </span>
-                <span className="text-xs font-medium text-gray-500">Remote — zero install</span>
+                <span className="text-xs font-medium text-zinc-500">Remote — zero install</span>
               </div>
-              <pre className="rounded-md bg-gray-900 p-4 text-xs text-gray-200 overflow-x-auto">
+              <pre className="rounded-md bg-zinc-950 p-4 text-xs text-zinc-200 overflow-x-auto">
                 {`{
   "mcpServers": {
     "aiui": {
@@ -284,24 +284,24 @@ export default async function ProjectDetailPage(props: RouteContext) {
   }
 }`}
               </pre>
-              <p className="mt-2 text-xs text-gray-400">
-                <a href="/quick-setup" className="text-blue-600 hover:underline">
+              <p className="mt-2 text-xs text-zinc-500">
+                <a href="/quick-setup" className="text-lime-400 hover:underline">
                   Quick Setup
                 </a>{' '}
                 — get an API key and connect in 30 seconds. Or{' '}
-                <a href="/api-keys" className="text-blue-600 hover:underline">
+                <a href="/api-keys" className="text-lime-400 hover:underline">
                   manage API keys
                 </a>{' '}
-                to replace <code className="rounded bg-gray-100 px-1">YOUR_API_KEY</code> above.
+                to replace <code className="rounded bg-zinc-800 px-1">YOUR_API_KEY</code> above.
               </p>
             </div>
 
             {/* Local MCP (self-hosted) */}
             <details className="mt-4">
-              <summary className="cursor-pointer text-xs font-medium text-gray-500 hover:text-gray-700">
+              <summary className="cursor-pointer text-xs font-medium text-zinc-500 hover:text-zinc-300">
                 Alternative: Local MCP (self-hosted)
               </summary>
-              <pre className="mt-2 rounded-md bg-gray-900 p-4 text-xs text-gray-200 overflow-x-auto">
+              <pre className="mt-2 rounded-md bg-zinc-950 p-4 text-xs text-zinc-200 overflow-x-auto">
                 {`{
   "mcpServers": {
     "aiui": {
@@ -318,49 +318,49 @@ export default async function ProjectDetailPage(props: RouteContext) {
           </div>
 
           {/* Step 2: Sync design memory */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-zinc-950">
                 2
               </span>
-              <h3 className="text-sm font-semibold text-gray-900">Sync Design Memory</h3>
+              <h3 className="text-sm font-semibold text-white">Sync Design Memory</h3>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-zinc-500">
               Ask Claude to sync your design system. This creates persistent memory files that
               Claude reads automatically:
             </p>
-            <div className="mt-3 rounded-md bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-800">
+            <div className="mt-3 rounded-md bg-lime-500/10 border border-lime-500/20 px-4 py-3 text-sm text-lime-300">
               &quot;Sync the AIUI design memory for project <strong>{project.slug}</strong> to this
               directory&quot;
             </div>
-            <p className="mt-3 text-xs text-gray-400">
+            <p className="mt-3 text-xs text-zinc-500">
               Claude will call <code>sync_design_memory</code> which generates:
             </p>
-            <ul className="mt-1 space-y-1 text-xs text-gray-500">
+            <ul className="mt-1 space-y-1 text-xs text-zinc-500">
               <li>
-                <code className="rounded bg-gray-100 px-1">.aiui/design-memory.md</code> — Full
+                <code className="rounded bg-zinc-800 px-1">.aiui/design-memory.md</code> — Full
                 design context: tokens, components, rules
               </li>
               <li>
-                <code className="rounded bg-gray-100 px-1">.aiui/tokens.json</code> —
+                <code className="rounded bg-zinc-800 px-1">.aiui/tokens.json</code> —
                 Machine-readable token values
               </li>
             </ul>
           </div>
 
           {/* Step 3: CLAUDE.md one-liner */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-zinc-950">
                 3
               </span>
-              <h3 className="text-sm font-semibold text-gray-900">Add to CLAUDE.md</h3>
+              <h3 className="text-sm font-semibold text-white">Add to CLAUDE.md</h3>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-zinc-500">
               Add this to your project&apos;s CLAUDE.md so Claude loads the design memory in every
               conversation:
             </p>
-            <pre className="mt-3 rounded-md bg-gray-900 p-4 text-xs text-gray-200 overflow-x-auto">
+            <pre className="mt-3 rounded-md bg-zinc-950 p-4 text-xs text-zinc-200 overflow-x-auto">
               {`# Design System
 This project uses AIUI for design management.
 See \`.aiui/design-memory.md\` for the active design system — tokens, components, and rules.
@@ -369,33 +369,33 @@ Always follow the design rules defined there before building any UI.`}
           </div>
 
           {/* How it works */}
-          <div className="rounded-lg border border-blue-100 bg-blue-50 p-5">
-            <h3 className="text-sm font-semibold text-blue-900">How the Design Memory works</h3>
+          <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-5">
+            <h3 className="text-sm font-semibold text-white">How the Design Memory works</h3>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg bg-white p-3 shadow-sm">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Persistent</div>
-                <p className="mt-1 text-sm text-gray-700">
+              <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
+                <div className="text-xs font-semibold text-zinc-500 uppercase">Persistent</div>
+                <p className="mt-1 text-sm text-zinc-300">
                   .aiui/ files live in your project repo. Claude reads them at the start of every
                   conversation.
                 </p>
               </div>
-              <div className="rounded-lg bg-white p-3 shadow-sm">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Dynamic</div>
-                <p className="mt-1 text-sm text-gray-700">
+              <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
+                <div className="text-xs font-semibold text-zinc-500 uppercase">Dynamic</div>
+                <p className="mt-1 text-sm text-zinc-300">
                   Say &quot;re-sync design memory&quot; after changing your style pack or components
                   in AIUI. Files update from the database.
                 </p>
               </div>
-              <div className="rounded-lg bg-white p-3 shadow-sm">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Contextual</div>
-                <p className="mt-1 text-sm text-gray-700">
+              <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
+                <div className="text-xs font-semibold text-zinc-500 uppercase">Contextual</div>
+                <p className="mt-1 text-sm text-zinc-300">
                   Memory contains your exact token values, component list, and usage rules — not
                   generic instructions.
                 </p>
               </div>
-              <div className="rounded-lg bg-white p-3 shadow-sm">
-                <div className="text-xs font-semibold text-gray-500 uppercase">Validated</div>
-                <p className="mt-1 text-sm text-gray-700">
+              <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
+                <div className="text-xs font-semibold text-zinc-500 uppercase">Validated</div>
+                <p className="mt-1 text-sm text-zinc-300">
                   Claude calls validate_ui_output after generating code to check compliance with
                   your design system.
                 </p>
@@ -404,21 +404,21 @@ Always follow the design rules defined there before building any UI.`}
           </div>
 
           {/* The flow */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-gray-900">The flow</h3>
-            <ol className="mt-3 space-y-2 text-sm text-gray-600">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <h3 className="text-sm font-semibold text-white">The flow</h3>
+            <ol className="mt-3 space-y-2 text-sm text-zinc-400">
               <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
                   1
                 </span>
                 <span>
                   You ask Claude to build UI — Claude reads{' '}
-                  <code className="text-xs bg-gray-100 rounded px-1">.aiui/design-memory.md</code>{' '}
+                  <code className="text-xs bg-zinc-800 rounded px-1">.aiui/design-memory.md</code>{' '}
                   automatically
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
                   2
                 </span>
                 <span>
@@ -427,17 +427,17 @@ Always follow the design rules defined there before building any UI.`}
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
                   3
                 </span>
                 <span>
                   Claude calls{' '}
-                  <code className="text-xs bg-gray-100 rounded px-1">get_component_recipe</code> to
+                  <code className="text-xs bg-zinc-800 rounded px-1">get_component_recipe</code> to
                   get the full code template for each component it needs
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
                   4
                 </span>
                 <span>
@@ -445,12 +445,12 @@ Always follow the design rules defined there before building any UI.`}
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
                   5
                 </span>
                 <span>
                   Claude calls{' '}
-                  <code className="text-xs bg-gray-100 rounded px-1">validate_ui_output</code> to
+                  <code className="text-xs bg-zinc-800 rounded px-1">validate_ui_output</code> to
                   verify compliance — catches hardcoded colors and wrong fonts
                 </span>
               </li>
@@ -458,25 +458,25 @@ Always follow the design rules defined there before building any UI.`}
           </div>
 
           {/* Quick test */}
-          <div className="rounded-lg border border-gray-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-gray-900">Try it</h3>
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+            <h3 className="text-sm font-semibold text-white">Try it</h3>
             <div className="mt-2 space-y-2">
-              <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-700">
+              <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
                 &quot;Sync the AIUI design memory for <strong>{project.slug}</strong> to this
                 project&quot;
               </div>
-              <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-700">
+              <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
                 &quot;Build a landing page using my design system&quot;
               </div>
               {project.selectedRecipes.length > 0 && (
-                <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
                   &quot;Get the {project.selectedRecipes[0].name} recipe and build a{' '}
                   {project.selectedRecipes[0].type} section&quot;
                 </div>
               )}
-              <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-700">
+              <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
                 &quot;Re-sync design memory&quot;{' '}
-                <span className="text-xs text-gray-400">— after changing your design in AIUI</span>
+                <span className="text-xs text-zinc-500">— after changing your design in AIUI</span>
               </div>
             </div>
           </div>

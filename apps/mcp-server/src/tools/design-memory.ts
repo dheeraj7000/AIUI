@@ -15,6 +15,7 @@ import {
   computeMemoryDiff,
 } from '@aiui/design-core';
 import type { DriftChange } from '@aiui/design-core';
+import { getContext } from '../lib/context';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -196,6 +197,12 @@ async function generateDesignMemory(
   // Fetch project
   const [project] = await db.select().from(projects).where(eq(projects.slug, slug)).limit(1);
   if (!project) throw new NotFoundError('Project', slug);
+
+  // Verify project org matches auth context
+  const authCtx = getContext();
+  if (authCtx?.organizationId && project.organizationId !== authCtx.organizationId) {
+    throw new NotFoundError('Project', slug);
+  }
 
   // Fetch style pack + tokens
   let pack: typeof stylePacks.$inferSelect | null = null;
@@ -748,6 +755,12 @@ export function registerDesignMemory(server: AiuiMcpServer) {
       const [project] = await db.select().from(projects).where(eq(projects.slug, slug)).limit(1);
       if (!project) throw new NotFoundError('Project', slug);
 
+      // Verify project org matches auth context
+      const authCtxSync = getContext();
+      if (authCtxSync?.organizationId && project.organizationId !== authCtxSync.organizationId) {
+        throw new NotFoundError('Project', slug);
+      }
+
       const [profile] = await db
         .select()
         .from(designProfiles)
@@ -878,6 +891,12 @@ export function registerDesignMemory(server: AiuiMcpServer) {
       const [project] = await db.select().from(projects).where(eq(projects.slug, slug)).limit(1);
       if (!project) throw new NotFoundError('Project', slug);
 
+      // Verify project org matches auth context
+      const authCtxGet = getContext();
+      if (authCtxGet?.organizationId && project.organizationId !== authCtxGet.organizationId) {
+        throw new NotFoundError('Project', slug);
+      }
+
       const [profile] = await db
         .select({ updatedAt: designProfiles.updatedAt })
         .from(designProfiles)
@@ -922,6 +941,12 @@ export function registerDesignMemory(server: AiuiMcpServer) {
       // Fetch project
       const [project] = await db.select().from(projects).where(eq(projects.slug, slug)).limit(1);
       if (!project) throw new NotFoundError('Project', slug);
+
+      // Verify project org matches auth context
+      const authCtxCheck = getContext();
+      if (authCtxCheck?.organizationId && project.organizationId !== authCtxCheck.organizationId) {
+        throw new NotFoundError('Project', slug);
+      }
 
       // Fetch design profile
       const [profile] = await db

@@ -21,20 +21,35 @@ export function generateProjectSlug(name: string): string {
  * Find a unique slug within an organization by appending -2, -3, etc. on collision.
  */
 async function findUniqueSlug(db: Database, orgId: string, baseSlug: string): Promise<string> {
-  let slug = baseSlug;
-  let suffix = 2;
+  // Single query: find the highest existing slug matching "baseSlug" or "baseSlug-N"
+  const rows = await db
+    .select({ slug: projects.slug })
+    .from(projects)
+    .where(
+      and(
+        eq(projects.organizationId, orgId),
+        sql`${projects.slug} = ${baseSlug} OR ${projects.slug} LIKE ${baseSlug + '-%'}`
+      )
+    );
 
-  while (true) {
-    const [existing] = await db
-      .select({ id: projects.id })
-      .from(projects)
-      .where(and(eq(projects.organizationId, orgId), eq(projects.slug, slug)))
-      .limit(1);
+  if (rows.length === 0) return baseSlug;
 
-    if (!existing) return slug;
-    slug = `${baseSlug}-${suffix}`;
-    suffix++;
+  const existing = new Set(rows.map((r) => r.slug));
+
+  // If the base slug itself isn't taken, use it
+  if (!existing.has(baseSlug)) return baseSlug;
+
+  // Find the highest numeric suffix
+  let maxSuffix = 1;
+  for (const row of rows) {
+    const match = row.slug.match(new RegExp(`^${baseSlug}-(\\d+)$`));
+    if (match) {
+      const n = parseInt(match[1], 10);
+      if (n > maxSuffix) maxSuffix = n;
+    }
   }
+
+  return `${baseSlug}-${maxSuffix + 1}`;
 }
 
 /**

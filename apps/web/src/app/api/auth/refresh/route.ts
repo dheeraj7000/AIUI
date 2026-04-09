@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDb, users } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import { verifyToken, createToken } from '@/lib/jwt';
+import { setAuthCookies } from '@/lib/auth-cookies';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -21,6 +23,15 @@ export async function POST(req: NextRequest) {
 
     if (!token) {
       return NextResponse.json({ error: 'Authorization header required' }, { status: 401 });
+    }
+
+    // Rate limit by last 10 chars of token (no userId available yet)
+    const rateLimited = checkRateLimit(`refresh:${token.slice(-10)}`, RATE_LIMITS.refresh);
+    if (rateLimited) {
+      return NextResponse.json(
+        { error: rateLimited.error },
+        { status: 429, headers: { 'Retry-After': String(rateLimited.retryAfter) } }
+      );
     }
 
     // Verify token — accept recently expired tokens for refresh
@@ -45,7 +56,13 @@ export async function POST(req: NextRequest) {
     // Issue fresh tokens
     const { accessToken, idToken, expiresAt } = await createToken(user.id, user.email);
 
-    return NextResponse.json({ accessToken, idToken, expiresAt });
+    const response = NextResponse.json({ accessToken, idToken, expiresAt });
+
+    // Set HttpOnly cookies so the middleware can read tokens server-side
+    // while preventing client-side JS access (XSS mitigation).
+    setAuthCookies(response, accessToken, idToken);
+
+    return response;
   } catch (error) {
     console.error('Token refresh error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

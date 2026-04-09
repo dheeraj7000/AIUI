@@ -5,7 +5,9 @@ import {
   listStylePacks,
   createStylePackValidation,
   listStylePacksSchema,
+  verifyOrgMembership,
 } from '@aiui/design-core';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -22,6 +24,14 @@ export async function GET(req: NextRequest) {
   const userId = req.headers.get('x-user-id');
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rateLimited = checkRateLimit(`style-packs:${userId}`, RATE_LIMITS.read);
+  if (rateLimited) {
+    return NextResponse.json(
+      { error: rateLimited.error },
+      { status: 429, headers: { 'Retry-After': String(rateLimited.retryAfter) } }
+    );
   }
 
   const orgId = req.nextUrl.searchParams.get('organizationId');
@@ -51,6 +61,10 @@ export async function GET(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const result = await listStylePacks(db, orgId, parsed.data);
     return NextResponse.json(result);
   } catch (error) {
@@ -85,6 +99,10 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const stylePack = await createStylePack(db, parsed.data, organizationId);
     return NextResponse.json(stylePack, { status: 201 });
   } catch (error) {

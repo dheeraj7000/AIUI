@@ -5,6 +5,7 @@ import {
   bulkImportTokens,
   parseFigmaUrl,
   extractFigmaTokens,
+  verifyOrgMembership,
 } from '@aiui/design-core';
 import { assignStylePack } from '@aiui/design-core/src/operations/project-style-pack';
 
@@ -56,6 +57,10 @@ export async function POST(req: NextRequest) {
     const result = await extractFigmaTokens(fileKey, accessToken);
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const stylePack = await createStylePack(
       db,

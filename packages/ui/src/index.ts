@@ -1,6 +1,13 @@
 // Utility
 export { cn } from './lib/utils';
 
+// Design-system primitives (dark theme)
+export { Button as DsButton } from './button';
+export type { ButtonProps as DsButtonProps } from './button';
+
+export { Card, CardHeader, CardContent, Label } from './card';
+export type { CardProps, CardHeaderProps, CardContentProps } from './card';
+
 // Layout Components
 export { AppShell } from './components/app-shell';
 export type { AppShellProps } from './components/app-shell';

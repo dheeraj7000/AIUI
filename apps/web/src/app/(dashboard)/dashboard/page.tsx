@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { createDb, stylePacks, componentRecipes, projects } from '@aiui/design-core';
+import { createDb, stylePacks, componentRecipes, projects, apiKeys } from '@aiui/design-core';
 import { count, eq, or } from 'drizzle-orm';
 import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Key, Download } from 'lucide-react';
 import { getUserOrg } from '@/lib/get-user-org';
+import { OnboardingChecklist } from '@/components/ui/onboarding-checklist';
 
 export const metadata = { title: 'Dashboard - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -54,11 +55,19 @@ async function getStats() {
         .limit(6)
     : [];
 
+  // Check onboarding state
+  const hasApiKey = orgId
+    ? (
+        await db.select({ count: count() }).from(apiKeys).where(eq(apiKeys.organizationId, orgId))
+      )[0]?.count > 0
+    : false;
+
   return {
     packs: packCount?.count ?? 0,
     recipes: recipeCount?.count ?? 0,
     projects: projectCount?.count ?? 0,
     recentProjects,
+    hasApiKey,
   };
 }
 
@@ -99,6 +108,15 @@ export default async function DashboardPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+      </div>
+
+      <div className="mt-6">
+        <OnboardingChecklist
+          hasProject={stats.projects > 0}
+          hasStylePack={stats.packs > 0}
+          hasApiKey={stats.hasApiKey}
+          hasComponent={stats.recipes > 0}
+        />
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, createProject, listProjects } from '@aiui/design-core';
+import { createDb, createProject, listProjects, verifyOrgMembership } from '@aiui/design-core';
 import { createProjectSchema, listProjectsSchema } from '@aiui/design-core/src/validation/project';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -19,6 +20,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const rateLimited = checkRateLimit(`projects:${userId}`, RATE_LIMITS.read);
+  if (rateLimited) {
+    return NextResponse.json(
+      { error: rateLimited.error },
+      { status: 429, headers: { 'Retry-After': String(rateLimited.retryAfter) } }
+    );
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const parsed = listProjectsSchema.safeParse({
@@ -35,6 +44,10 @@ export async function GET(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, parsed.data.orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const result = await listProjects(db, parsed.data);
 
     return NextResponse.json({
@@ -70,6 +83,10 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, parsed.data.orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const project = await createProject(db, parsed.data);
 
     return NextResponse.json(project, { status: 201 });

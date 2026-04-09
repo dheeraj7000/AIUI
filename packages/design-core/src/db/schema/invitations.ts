@@ -41,5 +41,6 @@ export const invitations = pgTable(
     uniqueIndex('invitations_token_idx').on(table.token),
     uniqueIndex('invitations_org_email_idx').on(table.orgId, table.email),
     index('invitations_org_id_idx').on(table.orgId),
+    index('invitations_status_expires_idx').on(table.status, table.expiresAt),
   ]
 );

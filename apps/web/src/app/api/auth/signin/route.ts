@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { createToken } from '@/lib/jwt';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { setAuthCookies } from '@/lib/auth-cookies';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -46,12 +47,18 @@ export async function POST(req: NextRequest) {
 
     const { accessToken, idToken, expiresAt } = await createToken(user.id, user.email);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: { id: user.id, email: user.email, name: user.name },
       accessToken,
       idToken,
       expiresAt,
     });
+
+    // Set HttpOnly cookies so the middleware can read tokens server-side
+    // while preventing client-side JS access (XSS mitigation).
+    setAuthCookies(response, accessToken, idToken);
+
+    return response;
   } catch (error) {
     console.error('Signin error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

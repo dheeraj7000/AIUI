@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, createApiKey, listApiKeys } from '@aiui/design-core';
+import { createDb, createApiKey, listApiKeys, verifyOrgMembership } from '@aiui/design-core';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -14,6 +15,14 @@ export async function POST(req: NextRequest) {
   const userId = req.headers.get('x-user-id');
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const rateLimited = checkRateLimit(`api-keys:${userId}`, RATE_LIMITS.apiKey);
+  if (rateLimited) {
+    return NextResponse.json(
+      { error: rateLimited.error },
+      { status: 429, headers: { 'Retry-After': String(rateLimited.retryAfter) } }
+    );
+  }
+
   try {
     const { name, organizationId, projectId } = await req.json();
     if (!name || !organizationId) {
@@ -21,6 +30,11 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const key = await createApiKey(db, { userId, organizationId, projectId, name });
 
     return NextResponse.json(key, { status: 201 });

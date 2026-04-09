@@ -16,14 +16,13 @@ export interface JwtClaims {
 // Local secret for signing/verifying JWTs
 // ---------------------------------------------------------------------------
 
-const DEFAULT_SECRET = 'aiui-local-dev-secret-change-in-production';
 const ISSUER = 'aiui-local';
 
 function getSecret(): Uint8Array {
-  const key = process.env.JWT_SECRET ?? DEFAULT_SECRET;
-  if (key === DEFAULT_SECRET && process.env.NODE_ENV === 'production') {
+  const key = process.env.JWT_SECRET;
+  if (!key) {
     throw new Error(
-      'FATAL: JWT_SECRET is not set. Set the JWT_SECRET environment variable before running in production.'
+      'FATAL: JWT_SECRET environment variable is required. Generate one with: openssl rand -base64 32'
     );
   }
   return new TextEncoder().encode(key);

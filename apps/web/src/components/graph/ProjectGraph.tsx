@@ -624,6 +624,7 @@ export function ProjectGraph({ projectId }: ProjectGraphProps) {
             onClick={zoomIn}
             className="rounded border border-zinc-700 bg-zinc-800/90 p-1.5 text-zinc-400 backdrop-blur hover:bg-zinc-700 hover:text-zinc-200"
             title="Zoom in"
+            aria-label="Zoom in"
           >
             <ZoomIn className="h-4 w-4" />
           </button>
@@ -631,6 +632,7 @@ export function ProjectGraph({ projectId }: ProjectGraphProps) {
             onClick={zoomOut}
             className="rounded border border-zinc-700 bg-zinc-800/90 p-1.5 text-zinc-400 backdrop-blur hover:bg-zinc-700 hover:text-zinc-200"
             title="Zoom out"
+            aria-label="Zoom out"
           >
             <ZoomOut className="h-4 w-4" />
           </button>
@@ -638,6 +640,7 @@ export function ProjectGraph({ projectId }: ProjectGraphProps) {
             onClick={resetView}
             className="rounded border border-zinc-700 bg-zinc-800/90 p-1.5 text-zinc-400 backdrop-blur hover:bg-zinc-700 hover:text-zinc-200"
             title="Reset view"
+            aria-label="Reset view"
           >
             <Maximize2 className="h-4 w-4" />
           </button>
@@ -693,6 +696,7 @@ export function ProjectGraph({ projectId }: ProjectGraphProps) {
             </div>
             <button
               onClick={() => setSelectedNode(null)}
+              aria-label="Close details panel"
               className="text-zinc-500 hover:text-zinc-300"
             >
               <span className="sr-only">Close</span>

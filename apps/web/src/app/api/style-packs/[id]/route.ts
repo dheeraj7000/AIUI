@@ -5,6 +5,7 @@ import {
   updateStylePack,
   deleteStylePack,
   updateStylePackSchema,
+  verifyOrgMembership,
 } from '@aiui/design-core';
 
 function getDb() {
@@ -35,6 +36,13 @@ export async function GET(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
     }
 
+    if (stylePack.organizationId) {
+      const isMember = await verifyOrgMembership(db, userId, stylePack.organizationId);
+      if (!isMember) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     return NextResponse.json(stylePack);
   } catch (error) {
     console.error('Failed to get style pack:', error);
@@ -53,6 +61,19 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
   try {
     const { id } = await context.params;
+    const db = getDb();
+
+    const existing = await getStylePack(db, id);
+    if (!existing) {
+      return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
+    }
+    if (existing.organizationId) {
+      const isMember = await verifyOrgMembership(db, userId, existing.organizationId);
+      if (!isMember) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     const body = await req.json();
 
     const parsed = updateStylePackSchema.safeParse(body);
@@ -63,7 +84,6 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const db = getDb();
     const updated = await updateStylePack(db, id, parsed.data);
 
     if (!updated) {
@@ -89,6 +109,18 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const db = getDb();
+
+    const existing = await getStylePack(db, id);
+    if (!existing) {
+      return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
+    }
+    if (existing.organizationId) {
+      const isMember = await verifyOrgMembership(db, userId, existing.organizationId);
+      if (!isMember) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     const deleted = await deleteStylePack(db, id);
 
     if (!deleted) {

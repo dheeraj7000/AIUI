@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, getAssetById, deleteAsset } from '@aiui/design-core';
+import {
+  createDb,
+  getAssetById,
+  deleteAsset,
+  verifyOrgMembership,
+  projects,
+} from '@aiui/design-core';
+import { eq } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -27,6 +34,20 @@ export async function GET(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
     }
 
+    if (asset.projectId) {
+      const [project] = await db
+        .select({ organizationId: projects.organizationId })
+        .from(projects)
+        .where(eq(projects.id, asset.projectId))
+        .limit(1);
+      if (project?.organizationId) {
+        const isMember = await verifyOrgMembership(db, userId, project.organizationId);
+        if (!isMember) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      }
+    }
+
     return NextResponse.json(asset);
   } catch (error) {
     console.error('Failed to get asset:', error);
@@ -46,6 +67,26 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const db = getDb();
+    const asset = await getAssetById(db, id);
+
+    if (!asset) {
+      return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
+    }
+
+    if (asset.projectId) {
+      const [project] = await db
+        .select({ organizationId: projects.organizationId })
+        .from(projects)
+        .where(eq(projects.id, asset.projectId))
+        .limit(1);
+      if (project?.organizationId) {
+        const isMember = await verifyOrgMembership(db, userId, project.organizationId);
+        if (!isMember) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      }
+    }
+
     const result = await deleteAsset(db, id);
 
     if (!result) {

@@ -291,7 +291,13 @@ export {
 } from './db/queries';
 
 // API key operations
-export { createApiKey, listApiKeys, revokeApiKey, verifyApiKey } from './operations/api-keys';
+export {
+  createApiKey,
+  listApiKeys,
+  revokeApiKey,
+  rotateApiKey,
+  verifyApiKey,
+} from './operations/api-keys';
 export type { CreateApiKeyInput, ApiKeyWithRaw, ApiKeyContext } from './operations/api-keys';
 
 // Design token importers
@@ -339,3 +345,6 @@ export {
   registryTokenSchema,
 } from './validation/registry';
 export type { RegistryItem, RegistryIndexItem, RegistryToken } from './validation/registry';
+
+// Auth guards
+export { verifyOrgMembership, verifyResourceOwnership } from './lib/auth-guards';

@@ -1,5 +1,6 @@
 import { pgTable, uuid, integer, jsonb, varchar, timestamp, index } from 'drizzle-orm/pg-core';
 import { designProfiles } from './design-profiles';
+import { projects } from './projects';
 
 export const promptBundles = pgTable(
   'prompt_bundles',
@@ -8,7 +9,9 @@ export const promptBundles = pgTable(
     designProfileId: uuid('design_profile_id')
       .notNull()
       .references(() => designProfiles.id, { onDelete: 'cascade' }),
-    projectId: uuid('project_id').notNull(),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
     bundleJson: jsonb('bundle_json').notNull(),
     version: integer('version').default(1).notNull(),
     checksum: varchar('checksum', { length: 255 }),
@@ -17,5 +20,6 @@ export const promptBundles = pgTable(
   (table) => [
     index('prompt_bundles_design_profile_id_idx').on(table.designProfileId),
     index('prompt_bundles_project_id_idx').on(table.projectId),
+    index('prompt_bundles_created_at_idx').on(table.createdAt),
   ]
 );
