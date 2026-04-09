@@ -50,7 +50,7 @@ export function OnboardingChecklist({
   };
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-white">Getting Started</h3>
@@ -60,7 +60,7 @@ export function OnboardingChecklist({
         </div>
         <button
           onClick={handleDismiss}
-          className="rounded-lg p-1 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+          className="rounded-lg p-1 text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
           aria-label="Dismiss onboarding checklist"
         >
           <X size={16} />
@@ -68,9 +68,9 @@ export function OnboardingChecklist({
       </div>
 
       {/* Progress bar */}
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/5">
         <div
-          className="h-full rounded-full bg-lime-500 transition-all duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-lime-500 to-cyan-500 transition-all duration-500"
           style={{ width: `${(completedCount / steps.length) * 100}%` }}
         />
       </div>
@@ -83,7 +83,7 @@ export function OnboardingChecklist({
               key={step.label}
               href={step.href}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                step.done ? 'text-zinc-500' : 'text-zinc-300 hover:bg-zinc-800'
+                step.done ? 'text-zinc-500' : 'text-zinc-300 hover:bg-white/5'
               }`}
             >
               {step.done ? (

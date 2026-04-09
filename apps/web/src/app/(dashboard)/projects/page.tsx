@@ -57,18 +57,20 @@ export default async function ProjectsPage() {
             <Link
               key={p.id}
               href={`/projects/${p.slug}`}
-              className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-shadow hover:shadow-md"
+              className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-white/10 hover:shadow-lg"
             >
-              <h3 className="text-base font-semibold text-white">{p.name}</h3>
+              <h3 className="text-base font-semibold text-white group-hover:text-lime-400 transition-colors">
+                {p.name}
+              </h3>
               {p.description && (
                 <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{p.description}</p>
               )}
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300">
+                <span className="rounded-full bg-white/5 border border-white/5 px-2.5 py-0.5 text-xs text-zinc-300">
                   {p.frameworkTarget}
                 </span>
                 {p.packName && (
-                  <span className="rounded-full bg-lime-500/10 px-2 py-0.5 text-xs text-lime-400">
+                  <span className="rounded-full bg-lime-500/10 border border-lime-500/10 px-2.5 py-0.5 text-xs text-lime-400">
                     {p.packName}
                   </span>
                 )}
@@ -78,7 +80,7 @@ export default async function ProjectsPage() {
           ))}
         </div>
       ) : (
-        <div className="mt-6 rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-12 text-center">
+        <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
           <p className="text-sm text-zinc-400">No projects yet.</p>
           <p className="mt-2 text-xs text-zinc-500">
             Go to a{' '}

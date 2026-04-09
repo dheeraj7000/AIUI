@@ -26,6 +26,9 @@ function validate(email: string, password: string): FormErrors {
   return errors;
 }
 
+const inputClass =
+  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-lime-500/50 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200';
+
 export default function SignInPage() {
   const router = useRouter();
   const { signIn } = useAuth();
@@ -64,15 +67,15 @@ export default function SignInPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900">Sign in to your account</h2>
-      <p className="mt-1 mb-6 text-sm text-gray-500">
+      <h2 className="text-xl font-semibold text-white">Sign in to your account</h2>
+      <p className="mt-1 mb-6 text-sm text-zinc-500">
         Welcome back. Enter your credentials to continue.
       </p>
 
       {serverError && (
-        <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
           <svg
-            className="mt-0.5 h-4 w-4 shrink-0 text-red-500"
+            className="mt-0.5 h-4 w-4 shrink-0 text-red-400"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -82,13 +85,13 @@ export default function SignInPage() {
               clipRule="evenodd"
             />
           </svg>
-          <p className="text-sm text-red-600">{serverError}</p>
+          <p className="text-sm text-red-400">{serverError}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor="email" className="block text-sm font-medium text-zinc-400 mb-1.5">
             Email address
           </label>
           <input
@@ -96,14 +99,14 @@ export default function SignInPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+            className={inputClass}
             placeholder="you@example.com"
             autoComplete="email"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? 'email-error' : undefined}
           />
           {errors.email && (
-            <p id="email-error" className="mt-1.5 text-xs text-red-600">
+            <p id="email-error" className="mt-1.5 text-xs text-red-400">
               {errors.email}
             </p>
           )}
@@ -111,12 +114,12 @@ export default function SignInPage() {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-zinc-400">
               Password
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs font-medium text-blue-600 hover:text-blue-700"
+              className="text-xs font-medium text-lime-400 hover:text-lime-300 transition-colors"
             >
               Forgot password?
             </Link>
@@ -126,13 +129,13 @@ export default function SignInPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+            className={inputClass}
             autoComplete="current-password"
             aria-invalid={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
           />
           {errors.password && (
-            <p id="password-error" className="mt-1.5 text-xs text-red-600">
+            <p id="password-error" className="mt-1.5 text-xs text-red-400">
               {errors.password}
             </p>
           )}
@@ -141,7 +144,7 @@ export default function SignInPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
           {isSubmitting ? (
             <>
@@ -169,9 +172,12 @@ export default function SignInPage() {
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-zinc-500">
           Don&apos;t have an account?{' '}
-          <Link href="/sign-up" className="font-semibold text-blue-600 hover:text-blue-700">
+          <Link
+            href="/sign-up"
+            className="font-semibold text-lime-400 hover:text-lime-300 transition-colors"
+          >
             Create one free
           </Link>
         </p>

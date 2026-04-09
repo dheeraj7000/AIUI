@@ -121,7 +121,7 @@ export default async function StylePacksPage() {
         </div>
         <Link
           href="/import"
-          className="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm transition-colors hover:bg-lime-400"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm shadow-lime-500/20 transition-all duration-200 hover:shadow-md hover:shadow-lime-500/25"
         >
           <Download size={16} />
           Import Design
@@ -134,7 +134,7 @@ export default async function StylePacksPage() {
           return (
             <span
               key={cat}
-              className="flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all duration-200 hover:border-zinc-600 hover:shadow-sm"
+              className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all duration-200 hover:bg-white/[0.06] hover:border-white/15 hover:text-white"
             >
               {cat !== 'All' && <CatIcon size={12} />}
               {cat}
@@ -149,7 +149,7 @@ export default async function StylePacksPage() {
             <Link
               key={pack.id}
               href={`/style-packs/${pack.id}`}
-              className="group rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-white/10 hover:shadow-lg"
             >
               <TokenStrip tokens={pack.previewTokens} />
               <div className="p-5">

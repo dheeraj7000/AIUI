@@ -1,5 +1,8 @@
+'use client';
+
 import { Palette, Plug, Rocket } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { FadeUp, StaggerContainer, StaggerChild } from './motion';
 
 interface Step {
   number: string;
@@ -16,7 +19,7 @@ const steps: Step[] = [
     description:
       'Import your tokens, pick a style pack, or build from scratch in the visual studio. No credit card required.',
     icon: Palette,
-    detail: 'Colors, typography, spacing, components, and rules -- all in one place.',
+    detail: 'Colors, typography, spacing, components, and rules — all in one place.',
   },
   {
     number: '2',
@@ -38,67 +41,82 @@ const steps: Step[] = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-zinc-950 py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="relative bg-zinc-950 py-24 sm:py-32">
+      <div className="absolute inset-0 bg-aurora-subtle" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-lime-400">
-            How It Works
-          </p>
-          <h2 className="mt-2 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
-            Up and running in 3 steps
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-zinc-400">
-            No packages to install. No build plugins to configure. Just your design decisions,
-            delivered to Claude.
-          </p>
-        </div>
+        <FadeUp>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-lime-400">
+              How It Works
+            </p>
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
+              Up and running in{' '}
+              <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+                3 steps
+              </span>
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-zinc-400">
+              No packages to install. No build plugins to configure. Just your design decisions,
+              delivered to Claude.
+            </p>
+          </div>
+        </FadeUp>
 
         {/* Steps */}
-        <div className="relative mt-16">
+        <div className="relative mt-20">
           {/* Connecting line (desktop) */}
-          <div className="absolute top-16 left-0 right-0 hidden lg:block">
-            <div className="mx-auto flex max-w-4xl items-center justify-between px-16">
-              <div className="h-px flex-1 bg-gradient-to-r from-lime-500 to-cyan-500" />
-              <div className="h-px flex-1 bg-gradient-to-r from-cyan-500 to-lime-500" />
+          <div className="absolute top-20 left-0 right-0 hidden lg:block">
+            <div className="mx-auto flex max-w-4xl items-center justify-between px-20">
+              <div className="h-px flex-1 bg-gradient-to-r from-lime-500/40 to-cyan-500/40" />
+              <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/40 to-lime-500/40" />
             </div>
           </div>
 
-          <div className="grid gap-12 lg:grid-cols-3 lg:gap-8">
+          <StaggerContainer className="grid gap-12 lg:grid-cols-3 lg:gap-8">
             {steps.map((step) => {
               const Icon = step.icon;
               return (
-                <div key={step.number} className="relative text-center lg:text-center">
-                  {/* Step number */}
-                  <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-lime-500 to-cyan-500 text-lg font-bold text-white shadow-lg shadow-lime-500/20">
-                    {step.number}
-                  </div>
-                  <div className="mt-2 inline-flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-zinc-400" />
-                  </div>
-                  <h3 className="mt-2 text-xl font-semibold text-white">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-400 max-w-xs mx-auto">
-                    {step.description}
-                  </p>
-                  {step.detail && (
-                    <p className="mt-2 text-xs text-zinc-500 max-w-xs mx-auto">{step.detail}</p>
-                  )}
-
-                  {/* Terminal command for step 2 */}
-                  {step.number === '2' && (
-                    <div className="mt-5 mx-auto max-w-sm rounded-lg bg-gray-950 p-4 text-left overflow-x-auto shadow-lg">
-                      <pre className="text-xs leading-relaxed font-mono">
-                        <code>
-                          <span className="text-gray-500">$</span>{' '}
-                          <span className="text-lime-400">claude mcp add aiui</span>
-                        </code>
-                      </pre>
+                <StaggerChild key={step.number}>
+                  <div className="relative text-center">
+                    {/* Step number badge */}
+                    <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-lime-500 to-cyan-500 text-xl font-bold text-white shadow-lg shadow-lime-500/25">
+                      {step.number}
+                      <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-lime-500/20 to-cyan-500/20 blur-lg -z-10" />
                     </div>
-                  )}
-                </div>
+
+                    {/* Icon */}
+                    <div className="mt-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 border border-white/5">
+                      <Icon className="h-5 w-5 text-zinc-400" />
+                    </div>
+
+                    <h3 className="mt-4 text-xl font-semibold text-white">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-zinc-400 max-w-xs mx-auto">
+                      {step.description}
+                    </p>
+                    {step.detail && (
+                      <p className="mt-2 text-xs text-zinc-500 max-w-xs mx-auto">{step.detail}</p>
+                    )}
+
+                    {/* Terminal command for step 2 */}
+                    {step.number === '2' && (
+                      <div className="mt-6 mx-auto max-w-sm">
+                        <div className="rounded-xl glass-card p-4 text-left overflow-x-auto">
+                          <pre className="text-xs leading-relaxed font-mono">
+                            <code>
+                              <span className="text-zinc-600">$</span>{' '}
+                              <span className="text-lime-400">claude mcp add aiui</span>
+                            </code>
+                          </pre>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </StaggerChild>
               );
             })}
-          </div>
+          </StaggerContainer>
         </div>
       </div>
     </section>

@@ -7,6 +7,9 @@ import { useAuth } from '@/providers/AuthProvider';
 
 type Step = 'request' | 'confirm';
 
+const inputClass =
+  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-lime-500/50 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200';
+
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const { forgotPassword, confirmForgotPassword } = useAuth();
@@ -76,20 +79,20 @@ export default function ForgotPasswordPage() {
   if (step === 'request') {
     return (
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Reset your password</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold text-white mb-2">Reset your password</h2>
+        <p className="text-sm text-zinc-500 mb-6">
           Enter your email address and we&apos;ll send you a code to reset your password.
         </p>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 p-3">
+            <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleRequestCode} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-zinc-400 mb-1">
               Email
             </label>
             <input
@@ -97,7 +100,7 @@ export default function ForgotPasswordPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={inputClass}
               placeholder="you@example.com"
               autoComplete="email"
             />
@@ -106,14 +109,17 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 w-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Sending code...' : 'Send reset code'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          <Link href="/sign-in" className="text-blue-600 hover:underline font-medium">
+        <p className="mt-6 text-center text-sm text-zinc-500">
+          <Link
+            href="/sign-in"
+            className="text-lime-400 hover:text-lime-300 font-medium transition-colors"
+          >
             Back to sign in
           </Link>
         </p>
@@ -123,21 +129,21 @@ export default function ForgotPasswordPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-2">Set new password</h2>
-      <p className="text-sm text-gray-600 mb-6">
-        Enter the verification code sent to <span className="font-medium">{email}</span> and your
-        new password.
+      <h2 className="text-xl font-semibold text-white mb-2">Set new password</h2>
+      <p className="text-sm text-zinc-500 mb-6">
+        Enter the verification code sent to <span className="font-medium text-white">{email}</span>{' '}
+        and your new password.
       </p>
 
       {error && (
-        <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
-          <p className="text-red-600 text-sm">{error}</p>
+        <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 p-3">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleResetPassword} className="space-y-4" noValidate>
         <div>
-          <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="code" className="block text-sm font-medium text-zinc-400 mb-1">
             Verification code
           </label>
           <input
@@ -147,14 +153,14 @@ export default function ForgotPasswordPage() {
             maxLength={6}
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`${inputClass} text-center text-lg tracking-widest`}
             placeholder="000000"
             autoComplete="one-time-code"
           />
         </div>
 
         <div>
-          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-400 mb-1">
             New password
           </label>
           <input
@@ -162,7 +168,7 @@ export default function ForgotPasswordPage() {
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={inputClass}
             placeholder="At least 8 characters"
             autoComplete="new-password"
           />
@@ -171,7 +177,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 w-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Resetting password...' : 'Reset password'}
         </button>
@@ -186,11 +192,14 @@ export default function ForgotPasswordPage() {
             setNewPassword('');
             setError('');
           }}
-          className="text-blue-600 hover:underline font-medium"
+          className="text-lime-400 hover:text-lime-300 font-medium transition-colors"
         >
           Try a different email
         </button>
-        <Link href="/sign-in" className="text-blue-600 hover:underline font-medium">
+        <Link
+          href="/sign-in"
+          className="text-lime-400 hover:text-lime-300 font-medium transition-colors"
+        >
           Back to sign in
         </Link>
       </div>

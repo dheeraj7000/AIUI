@@ -34,14 +34,14 @@ const footerSections = [
 
 export function Footer() {
   return (
-    <footer className="bg-zinc-950 border-t border-zinc-800 pt-16 pb-8">
+    <footer className="relative bg-zinc-950 border-t border-white/5 pt-16 pb-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Top: logo + tagline */}
         <div className="mb-12">
           <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
             AIUI
           </span>
-          <p className="mt-2 max-w-xs text-sm text-zinc-500">
+          <p className="mt-3 max-w-xs text-sm leading-6 text-zinc-500">
             The AI Design Control Layer. Pick your design system, add one config block, and Claude
             follows it everywhere.
           </p>
@@ -60,14 +60,14 @@ export function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-zinc-500 transition-colors hover:text-zinc-200"
+                        className="text-sm text-zinc-500 transition-colors hover:text-lime-400"
                       >
                         {link.label}
                       </a>
                     ) : (
                       <Link
                         href={link.href}
-                        className="text-sm text-zinc-500 transition-colors hover:text-zinc-200"
+                        className="text-sm text-zinc-500 transition-colors hover:text-lime-400"
                       >
                         {link.label}
                       </Link>
@@ -80,7 +80,8 @@ export function Footer() {
         </div>
 
         {/* Bottom: copyright */}
-        <div className="mt-12 border-t border-zinc-800 pt-8">
+        <div className="mt-12 pt-8">
+          <div className="section-divider mb-8" />
           <p className="text-center text-xs text-zinc-600">
             &copy; {new Date().getFullYear()} AIUI. All rights reserved.
           </p>

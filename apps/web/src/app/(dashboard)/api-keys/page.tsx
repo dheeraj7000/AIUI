@@ -240,7 +240,7 @@ function IdeSetupSection({
 
   // Collapsible variant
   return (
-    <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm">
+    <div className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm shadow-sm">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center justify-between px-5 py-4 text-left"
@@ -442,7 +442,7 @@ export default function ApiKeysPage() {
 
       {/* Newly created key banner */}
       {createdKey && (
-        <div className="mt-6 rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-5">
+        <div className="mt-6 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-5">
           <div className="mb-2 flex items-center gap-2">
             <ShieldAlert size={20} className="text-amber-400" />
             <h2 className="text-base font-semibold text-amber-300">Save your API key</h2>
@@ -516,7 +516,7 @@ export default function ApiKeysPage() {
       {showCreateForm && (
         <form
           onSubmit={handleCreate}
-          className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm"
+          className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 shadow-sm"
         >
           <h2 className="mb-3 text-base font-semibold text-white">Create a new API key</h2>
           <label htmlFor="key-name" className="mb-1 block text-sm font-medium text-zinc-400">
@@ -567,8 +567,8 @@ export default function ApiKeysPage() {
           Loading API keys...
         </div>
       ) : keys.length === 0 && !createdKey ? (
-        <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900 p-8 text-center shadow-sm">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800">
+        <div className="mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 text-center shadow-sm">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 border border-white/5">
             <KeyRound size={24} className="text-zinc-500" />
           </div>
           <p className="text-sm font-medium text-zinc-400">No API keys yet</p>
@@ -577,10 +577,10 @@ export default function ApiKeysPage() {
           </p>
         </div>
       ) : keys.length > 0 ? (
-        <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm">
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm shadow-sm">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-800/50">
+              <tr className="border-b border-white/5 bg-white/[0.03]">
                 <th className="px-4 py-3 font-medium text-zinc-400">Name</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Key Prefix</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Created</th>
@@ -592,7 +592,7 @@ export default function ApiKeysPage() {
               {keys.map((key) => (
                 <tr
                   key={key.id}
-                  className="border-b border-zinc-800 transition-colors last:border-b-0 hover:bg-zinc-800/50"
+                  className="border-b border-white/5 transition-colors last:border-b-0 hover:bg-white/[0.03]"
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">

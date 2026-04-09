@@ -77,27 +77,30 @@ const statCards = [
     key: 'packs' as const,
     href: '/style-packs',
     icon: Palette,
-    gradient: 'from-blue-500 to-blue-600',
-    bgLight: 'bg-blue-500/10',
     iconColor: 'text-blue-400',
+    glowColor: 'group-hover:shadow-blue-500/10',
+    bgColor: 'bg-blue-500/10',
+    borderHover: 'hover:border-blue-500/20',
   },
   {
     label: 'Component Recipes',
     key: 'recipes' as const,
     href: '/components',
     icon: LayoutGrid,
-    gradient: 'from-violet-500 to-violet-600',
-    bgLight: 'bg-violet-500/10',
     iconColor: 'text-violet-400',
+    glowColor: 'group-hover:shadow-violet-500/10',
+    bgColor: 'bg-violet-500/10',
+    borderHover: 'hover:border-violet-500/20',
   },
   {
     label: 'Projects',
     key: 'projects' as const,
     href: '/projects',
     icon: FolderOpen,
-    gradient: 'from-emerald-500 to-emerald-600',
-    bgLight: 'bg-emerald-500/10',
     iconColor: 'text-emerald-400',
+    glowColor: 'group-hover:shadow-emerald-500/10',
+    bgColor: 'bg-emerald-500/10',
+    borderHover: 'hover:border-emerald-500/20',
   },
 ];
 
@@ -106,10 +109,15 @@ export default async function DashboardPage() {
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <p className="mt-1 text-sm text-zinc-500">Manage your design system and projects</p>
+        </div>
       </div>
 
+      {/* Onboarding */}
       <div className="mt-6">
         <OnboardingChecklist
           hasProject={stats.projects > 0}
@@ -119,6 +127,7 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* Stat cards */}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         {statCards.map((card) => {
           const Icon = card.icon;
@@ -126,11 +135,11 @@ export default async function DashboardPage() {
             <Link
               key={card.key}
               href={card.href}
-              className="group rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              className={`group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:shadow-xl ${card.glowColor} ${card.borderHover}`}
             >
               <div className="flex items-center justify-between">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${card.bgLight}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${card.bgColor} border border-white/5`}
                 >
                   <Icon size={20} className={card.iconColor} />
                 </div>
@@ -139,8 +148,8 @@ export default async function DashboardPage() {
                   className="text-zinc-600 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-zinc-400"
                 />
               </div>
-              <div className="mt-3 text-3xl font-bold text-white">{stats[card.key]}</div>
-              <div className="text-sm text-zinc-400">{card.label}</div>
+              <div className="mt-4 text-3xl font-bold text-white">{stats[card.key]}</div>
+              <div className="mt-0.5 text-sm text-zinc-500">{card.label}</div>
             </Link>
           );
         })}
@@ -152,15 +161,17 @@ export default async function DashboardPage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Link
             href="/api-keys"
-            className="group rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-lime-500/20 hover:shadow-lg hover:shadow-lime-500/5"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime-500/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lime-500/10 border border-lime-500/10">
                 <Key size={20} className="text-lime-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">API Keys</h3>
-                <p className="text-xs text-zinc-400">
+                <h3 className="text-sm font-semibold text-white group-hover:text-lime-400 transition-colors">
+                  API Keys
+                </h3>
+                <p className="text-xs text-zinc-500">
                   Create an API key and connect your AI coding assistant
                 </p>
               </div>
@@ -168,15 +179,17 @@ export default async function DashboardPage() {
           </Link>
           <Link
             href="/import"
-            className="group rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-teal-500/20 hover:shadow-lg hover:shadow-teal-500/5"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/10 border border-teal-500/10">
                 <Download size={20} className="text-teal-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Import Tokens</h3>
-                <p className="text-xs text-zinc-400">
+                <h3 className="text-sm font-semibold text-white group-hover:text-teal-400 transition-colors">
+                  Import Tokens
+                </h3>
+                <p className="text-xs text-zinc-500">
                   Import design tokens from Figma, CSS, or Tailwind
                 </p>
               </div>
@@ -185,16 +198,17 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Projects */}
       <div className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Projects</h2>
           {stats.recentProjects.length > 0 && (
             <Link
               href="/projects"
-              className="flex items-center gap-1 text-sm font-medium text-lime-400 transition-colors hover:text-lime-300"
+              className="group flex items-center gap-1 text-sm font-medium text-lime-400 transition-colors hover:text-lime-300"
             >
               View all
-              <ArrowRight size={14} />
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
           )}
         </div>
@@ -205,11 +219,14 @@ export default async function DashboardPage() {
               <Link
                 key={p.id}
                 href={`/projects/${p.slug}`}
-                className="group block rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                className="group block rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-white/10 hover:shadow-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800">
-                    <FolderOpen size={18} className="text-zinc-400" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/5">
+                    <FolderOpen
+                      size={18}
+                      className="text-zinc-400 group-hover:text-lime-400 transition-colors"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-base font-semibold text-white">{p.name}</h3>
@@ -220,8 +237,8 @@ export default async function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="mt-4 rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-10 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800">
+          <div className="mt-4 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 border border-white/5">
               <Inbox size={24} className="text-zinc-500" />
             </div>
             <p className="text-sm font-medium text-zinc-400">No projects yet</p>

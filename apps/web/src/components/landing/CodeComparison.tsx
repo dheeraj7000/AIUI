@@ -1,4 +1,7 @@
+'use client';
+
 import { X, Check } from 'lucide-react';
+import { FadeUp, FadeLeft, FadeRight } from './motion';
 
 const withoutAiui = `// Prompt: "Build me a settings page"
 
@@ -34,59 +37,72 @@ const withAiui = `// Prompt: "Build me a settings page"
 
 export function CodeComparison() {
   return (
-    <section className="bg-zinc-900 py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-zinc-900/50 py-24 sm:py-32 noise-overlay">
+      <div className="absolute inset-0 bg-aurora-subtle" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-lime-400">
-            The Difference
-          </p>
-          <h2 className="mt-2 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
-            Design consistency, automatically
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-zinc-400">
-            Without AIUI, Claude invents styles on the fly. With AIUI, every component follows your
-            exact design system.
-          </p>
-        </div>
+        <FadeUp>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-lime-400">
+              The Difference
+            </p>
+            <h2 className="mt-3 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
+              Design consistency,{' '}
+              <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+                automatically
+              </span>
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-zinc-400">
+              Without AIUI, Claude invents styles on the fly. With AIUI, every component follows
+              your exact design system.
+            </p>
+          </div>
+        </FadeUp>
 
         {/* Comparison blocks */}
         <div className="mt-16 grid gap-6 md:grid-cols-2">
           {/* Without AIUI */}
-          <div className="rounded-2xl border-2 border-red-500/30 bg-red-950/30 overflow-hidden">
-            <div className="flex items-center gap-2 border-b border-red-500/20 bg-red-950/50 px-5 py-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
-                <X className="h-3.5 w-3.5 text-white" />
+          <FadeLeft delay={0.1}>
+            <div className="h-full rounded-2xl border border-red-500/20 bg-red-950/20 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-red-500/30">
+              <div className="flex items-center gap-2.5 border-b border-red-500/15 bg-red-950/40 px-5 py-3.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/20 border border-red-500/30">
+                  <X className="h-3.5 w-3.5 text-red-400" />
+                </div>
+                <span className="text-sm font-semibold text-red-400">Without AIUI</span>
               </div>
-              <span className="text-sm font-semibold text-red-400">Without AIUI</span>
-            </div>
-            <div className="p-5">
-              <p className="mb-3 text-sm text-red-400">
-                Inconsistent styles, inline CSS, arbitrary colors, no design tokens.
-              </p>
-              <div className="rounded-lg bg-gray-950 p-4 overflow-x-auto">
-                <pre className="text-xs leading-relaxed font-mono text-gray-300">{withoutAiui}</pre>
+              <div className="p-5">
+                <p className="mb-4 text-sm text-red-400/80">
+                  Inconsistent styles, inline CSS, arbitrary colors, no design tokens.
+                </p>
+                <div className="rounded-xl bg-zinc-950/80 border border-white/5 p-4 overflow-x-auto">
+                  <pre className="text-xs leading-relaxed font-mono text-zinc-400">
+                    {withoutAiui}
+                  </pre>
+                </div>
               </div>
             </div>
-          </div>
+          </FadeLeft>
 
           {/* With AIUI */}
-          <div className="rounded-2xl border-2 border-lime-500/30 bg-lime-950/30 overflow-hidden">
-            <div className="flex items-center gap-2 border-b border-lime-500/20 bg-lime-950/50 px-5 py-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500">
-                <Check className="h-3.5 w-3.5 text-white" />
+          <FadeRight delay={0.1}>
+            <div className="h-full rounded-2xl border border-lime-500/20 bg-lime-950/20 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-lime-500/30 hover:shadow-lg hover:shadow-lime-500/5">
+              <div className="flex items-center gap-2.5 border-b border-lime-500/15 bg-lime-950/40 px-5 py-3.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-lime-500/20 border border-lime-500/30">
+                  <Check className="h-3.5 w-3.5 text-lime-400" />
+                </div>
+                <span className="text-sm font-semibold text-lime-400">With AIUI</span>
               </div>
-              <span className="text-sm font-semibold text-lime-400">With AIUI</span>
-            </div>
-            <div className="p-5">
-              <p className="mb-3 text-sm text-lime-400">
-                Your exact tokens, approved components, consistent output every time.
-              </p>
-              <div className="rounded-lg bg-gray-950 p-4 overflow-x-auto">
-                <pre className="text-xs leading-relaxed font-mono text-gray-300">{withAiui}</pre>
+              <div className="p-5">
+                <p className="mb-4 text-sm text-lime-400/80">
+                  Your exact tokens, approved components, consistent output every time.
+                </p>
+                <div className="rounded-xl bg-zinc-950/80 border border-white/5 p-4 overflow-x-auto">
+                  <pre className="text-xs leading-relaxed font-mono text-zinc-400">{withAiui}</pre>
+                </div>
               </div>
             </div>
-          </div>
+          </FadeRight>
         </div>
       </div>
     </section>
