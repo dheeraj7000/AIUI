@@ -49,7 +49,7 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
           throw new NotFoundError('Project', slug);
         }
 
-        // Auto-generate an initial graph for the new project
+        // Get the newly created project ID
         const [newProject] = await db
           .select({ id: projects.id })
           .from(projects)
@@ -57,6 +57,26 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
           .limit(1);
 
         if (newProject) {
+          // Create an empty design profile so the dashboard shows it
+          await db.insert(designProfiles).values({
+            projectId: newProject.id,
+            name: `${slugToTitle(slug)} Design Profile`,
+            version: 1,
+            compiledJson: {
+              tokens: {},
+              components: [],
+              _changelog: [
+                {
+                  version: 1,
+                  date: new Date().toISOString().split('T')[0],
+                  summary: 'Project auto-created via MCP. Run sync_design_memory to populate.',
+                },
+              ],
+            },
+            compilationValid: true,
+          });
+
+          // Auto-generate an initial graph
           await autoGenerateGraph(db, newProject.id);
         }
 
