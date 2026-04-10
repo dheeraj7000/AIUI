@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb } from '@aiui/design-core';
+import { createDb, designProfiles } from '@aiui/design-core';
 import {
   assignStylePack,
   getProjectStylePack,
   StylePackNotFoundError,
   ProjectNotFoundError,
 } from '@aiui/design-core/src/operations/project-style-pack';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 function getDb() {
@@ -74,6 +75,18 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       parsed.data.stylePackId,
       parsed.data.tokenOverrides
     );
+
+    // Mark the project's design profile as stale so MCP read tools surface
+    // a warning until sync_design_memory is called. Soft signal — log and
+    // continue on failure.
+    try {
+      await db
+        .update(designProfiles)
+        .set({ compilationValid: false, updatedAt: new Date() })
+        .where(eq(designProfiles.projectId, id));
+    } catch (staleErr) {
+      console.error('Failed to mark design profile stale:', staleErr);
+    }
 
     return NextResponse.json(result);
   } catch (error) {

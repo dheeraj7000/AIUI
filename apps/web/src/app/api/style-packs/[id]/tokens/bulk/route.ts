@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, bulkImportTokens, bulkImportSchema } from '@aiui/design-core';
+import {
+  createDb,
+  bulkImportTokens,
+  bulkImportSchema,
+  designProfiles,
+  projects,
+} from '@aiui/design-core';
+import { eq, inArray } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -35,6 +42,29 @@ export async function POST(req: NextRequest, context: RouteContext) {
 
     if ('error' in result) {
       return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
+    }
+
+    // Mark every project using this style pack as stale so MCP read tools
+    // surface a warning until sync_design_memory is called. Soft signal —
+    // log and continue on failure.
+    try {
+      const affectedProjects = await db
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.activeStylePackId, stylePackId));
+      if (affectedProjects.length > 0) {
+        await db
+          .update(designProfiles)
+          .set({ compilationValid: false, updatedAt: new Date() })
+          .where(
+            inArray(
+              designProfiles.projectId,
+              affectedProjects.map((p) => p.id)
+            )
+          );
+      }
+    } catch (staleErr) {
+      console.error('Failed to mark design profile stale:', staleErr);
     }
 
     return NextResponse.json(result.data);

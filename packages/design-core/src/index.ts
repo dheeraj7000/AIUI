@@ -304,6 +304,7 @@ export type { CreateApiKeyInput, ApiKeyWithRaw, ApiKeyContext } from './operatio
 export {
   initProjectWithStarter,
   createProjectWithStarter,
+  seedProjectWithStarterPack,
   DEFAULT_STARTER_PACK_SLUG,
 } from './operations/init-project';
 export type {

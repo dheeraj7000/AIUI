@@ -128,8 +128,7 @@ function getIdeConfig(tab: IdeTab, rawKey: string): string {
         {
           mcpServers: {
             aiui: {
-              type: 'http',
-              url: `${host}/mcp`,
+              serverUrl: `${host}/mcp`,
               headers: {
                 Authorization: `Bearer ${rawKey}`,
               },
@@ -225,11 +224,14 @@ function IdeSetupSection({
 
   if (variant === 'inline') {
     return (
-      <div className="mt-4">
+      <div className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-1">
           <Monitor size={16} className="text-indigo-400" />
-          <span className="text-sm font-medium text-indigo-300">IDE Setup</span>
+          <span className="text-sm font-semibold text-white">Connect your MCP client</span>
         </div>
+        <p className="text-xs text-zinc-400">
+          One-time setup. Paste the snippet for your editor and you&apos;re connected to AIUI.
+        </p>
         {content}
       </div>
     );

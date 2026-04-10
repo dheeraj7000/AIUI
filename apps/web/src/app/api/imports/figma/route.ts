@@ -6,8 +6,10 @@ import {
   parseFigmaUrl,
   extractFigmaTokens,
   verifyOrgMembership,
+  designProfiles,
 } from '@aiui/design-core';
 import { assignStylePack } from '@aiui/design-core/src/operations/project-style-pack';
+import { eq } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -76,6 +78,17 @@ export async function POST(req: NextRequest) {
     if (projectId) {
       try {
         await assignStylePack(db, projectId, stylePack.id);
+        // Mark the project's design profile as stale so MCP read tools
+        // surface a warning until sync_design_memory is called. Soft
+        // signal — log and continue on failure.
+        try {
+          await db
+            .update(designProfiles)
+            .set({ compilationValid: false, updatedAt: new Date() })
+            .where(eq(designProfiles.projectId, projectId));
+        } catch (staleErr) {
+          console.error('Failed to mark design profile stale:', staleErr);
+        }
       } catch {
         // Project assignment is best-effort; the pack was still created
       }

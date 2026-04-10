@@ -29,7 +29,7 @@ interface SeedResult {
  * project row. Used by both `initProjectWithStarter` (explicit slug, idempotent)
  * and `createProjectWithStarter` (name-based, collision-safe slug).
  */
-async function seedProjectWithStarterPack(
+export async function seedProjectWithStarterPack(
   db: Database,
   projectId: string,
   starterPackSlug: string

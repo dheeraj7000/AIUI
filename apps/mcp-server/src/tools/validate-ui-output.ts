@@ -341,7 +341,7 @@ function checkColorContrast(code: string): Violation[] {
 export function registerValidateUiOutput(server: AiuiMcpServer) {
   server.registerTool(
     'validate_ui_output',
-    'Check generated UI code for compliance against the project design profile. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.',
+    "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
     {
       projectId: z.string().uuid().describe('The project ID to validate against'),
       code: z.string().describe('The generated UI code to validate'),

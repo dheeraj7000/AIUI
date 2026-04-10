@@ -365,7 +365,7 @@ export async function generateDesignMemory(
   // Staleness warning
   if (stale) {
     lines.push(
-      '> **Warning:** Design profile was compiled with different tokens. Re-sync recommended.'
+      '> **Warning:** Design system was compiled with different tokens. Re-sync recommended.'
     );
     lines.push('');
   }
@@ -373,7 +373,7 @@ export async function generateDesignMemory(
   // Low drift score warning
   if (driftScore !== null && driftScore < 80) {
     lines.push(
-      `> **Drift Warning:** Design drift score is ${driftScore}/100. Tokens have diverged significantly from the compiled profile. Re-compile and re-sync immediately.`
+      `> **Drift Warning:** Design drift score is ${driftScore}/100. Tokens have diverged significantly from the compiled design system. Re-compile and re-sync immediately.`
     );
     lines.push('');
   }
@@ -969,7 +969,8 @@ export function registerDesignMemory(server: AiuiMcpServer) {
           currentTokenCount: 0,
           driftScore: 0,
           changes: { added: [], removed: [], modified: [] },
-          recommendation: 'No design profile found. Call sync_design_memory to create one.',
+          recommendation:
+            'No design system found for this project. Call sync_design_memory to create one.',
         };
       }
 

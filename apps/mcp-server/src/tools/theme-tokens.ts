@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { projects, styleTokens } from '@aiui/design-core';
+import { projects, styleTokens, designProfiles } from '@aiui/design-core';
 import { exportTailwindConfig, exportCSSVariables, mergeTokens } from '@aiui/prompt-compiler';
 import { NotFoundError } from '../lib/errors';
 
@@ -38,12 +38,25 @@ export function registerThemeTokens(server: AiuiMcpServer) {
 
       const { tokens: merged } = mergeTokens(tokenMap, {}, { applyDefaults: true });
 
+      // Surface a stale-warning if the design profile has been marked invalid
+      // by a recent write from the dashboard or another MCP session.
+      let staleWarning: string | null = null;
+      const [profile] = await db
+        .select({ compilationValid: designProfiles.compilationValid })
+        .from(designProfiles)
+        .where(eq(designProfiles.projectId, project.id))
+        .limit(1);
+      if (profile && !profile.compilationValid) {
+        staleWarning =
+          'Design tokens may have changed since the local .aiui/ files were last synced. Call sync_design_memory to refresh.';
+      }
+
       if (format === 'tailwind') {
-        return exportTailwindConfig(merged);
+        return { ...exportTailwindConfig(merged), staleWarning };
       } else if (format === 'css') {
-        return exportCSSVariables(merged);
+        return { ...exportCSSVariables(merged), staleWarning };
       } else {
-        return { tokens: merged };
+        return { tokens: merged, staleWarning };
       }
     }
   );

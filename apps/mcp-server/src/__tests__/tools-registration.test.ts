@@ -4,6 +4,8 @@ import { registerWriteTokens } from '../tools/write-tokens';
 import { registerWriteProject } from '../tools/write-project';
 import { registerInitProject } from '../tools/init-project';
 import { registerFixCompliance } from '../tools/fix-compliance';
+import { registerResetProject } from '../tools/reset-project';
+import { registerUndoTokens } from '../tools/undo-tokens';
 import { registerGetProjectContext } from '../tools/get-project-context';
 import { registerResolveTag } from '../tools/resolve-tag';
 import { registerComponentTools } from '../tools/components';
@@ -33,6 +35,14 @@ describe('Tools registration exports', () => {
 
   it('registerFixCompliance is a function', () => {
     expect(typeof registerFixCompliance).toBe('function');
+  });
+
+  it('registerResetProject is a function', () => {
+    expect(typeof registerResetProject).toBe('function');
+  });
+
+  it('registerUndoTokens is a function', () => {
+    expect(typeof registerUndoTokens).toBe('function');
   });
 
   it('registerGetProjectContext is a function', () => {
@@ -78,6 +88,8 @@ describe('Tools registration exports', () => {
       registerWriteProject,
       registerInitProject,
       registerFixCompliance,
+      registerResetProject,
+      registerUndoTokens,
       registerGetProjectContext,
       registerResolveTag,
       registerComponentTools,

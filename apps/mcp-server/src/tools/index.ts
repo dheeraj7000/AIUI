@@ -12,6 +12,8 @@ import { registerWriteTokens } from './write-tokens';
 import { registerWriteProject } from './write-project';
 import { registerInitProject } from './init-project';
 import { registerFixCompliance } from './fix-compliance';
+import { registerResetProject } from './reset-project';
+import { registerUndoTokens } from './undo-tokens';
 
 /**
  * Register all AIUI tools with the MCP server.
@@ -33,4 +35,6 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerWriteProject(server);
   registerInitProject(server);
   registerFixCompliance(server);
+  registerResetProject(server);
+  registerUndoTokens(server);
 }
