@@ -146,7 +146,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
     try {
       // Load style pack
       const packRes = await fetch(`/api/projects/${projectId}/style-pack`, {
-        headers: { Authorization: `Bearer ${session.accessToken}` },
+        credentials: 'same-origin',
       });
       if (packRes.ok) {
         const data = await packRes.json();
@@ -155,7 +155,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
 
       // Load components
       const compRes = await fetch(`/api/projects/${projectId}/components`, {
-        headers: { Authorization: `Bearer ${session.accessToken}` },
+        credentials: 'same-origin',
       });
       if (compRes.ok) {
         const data = await compRes.json();
@@ -192,10 +192,8 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
     try {
       const res = await fetch('/api/projects', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.accessToken}`,
-        },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orgId, name: newProjectName.trim() }),
       });
       if (!res.ok) {
@@ -248,10 +246,8 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
       if (selectedPackId) {
         const res = await fetch(`/api/projects/${selectedProject.id}/style-pack`, {
           method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.accessToken}`,
-          },
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ stylePackId: selectedPackId }),
         });
         if (!res.ok) throw new Error('Failed to apply style pack');
@@ -260,10 +256,8 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
       // Save components
       const res = await fetch(`/api/projects/${selectedProject.id}/components`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.accessToken}`,
-        },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ componentRecipeIds: [...selectedRecipeIds] }),
       });
       if (!res.ok) throw new Error('Failed to save components');

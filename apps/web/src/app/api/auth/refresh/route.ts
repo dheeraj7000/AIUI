@@ -18,11 +18,17 @@ function getDb() {
  */
 export async function POST(req: NextRequest) {
   try {
+    // Accept token from Authorization header OR HttpOnly cookie.
+    // The cookie path is required for cold-start refresh after a page reload,
+    // since HttpOnly cookies cannot be read by client JS.
     const authHeader = req.headers.get('authorization');
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const token =
+      (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null) ??
+      req.cookies.get('aiui-access-token')?.value ??
+      null;
 
     if (!token) {
-      return NextResponse.json({ error: 'Authorization header required' }, { status: 401 });
+      return NextResponse.json({ error: 'No auth token found' }, { status: 401 });
     }
 
     // Rate limit by last 10 chars of token (no userId available yet)

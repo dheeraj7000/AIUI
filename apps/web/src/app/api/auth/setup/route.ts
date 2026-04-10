@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDb, organizations, organizationMembers, projects } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
+import { verifyToken } from '@/lib/jwt';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -11,13 +12,25 @@ function getDb() {
 /**
  * POST /api/auth/setup — Ensure the user has a default org.
  * Returns the org and its projects.
+ *
+ * Authenticates via the HttpOnly access token cookie. The userId/email
+ * fields in the request body are ignored — they were a leftover from the
+ * pre-cookie design where the client passed user info explicitly.
  */
 export async function POST(req: NextRequest) {
   try {
-    const { userId, email } = await req.json();
-    if (!userId) {
-      return NextResponse.json({ error: 'userId required' }, { status: 400 });
+    // Authenticate from the HttpOnly cookie
+    const token = req.cookies.get('aiui-access-token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const claims = await verifyToken(token);
+    if (!claims) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = claims.sub;
+    const email = claims.email ?? '';
 
     const db = getDb();
 

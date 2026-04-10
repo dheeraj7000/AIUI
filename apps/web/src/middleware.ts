@@ -57,10 +57,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protected API routes: check Authorization header
+  // Protected API routes: accept Authorization header (for external clients
+  // like MCP) OR HttpOnly cookie (for browser-originated requests).
   if (isApiRoute) {
     const authHeader = request.headers.get('authorization');
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const cookieToken = request.cookies.get('aiui-access-token')?.value ?? null;
+    // Use || (not ??) so empty Bearer headers fall through to the cookie.
+    const token = headerToken || cookieToken;
 
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

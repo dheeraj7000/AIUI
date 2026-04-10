@@ -19,7 +19,7 @@ import {
   Circle,
   Square,
 } from 'lucide-react';
-import { getPersistedAccessToken, getActiveOrgId } from '@/lib/session';
+import { getActiveOrgId } from '@/lib/session';
 import { TokenPreview } from '@/components/ui/TokenPreview';
 
 // ---------------------------------------------------------------------------
@@ -79,13 +79,10 @@ const statIcons: Record<string, typeof Palette> = {
 // ---------------------------------------------------------------------------
 
 async function authedFetch(url: string, body: Record<string, unknown>): Promise<Response> {
-  const token = getPersistedAccessToken();
   return fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
 }

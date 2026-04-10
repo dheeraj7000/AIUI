@@ -11,7 +11,7 @@ export function AddToProject({ recipeId }: { recipeId: string }) {
 
     // First get current selection
     const getRes = await fetch(`/api/projects/${projectId}/components`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
+      credentials: 'same-origin',
     });
 
     let existing: string[] = [];
@@ -29,10 +29,8 @@ export function AddToProject({ recipeId }: { recipeId: string }) {
 
     const res = await fetch(`/api/projects/${projectId}/components`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.accessToken}`,
-      },
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ componentRecipeIds: [...existing, recipeId] }),
     });
 

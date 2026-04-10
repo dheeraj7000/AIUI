@@ -64,10 +64,8 @@ export function ProjectPicker({ action, onSelect }: ProjectPickerProps) {
     try {
       const res = await fetch('/api/projects', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.accessToken}`,
-        },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orgId, name: newName.trim() }),
       });
       if (!res.ok) {

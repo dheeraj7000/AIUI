@@ -24,13 +24,7 @@ import {
   forgotPassword as authForgotPassword,
   confirmForgotPassword as authConfirmForgotPassword,
 } from '@/lib/auth';
-import {
-  persistSession,
-  getPersistedSession,
-  clearSession,
-  setActiveOrgId,
-  getActiveOrgId,
-} from '@/lib/session';
+import { clearSession, setActiveOrgId, getActiveOrgId } from '@/lib/session';
 import {
   onSessionMessage,
   broadcastSignOut,
@@ -111,7 +105,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const newSession = await refreshSession();
         if (newSession) {
           setSession(newSession);
-          persistSession(newSession);
           broadcastSessionUpdate();
           scheduleRefresh(newSession);
         }
@@ -212,12 +205,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           router.push('/sign-in');
           break;
         case SESSION_UPDATED:
-          // Another tab refreshed the session -- re-fetch
-          refreshSession()
+          // Another tab refreshed the session — re-read it from cookies via API
+          getSession()
             .then((newSession) => {
               if (newSession) {
                 setSession(newSession);
-                persistSession(newSession);
                 scheduleRefresh(newSession);
               }
             })
@@ -243,44 +235,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         configureAuth();
 
-        // Attempt to read a persisted session from cookies for fast restore
-        const persisted = getPersistedSession();
-
+        // Ask the server who we are. The server reads the HttpOnly cookie
+        // and returns user info if the token is valid. This is the source
+        // of truth on cold start (page refresh) — JavaScript cannot read
+        // HttpOnly cookies directly.
         const [currentUser, currentSession] = await Promise.all([getCurrentUser(), getSession()]);
         if (cancelled) return;
 
         if (currentUser && currentSession) {
           setUser(currentUser);
           setSession(currentSession);
-          persistSession(currentSession);
           scheduleRefresh(currentSession);
-        } else if (persisted && persisted.expiresAt > Date.now()) {
-          // Tokens exist in cookies but no in-memory session
-          // (e.g. page refresh). Use the persisted session as a fallback
-          // while we try to refresh.
-          setSession(persisted);
-          try {
-            const refreshed = await refreshSession();
-            if (!cancelled && refreshed) {
-              setSession(refreshed);
-              persistSession(refreshed);
-              scheduleRefresh(refreshed);
-
-              const refreshedUser = await getCurrentUser();
-              if (!cancelled && refreshedUser) {
-                setUser(refreshedUser);
-              }
-            }
-          } catch {
-            // Refresh failed; the persisted session may be stale
-            if (!cancelled) {
-              clearSession();
-              setSession(null);
-            }
-          }
         }
+        // If no user, leave state null — middleware will redirect protected routes
       } catch {
-        // Not authenticated -- that's fine
+        // Network error or similar — leave unauthenticated
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -297,12 +266,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Auth actions
   // -----------------------------------------------------------------------
 
-  const ensureOrg = useCallback(async (userId: string, email: string, token: string) => {
+  const ensureOrg = useCallback(async (userId: string, email: string) => {
     if (getActiveOrgId()) return;
     try {
       const res = await fetch('/api/auth/setup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ userId, email }),
       });
       if (res.ok) {
@@ -324,10 +294,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(currentUser);
           setSession(currentSession);
           if (currentSession) {
-            persistSession(currentSession);
             broadcastSessionUpdate();
             if (currentUser) {
-              await ensureOrg(currentUser.id, currentUser.email, currentSession.accessToken);
+              await ensureOrg(currentUser.id, currentUser.email);
             }
           }
           scheduleRefresh(currentSession);
@@ -352,10 +321,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(currentUser);
           setSession(currentSession);
           if (currentSession) {
-            persistSession(currentSession);
             broadcastSessionUpdate();
             if (currentUser) {
-              await ensureOrg(currentUser.id, currentUser.email, currentSession.accessToken);
+              await ensureOrg(currentUser.id, currentUser.email);
             }
           }
           scheduleRefresh(currentSession);
@@ -440,7 +408,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const newSession = await refreshSession();
       setSession(newSession);
       if (newSession) {
-        persistSession(newSession);
         broadcastSessionUpdate();
       }
       scheduleRefresh(newSession);

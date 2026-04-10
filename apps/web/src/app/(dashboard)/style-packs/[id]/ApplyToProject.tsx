@@ -10,10 +10,8 @@ export function ApplyToProject({ stylePackId }: { stylePackId: string }) {
     if (!session) throw new Error('Not signed in');
     const res = await fetch(`/api/projects/${projectId}/style-pack`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.accessToken}`,
-      },
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ stylePackId }),
     });
     if (!res.ok) {

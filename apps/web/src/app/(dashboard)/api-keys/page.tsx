@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { getPersistedAccessToken, getActiveOrgId } from '@/lib/session';
+import { getActiveOrgId } from '@/lib/session';
 import {
   Key,
   Copy,
@@ -47,11 +47,8 @@ type IdeTab = 'claude-code' | 'cursor' | 'vscode' | 'windsurf';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function authHeaders(): Record<string, string> {
-  const token = getPersistedAccessToken();
-  if (!token) return {};
-  return { Authorization: `Bearer ${token}` };
-}
+// Auth is now sent via HttpOnly cookies — `credentials: 'same-origin'` ensures
+// the browser includes them on every request. No client-side token handling.
 
 function formatDate(iso: string | null): string {
   if (!iso) return '--';
@@ -296,7 +293,7 @@ export default function ApiKeysPage() {
 
   const fetchKeys = useCallback(async () => {
     try {
-      const res = await fetch('/api/api-keys', { headers: authHeaders() });
+      const res = await fetch('/api/api-keys', { credentials: 'same-origin' });
       if (!res.ok) {
         throw new Error(`Failed to load keys (${res.status})`);
       }
@@ -330,10 +327,8 @@ export default function ApiKeysPage() {
 
       const res = await fetch('/api/api-keys', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders(),
-        },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newKeyName.trim(), organizationId }),
       });
 
@@ -369,7 +364,7 @@ export default function ApiKeysPage() {
     try {
       const res = await fetch(`/api/api-keys/${id}`, {
         method: 'DELETE',
-        headers: authHeaders(),
+        credentials: 'same-origin',
       });
 
       if (!res.ok && res.status !== 204) {

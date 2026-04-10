@@ -1,144 +1,51 @@
 // ---------------------------------------------------------------------------
 // Session persistence utilities
 // ---------------------------------------------------------------------------
-// Manages auth tokens in cookies and org selection in localStorage.
-// Cookies use secure flags in production; localStorage is used for
-// non-sensitive preferences like the active organisation ID.
+// Auth tokens live in HttpOnly cookies set by the server (see auth-cookies.ts).
+// Client JavaScript never reads or writes those cookies directly.
+// This module manages the active organisation ID in localStorage and exposes
+// a clearSession helper that calls the server signout endpoint.
 // ---------------------------------------------------------------------------
 
 import type { AuthSession } from '@/types/auth';
 
-const ACCESS_TOKEN_COOKIE = 'aiui-access-token';
-const ID_TOKEN_COOKIE = 'aiui-id-token';
 const ACTIVE_ORG_KEY = 'aiui-active-org';
 
-/**
- * Build a cookie string with consistent flags.
- */
-function buildCookie(name: string, value: string, maxAgeSec?: number): string {
-  const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
-
-  const parts = [`${name}=${encodeURIComponent(value)}`, 'path=/', 'SameSite=Lax'];
-
-  if (isSecure) {
-    parts.push('Secure');
-  }
-
-  if (maxAgeSec !== undefined) {
-    parts.push(`max-age=${maxAgeSec}`);
-  }
-
-  return parts.join('; ');
-}
-
 // ---------------------------------------------------------------------------
-// Token persistence (cookies)
+// Token persistence (no-ops — server manages HttpOnly cookies)
 // ---------------------------------------------------------------------------
 
 /**
- * Store access and ID tokens as cookies so the auth middleware can read them
- * on subsequent page loads.
- *
- * @param accessToken - Access token (JWT)
- * @param idToken     - ID token (JWT)
- * @param maxAgeSec   - Cookie lifetime in seconds (default: 1 hour)
+ * No-op. Auth tokens live in HttpOnly cookies set by the server endpoints
+ * (signin/signup/refresh). The client never persists tokens directly because
+ * doing so would defeat the HttpOnly XSS protection.
  */
-export function persistTokens(accessToken: string, idToken: string, maxAgeSec = 3600): void {
-  if (typeof document === 'undefined') return;
-
-  document.cookie = buildCookie(ACCESS_TOKEN_COOKIE, accessToken, maxAgeSec);
-  document.cookie = buildCookie(ID_TOKEN_COOKIE, idToken, maxAgeSec);
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export function persistSession(_session: AuthSession): void {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+  // intentionally empty
 }
 
 /**
- * Read the persisted access token from cookies.
- */
-export function getPersistedAccessToken(): string | null {
-  if (typeof document === 'undefined') return null;
-
-  const match = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith(`${ACCESS_TOKEN_COOKIE}=`));
-
-  if (!match) return null;
-
-  return decodeURIComponent(match.split('=')[1] ?? '');
-}
-
-/**
- * Read the persisted ID token from cookies.
- */
-export function getPersistedIdToken(): string | null {
-  if (typeof document === 'undefined') return null;
-
-  const match = document.cookie.split('; ').find((row) => row.startsWith(`${ID_TOKEN_COOKIE}=`));
-
-  if (!match) return null;
-
-  return decodeURIComponent(match.split('=')[1] ?? '');
-}
-
-/**
- * Persist a full session (access + ID tokens) to cookies.
- */
-export function persistSession(session: AuthSession): void {
-  const maxAgeSec = session.expiresAt
-    ? Math.max(Math.floor((session.expiresAt - Date.now()) / 1000), 0)
-    : 3600;
-  persistTokens(session.accessToken, session.idToken, maxAgeSec);
-}
-
-/**
- * Reconstruct a persisted session from cookies. Returns null if tokens
- * are missing. The expiresAt is decoded from the access token JWT payload.
+ * @deprecated Cookies are HttpOnly — JS cannot read them. Use getCurrentUser()
+ * from @/lib/auth instead, which calls /api/auth/me to ask the server.
  */
 export function getPersistedSession(): AuthSession | null {
-  const accessToken = getPersistedAccessToken();
-  const idToken = getPersistedIdToken();
-
-  if (!accessToken || !idToken) return null;
-
-  // Decode the exp claim from the access token (JWT middle segment)
-  let expiresAt = 0;
-  try {
-    const parts = accessToken.split('.');
-    const payload = JSON.parse(atob(parts[1] ?? ''));
-    if (typeof payload.exp === 'number') {
-      expiresAt = payload.exp * 1000;
-    }
-  } catch {
-    // If we cannot decode, leave expiresAt as 0
-  }
-
-  return {
-    accessToken,
-    idToken,
-    refreshToken: '',
-    expiresAt,
-  };
+  return null;
 }
 
 /**
- * Remove all auth cookies and localStorage entries to fully clear the session.
- *
- * This clears client-readable cookies via document.cookie and also calls the
- * signout API to expire the HttpOnly server-set cookies that JavaScript cannot
- * access directly.
+ * Clear all client-side session state and ask the server to expire the
+ * HttpOnly auth cookies via /api/auth/signout.
  */
 export function clearSession(): void {
-  if (typeof document !== 'undefined') {
-    // Expire client-readable cookies by setting max-age=0
-    document.cookie = buildCookie(ACCESS_TOKEN_COOKIE, '', 0);
-    document.cookie = buildCookie(ID_TOKEN_COOKIE, '', 0);
-  }
-
   if (typeof localStorage !== 'undefined') {
     localStorage.removeItem(ACTIVE_ORG_KEY);
   }
 
   // Clear HttpOnly cookies via server endpoint (fire-and-forget)
   if (typeof fetch !== 'undefined') {
-    fetch('/api/auth/signout', { method: 'POST' }).catch(() => {
+    fetch('/api/auth/signout', { method: 'POST', credentials: 'same-origin' }).catch(() => {
       // Best-effort — if this fails the cookies will expire naturally
     });
   }
