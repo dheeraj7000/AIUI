@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { registerWriteStylePack } from '../tools/write-style-pack';
 import { registerWriteTokens } from '../tools/write-tokens';
 import { registerWriteProject } from '../tools/write-project';
+import { registerInitProject } from '../tools/init-project';
 import { registerFixCompliance } from '../tools/fix-compliance';
 import { registerGetProjectContext } from '../tools/get-project-context';
 import { registerResolveTag } from '../tools/resolve-tag';
@@ -24,6 +25,10 @@ describe('Tools registration exports', () => {
 
   it('registerWriteProject is a function', () => {
     expect(typeof registerWriteProject).toBe('function');
+  });
+
+  it('registerInitProject is a function', () => {
+    expect(typeof registerInitProject).toBe('function');
   });
 
   it('registerFixCompliance is a function', () => {
@@ -71,6 +76,7 @@ describe('Tools registration exports', () => {
       registerWriteStylePack,
       registerWriteTokens,
       registerWriteProject,
+      registerInitProject,
       registerFixCompliance,
       registerGetProjectContext,
       registerResolveTag,

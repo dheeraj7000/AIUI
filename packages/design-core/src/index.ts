@@ -300,6 +300,17 @@ export {
 } from './operations/api-keys';
 export type { CreateApiKeyInput, ApiKeyWithRaw, ApiKeyContext } from './operations/api-keys';
 
+// Project initialization with starter pack seeding
+export {
+  initProjectWithStarter,
+  createProjectWithStarter,
+  DEFAULT_STARTER_PACK_SLUG,
+} from './operations/init-project';
+export type {
+  InitProjectWithStarterInput,
+  InitProjectWithStarterResult,
+} from './operations/init-project';
+
 // Design token importers
 export {
   detectFormat,

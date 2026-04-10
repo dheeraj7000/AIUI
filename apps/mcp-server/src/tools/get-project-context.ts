@@ -2,20 +2,10 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { getProjectContext, autoGenerateGraph } from '@aiui/design-core';
+import { getProjectContext, initProjectWithStarter } from '@aiui/design-core';
 import { projects, designProfiles } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
-
-/**
- * Convert a slug to title case: "my-app" -> "My App", "marketplace" -> "Marketplace"
- */
-function slugToTitle(slug: string): string {
-  return slug
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
 
 export function registerGetProjectContext(server: AiuiMcpServer) {
   server.registerTool(
@@ -29,55 +19,24 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
       let autoCreated = false;
 
       if (!context) {
-        // Attempt to auto-create the project if we have auth context
+        // Attempt to auto-create the project if we have auth context.
+        // Routes through initProjectWithStarter so the new project is seeded
+        // with a real starter style pack + component selection + graph,
+        // matching the init_project MCP tool. This closes the "empty state"
+        // gap where slug-first callers used to land on {tokens:{}}.
         const authCtx = getContext();
         if (!authCtx?.organizationId) {
           throw new NotFoundError('Project', slug);
         }
 
-        // Insert the new project
-        await db.insert(projects).values({
-          name: slugToTitle(slug),
-          slug,
+        await initProjectWithStarter(db, {
           organizationId: authCtx.organizationId,
-          frameworkTarget: 'nextjs-tailwind',
+          slug,
         });
 
-        // Retry fetching the context after creation
         context = await getProjectContext(db, slug);
         if (!context) {
           throw new NotFoundError('Project', slug);
-        }
-
-        // Get the newly created project ID
-        const [newProject] = await db
-          .select({ id: projects.id })
-          .from(projects)
-          .where(eq(projects.slug, slug))
-          .limit(1);
-
-        if (newProject) {
-          // Create an empty design profile so the dashboard shows it
-          await db.insert(designProfiles).values({
-            projectId: newProject.id,
-            name: `${slugToTitle(slug)} Design Profile`,
-            version: 1,
-            compiledJson: {
-              tokens: {},
-              components: [],
-              _changelog: [
-                {
-                  version: 1,
-                  date: new Date().toISOString().split('T')[0],
-                  summary: 'Project auto-created via MCP. Run sync_design_memory to populate.',
-                },
-              ],
-            },
-            compilationValid: true,
-          });
-
-          // Auto-generate an initial graph
-          await autoGenerateGraph(db, newProject.id);
         }
 
         autoCreated = true;

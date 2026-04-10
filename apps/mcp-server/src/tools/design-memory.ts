@@ -188,7 +188,7 @@ function inferTier(type: string, explicit?: string | null): string {
   return 'organism';
 }
 
-async function generateDesignMemory(
+export async function generateDesignMemory(
   slug: string,
   changelog?: ChangelogEntry[]
 ): Promise<DesignMemory> {

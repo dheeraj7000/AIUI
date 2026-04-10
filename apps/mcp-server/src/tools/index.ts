@@ -10,6 +10,7 @@ import { registerDesignStudio } from './design-studio';
 import { registerWriteStylePack } from './write-style-pack';
 import { registerWriteTokens } from './write-tokens';
 import { registerWriteProject } from './write-project';
+import { registerInitProject } from './init-project';
 import { registerFixCompliance } from './fix-compliance';
 
 /**
@@ -30,5 +31,6 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerWriteStylePack(server);
   registerWriteTokens(server);
   registerWriteProject(server);
+  registerInitProject(server);
   registerFixCompliance(server);
 }

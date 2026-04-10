@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, createProject, listProjects, verifyOrgMembership } from '@aiui/design-core';
+import {
+  createDb,
+  createProjectWithStarter,
+  listProjects,
+  verifyOrgMembership,
+} from '@aiui/design-core';
 import { createProjectSchema, listProjectsSchema } from '@aiui/design-core/src/validation/project';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
@@ -87,11 +92,27 @@ export async function POST(req: NextRequest) {
     if (!isMember) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    const project = await createProject(db, parsed.data);
 
-    return NextResponse.json(project, { status: 201 });
+    // Create the project AND seed it with the shadcn/ui Essentials starter
+    // pack, a design profile, and an initial graph. This mirrors the MCP
+    // init_project tool so web-created and MCP-created projects arrive in
+    // the same populated state instead of an empty one.
+    const result = await createProjectWithStarter(db, parsed.data);
+
+    // Return the project row shape the client already expects, augmented
+    // with the seeded starter metadata for the dashboard to display.
+    return NextResponse.json(
+      {
+        ...result.project,
+        stylePack: result.stylePack,
+        tokenCount: result.tokenCount,
+        componentCount: result.componentCount,
+      },
+      { status: 201 }
+    );
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error('Failed to create project:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: message || 'Internal server error' }, { status: 500 });
   }
 }
