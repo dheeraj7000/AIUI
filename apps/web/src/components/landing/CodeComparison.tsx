@@ -37,7 +37,7 @@ const withAiui = `// Prompt: "Build me a settings page"
 
 export function CodeComparison() {
   return (
-    <section className="relative bg-zinc-900/50 py-24 sm:py-32 noise-overlay">
+    <section className="relative bg-zinc-950 py-24 sm:py-32 noise-overlay">
       <div className="absolute inset-0 bg-aurora-subtle" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

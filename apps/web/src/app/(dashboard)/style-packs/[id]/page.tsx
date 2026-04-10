@@ -34,12 +34,36 @@ async function getStylePack(id: string) {
 }
 
 const sectionMeta: Record<string, { label: string; badge: string; icon: typeof Palette }> = {
-  color: { label: 'Colors', badge: 'bg-pink-50 text-pink-700', icon: Palette },
-  font: { label: 'Typography', badge: 'bg-amber-50 text-amber-700', icon: Type },
-  radius: { label: 'Border Radius', badge: 'bg-blue-50 text-blue-700', icon: Circle },
-  shadow: { label: 'Shadows', badge: 'bg-purple-50 text-purple-700', icon: Layers },
-  spacing: { label: 'Spacing', badge: 'bg-green-50 text-green-700', icon: Move },
-  elevation: { label: 'Elevation', badge: 'bg-indigo-50 text-indigo-700', icon: BoxSelect },
+  color: {
+    label: 'Colors',
+    badge: 'bg-pink-500/10 text-pink-400 border border-pink-500/20',
+    icon: Palette,
+  },
+  font: {
+    label: 'Typography',
+    badge: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+    icon: Type,
+  },
+  radius: {
+    label: 'Border Radius',
+    badge: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+    icon: Circle,
+  },
+  shadow: {
+    label: 'Shadows',
+    badge: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+    icon: Layers,
+  },
+  spacing: {
+    label: 'Spacing',
+    badge: 'bg-green-500/10 text-green-400 border border-green-500/20',
+    icon: Move,
+  },
+  elevation: {
+    label: 'Elevation',
+    badge: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+    icon: BoxSelect,
+  },
 };
 
 /** Display order for token-type sections. */
@@ -77,9 +101,9 @@ export default async function StylePackDetailPage(props: RouteContext) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{pack.name}</h1>
-          <p className="mt-1 text-sm text-gray-500">{pack.description}</p>
-          <div className="mt-2 flex gap-2 text-xs text-gray-400">
+          <h1 className="text-2xl font-bold text-white">{pack.name}</h1>
+          <p className="mt-1 text-sm text-zinc-400">{pack.description}</p>
+          <div className="mt-2 flex gap-2 text-xs text-zinc-500">
             <span>{pack.category}</span>
             <span>v{pack.version}</span>
             <span>{pack.tokens.length} tokens</span>
@@ -95,20 +119,23 @@ export default async function StylePackDetailPage(props: RouteContext) {
           const tokens = grouped[type]!;
           const meta = sectionMeta[type] ?? {
             label: type,
-            badge: 'bg-gray-100 text-gray-700',
+            badge: 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20',
             icon: Layers,
           };
           const SectionIcon = meta.icon;
 
           return (
-            <div key={type} className="rounded-lg border border-gray-200 bg-white p-5">
+            <div
+              key={type}
+              className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5"
+            >
               {/* Section header */}
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                <SectionIcon size={14} className="text-gray-400" />
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <SectionIcon size={14} className="text-zinc-400" />
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${meta.badge}`}>
                   {meta.label}
                 </span>
-                <span className="font-normal text-gray-400">{tokens.length} tokens</span>
+                <span className="font-normal text-zinc-500">{tokens.length} tokens</span>
               </h2>
 
               {/* --- Colors: grid of swatches --- */}
@@ -153,10 +180,10 @@ export default async function StylePackDetailPage(props: RouteContext) {
                     ))}
                   </div>
                   {/* Extended text samples */}
-                  <div className="space-y-3 rounded-lg border border-gray-100 bg-gray-50/50 p-4">
+                  <div className="space-y-3 rounded-lg border border-white/5 bg-white/[0.03] p-4">
                     {headingFont && (
                       <p
-                        className="text-xl font-bold text-gray-900"
+                        className="text-xl font-bold text-white"
                         style={{ fontFamily: headingFont }}
                       >
                         The quick brown fox jumps over the lazy dog
@@ -164,7 +191,7 @@ export default async function StylePackDetailPage(props: RouteContext) {
                     )}
                     {bodyFont && (
                       <p
-                        className="text-sm leading-relaxed text-gray-600"
+                        className="text-sm leading-relaxed text-zinc-400"
                         style={{ fontFamily: bodyFont }}
                       >
                         The quick brown fox jumps over the lazy dog. Pack my box with five dozen
@@ -252,16 +279,16 @@ export default async function StylePackDetailPage(props: RouteContext) {
       {/* Component recipes */}
       {pack.recipes.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-gray-900">Components in this pack</h2>
+          <h2 className="text-lg font-semibold text-white">Components in this pack</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {pack.recipes.map((r) => (
               <a
                 key={r.id}
                 href={`/components/${r.id}`}
-                className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm hover:shadow-sm"
+                className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm px-4 py-3 text-sm transition-all duration-200 hover:bg-white/[0.04] hover:border-white/10"
               >
-                <span className="font-medium text-gray-900">{r.name}</span>
-                <span className="ml-2 text-xs text-gray-400">{r.type}</span>
+                <span className="font-medium text-white">{r.name}</span>
+                <span className="ml-2 text-xs text-zinc-500">{r.type}</span>
               </a>
             ))}
           </div>

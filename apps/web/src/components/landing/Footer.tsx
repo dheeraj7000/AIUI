@@ -4,18 +4,18 @@ const footerSections = [
   {
     title: 'Product',
     links: [
-      { label: 'Style Packs', href: '/style-packs' },
-      { label: 'Components', href: '/components' },
-      { label: 'Visual Studio', href: '/studio' },
-      { label: 'Import', href: '/import' },
+      { label: 'Style Packs', href: '/#features' },
+      { label: 'Components', href: '/#features' },
+      { label: 'Visual Studio', href: '/#features' },
+      { label: 'Get Started', href: '/sign-up' },
     ],
   },
   {
     title: 'Developers',
     links: [
-      { label: 'API Keys', href: '/api-keys' },
-      { label: 'MCP Tools', href: '/projects' },
       { label: 'Documentation', href: '/docs' },
+      { label: 'MCP Integration', href: '/#how-it-works' },
+      { label: 'Status', href: '/api/health' },
     ],
   },
   {
@@ -23,7 +23,7 @@ const footerSections = [
     links: [
       { label: 'Documentation', href: '/docs' },
       { label: 'Self-Hosting', href: '/docs' },
-      { label: 'Status', href: '/api/health' },
+      { label: 'Beta Access', href: '/sign-up' },
     ],
   },
   {

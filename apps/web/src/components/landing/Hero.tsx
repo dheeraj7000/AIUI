@@ -55,7 +55,7 @@ export function Hero() {
         </div>
       </div>
       <div
-        className="absolute bottom-36 left-[12%] hidden lg:block animate-float-slow"
+        className="absolute bottom-36 left-[4%] hidden lg:block animate-float-slow"
         style={{ '--float-rotate': '3deg' } as React.CSSProperties}
       >
         <div className="rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-zinc-400 border border-white/10 shadow-lg shadow-black/20">

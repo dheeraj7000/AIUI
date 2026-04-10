@@ -29,7 +29,9 @@ export function OnboardingChecklist({
   const [dismissed, setDismissed] = useState(true); // default hidden to avoid flash
 
   useEffect(() => {
-    setDismissed(localStorage.getItem(DISMISSED_KEY) === 'true');
+    // Migrate from localStorage (permanent) to sessionStorage (per-session)
+    localStorage.removeItem(DISMISSED_KEY);
+    setDismissed(sessionStorage.getItem(DISMISSED_KEY) === 'true');
   }, []);
 
   const steps: OnboardingStep[] = [
@@ -45,7 +47,7 @@ export function OnboardingChecklist({
   if (dismissed || allDone) return null;
 
   const handleDismiss = () => {
-    localStorage.setItem(DISMISSED_KEY, 'true');
+    sessionStorage.setItem(DISMISSED_KEY, 'true');
     setDismissed(true);
   };
 

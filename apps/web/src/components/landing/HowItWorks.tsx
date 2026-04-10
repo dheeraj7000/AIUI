@@ -99,11 +99,14 @@ export function HowItWorks() {
                       <p className="mt-2 text-xs text-zinc-500 max-w-xs mx-auto">{step.detail}</p>
                     )}
 
-                    {/* Terminal command for step 2 */}
+                    {/* Terminal command for step 2 — floating chip style */}
                     {step.number === '2' && (
-                      <div className="mt-6 mx-auto max-w-sm">
-                        <div className="rounded-xl glass-card p-4 text-left overflow-x-auto">
-                          <pre className="text-xs leading-relaxed font-mono">
+                      <div className="mt-6 flex justify-center">
+                        <div
+                          className="inline-block rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 border border-white/10 shadow-lg shadow-black/20 animate-float"
+                          style={{ '--float-rotate': '-3deg' } as React.CSSProperties}
+                        >
+                          <pre className="text-xs font-mono">
                             <code>
                               <span className="text-zinc-600">$</span>{' '}
                               <span className="text-lime-400">claude mcp add aiui</span>

@@ -73,7 +73,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-4">
+    <header className="relative z-30 flex h-14 items-center justify-between border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-4">
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
@@ -95,7 +95,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </button>
 
         {dropdownOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/95 backdrop-blur-xl shadow-2xl shadow-black/40">
+          <div className="absolute right-0 top-full mt-2 z-50 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/95 backdrop-blur-xl shadow-2xl shadow-black/40">
             {userEmail && (
               <div className="truncate border-b border-white/5 px-3 py-2.5 text-xs text-zinc-500">
                 {userEmail}

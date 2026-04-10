@@ -20,7 +20,7 @@ const stats: Stat[] = [
 
 export function StatsBar() {
   return (
-    <section className="relative bg-zinc-950/80 backdrop-blur-sm border-y border-white/5">
+    <section className="relative bg-zinc-950 border-y border-white/5">
       <div className="absolute inset-0 bg-aurora-subtle" />
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <StaggerContainer className="grid grid-cols-2 gap-8 md:grid-cols-4">

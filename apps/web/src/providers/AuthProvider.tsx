@@ -400,12 +400,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       clearSession();
       // Notify other tabs
       broadcastSignOut();
+      // Redirect to sign-in
+      router.push('/sign-in');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Sign out failed';
       setError(message);
       throw err;
     }
-  }, [clearIdleTimers]);
+  }, [clearIdleTimers, router]);
 
   const handleForgotPassword = useCallback(async (email: string) => {
     setError(null);
