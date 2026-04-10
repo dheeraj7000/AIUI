@@ -4,6 +4,7 @@ import { count, eq, or } from 'drizzle-orm';
 import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Key, Download } from 'lucide-react';
 import { getUserOrg } from '@/lib/get-user-org';
 import { OnboardingChecklist } from '@/components/ui/onboarding-checklist';
+import { McpWalkthrough } from '@/components/ui/mcp-walkthrough';
 
 export const metadata = { title: 'Dashboard - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -118,7 +119,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* Onboarding */}
-      <div className="mt-6">
+      <div className="mt-6 space-y-4">
+        <McpWalkthrough hasApiKey={stats.hasApiKey} />
         <OnboardingChecklist
           hasProject={stats.projects > 0}
           hasStylePack={stats.packs > 0}

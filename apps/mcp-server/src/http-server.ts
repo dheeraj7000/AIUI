@@ -6,6 +6,7 @@ import { log } from './lib/errors';
 import { authenticateRequest } from './lib/auth';
 import { runWithContext } from './lib/context';
 import { registerAllTools } from './tools';
+import { trackUsageAsync } from './lib/usage';
 import type { AiuiMcpServer } from './server';
 
 // ---------------------------------------------------------------------------
@@ -14,20 +15,43 @@ import type { AiuiMcpServer } from './server';
 
 const SERVER_START_TIME = Date.now();
 
-// Count the actual tools that `registerAllTools` registers by running it
-// against a counter stub once at module load. This replaces a hardcoded
-// constant that drifted every time a tool was added.
-function countRegisteredTools(): number {
-  let count = 0;
-  registerAllTools({
-    registerTool: () => {
-      count++;
-    },
-  } as unknown as AiuiMcpServer);
-  return count;
+// Enumerate the tools that `registerAllTools` registers by running it
+// against a capturing stub once at module load. This replaces hardcoded
+// constants that drifted every time a tool was added, and powers both the
+// /health tools_count and the public /mcp/catalog endpoint.
+interface CatalogEntry {
+  name: string;
+  description: string;
+  category: 'read' | 'write';
 }
 
-const TOOLS_COUNT = countRegisteredTools();
+// Tool names that mutate state. Everything else is treated as read.
+const WRITE_TOOLS = new Set<string>([
+  'init_project',
+  'create_style_pack',
+  'apply_style_pack',
+  'update_tokens',
+  'fix_compliance_issues',
+  'reset_project_to_starter',
+  'undo_last_token_change',
+]);
+
+function listRegisteredTools(): CatalogEntry[] {
+  const tools: CatalogEntry[] = [];
+  registerAllTools({
+    registerTool: (name: string, description: string) => {
+      tools.push({
+        name,
+        description,
+        category: WRITE_TOOLS.has(name) ? 'write' : 'read',
+      });
+    },
+  } as unknown as AiuiMcpServer);
+  return tools;
+}
+
+const TOOL_CATALOG: CatalogEntry[] = listRegisteredTools();
+const TOOLS_COUNT = TOOL_CATALOG.length;
 
 const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const CLEANUP_INTERVAL_MS = 60_000; // 1 minute
@@ -122,6 +146,18 @@ export async function startHttpServer(port: number) {
       tools_count: TOOLS_COUNT,
       sessions_active: transports.size,
       transport: 'http',
+    });
+  });
+
+  // Public tool catalog — dynamic list of registered MCP tools. Unauthenticated
+  // so the web dashboard can render it cross-origin. Registered before the
+  // `/mcp` CORS middleware so the specific GET handler wins.
+  app.get('/mcp/catalog', (_req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.json({
+      tools: TOOL_CATALOG,
+      count: TOOL_CATALOG.length,
+      generatedAt: new Date(SERVER_START_TIME).toISOString(),
     });
   });
 
@@ -282,6 +318,27 @@ export async function startHttpServer(port: number) {
         res.status(429).json({ error: 'Rate limit exceeded' });
         return;
       }
+
+      // Track tool calls to the audit log / usage_events table (fire-and-forget).
+      // Handles both single JSON-RPC requests and batch arrays. Non-tool_call
+      // methods (initialize, tools/list, ...) are ignored.
+      const trackFromBody = (body: unknown): void => {
+        if (!body || typeof body !== 'object') return;
+        if (Array.isArray(body)) {
+          body.forEach(trackFromBody);
+          return;
+        }
+        const rec = body as { method?: string; params?: { name?: string } };
+        if (rec.method === 'tools/call' && rec.params?.name) {
+          trackUsageAsync({
+            apiKeyId: authContext.keyId,
+            organizationId: authContext.organizationId,
+            toolName: rec.params.name,
+            eventType: 'tool_call',
+          });
+        }
+      };
+      trackFromBody(req.body);
 
       // Check for existing session
       const sessionId = req.headers['mcp-session-id'] as string | undefined;

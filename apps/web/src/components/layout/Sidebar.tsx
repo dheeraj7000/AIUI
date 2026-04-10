@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   Key,
   BookOpen,
+  History,
   Download,
   User,
   LogOut,
@@ -38,6 +39,7 @@ const designItems: NavItem[] = [
 const integrationItems: NavItem[] = [
   { label: 'API Keys', href: '/api-keys', icon: Key },
   { label: 'MCP Tools', href: '/mcp-tools', icon: BookOpen },
+  { label: 'Audit Log', href: '/audit-log', icon: History },
 ];
 
 function NavLink({
