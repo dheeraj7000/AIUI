@@ -7,7 +7,7 @@ import { authenticateRequest } from './lib/auth';
 import { runWithContext } from './lib/context';
 import { registerAllTools } from './tools';
 import { trackUsageAsync } from './lib/usage';
-import type { AiuiMcpServer } from './server';
+import { AiuiMcpServer } from './server';
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -36,18 +36,19 @@ const WRITE_TOOLS = new Set<string>([
   'undo_last_token_change',
 ]);
 
+// Enumerate tools via a real AiuiMcpServer instance. The previous
+// implementation used a `{ registerTool } as unknown as AiuiMcpServer` stub
+// that would silently break if AiuiMcpServer.registerTool's signature ever
+// changed — the same class of bug that caused the empty-response issue in
+// per-session tool registration.
 function listRegisteredTools(): CatalogEntry[] {
-  const tools: CatalogEntry[] = [];
-  registerAllTools({
-    registerTool: (name: string, description: string) => {
-      tools.push({
-        name,
-        description,
-        category: WRITE_TOOLS.has(name) ? 'write' : 'read',
-      });
-    },
-  } as unknown as AiuiMcpServer);
-  return tools;
+  const aiui = new AiuiMcpServer();
+  registerAllTools(aiui);
+  return aiui.listTools().map(({ name, description }) => ({
+    name,
+    description,
+    category: WRITE_TOOLS.has(name) ? 'write' : 'read',
+  }));
 }
 
 const TOOL_CATALOG: CatalogEntry[] = listRegisteredTools();
@@ -365,11 +366,13 @@ export async function startHttpServer(port: number) {
         return;
       }
 
-      // New session — create server + transport
-      const server = new McpServer({ name: 'aiui', version: '1.0.0' });
-      registerAllTools({
-        registerTool: server.tool.bind(server),
-      } as unknown as AiuiMcpServer);
+      // New session — create server + transport.
+      // Tools MUST be registered via AiuiMcpServer so the result wrapper
+      // (`{ content: [{ type: 'text', text: JSON.stringify(...) }] }`) is
+      // applied. Binding `server.tool` directly skips the wrapper and every
+      // tool returns an empty response to the client.
+      const mcpServer = new McpServer({ name: 'aiui', version: '1.0.0' });
+      registerAllTools(new AiuiMcpServer(mcpServer));
 
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => `aiui_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -387,7 +390,7 @@ export async function startHttpServer(port: number) {
         }
       };
 
-      await server.connect(transport);
+      await mcpServer.connect(transport);
       await runWithContext(authContext, () => transport.handleRequest(req, res, req.body));
     } catch (err) {
       log('error', 'MCP request failed', {

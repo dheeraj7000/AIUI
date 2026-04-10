@@ -15,11 +15,17 @@ export class AiuiMcpServer {
   private server: McpServer;
   private tools = new Map<string, ToolDef>();
 
-  constructor() {
-    this.server = new McpServer({
-      name: 'aiui',
-      version: '1.0.0',
-    });
+  // Accept an externally-owned McpServer so HTTP mode can reuse the same
+  // result-wrapping logic per session. Without this, http-server.ts used to
+  // bind `server.tool` directly and bypass the `{ content: [...] }` wrapper,
+  // causing every tool to return an empty response to the client.
+  constructor(server?: McpServer) {
+    this.server =
+      server ??
+      new McpServer({
+        name: 'aiui',
+        version: '1.0.0',
+      });
   }
 
   /**
@@ -57,6 +63,17 @@ export class AiuiMcpServer {
     });
 
     log('info', `Registered tool: ${name}`);
+  }
+
+  /**
+   * Enumerate registered tools. Used by HTTP catalog / health endpoints so
+   * they can report an accurate list without a duck-typed capture stub.
+   */
+  listTools(): Array<{ name: string; description: string }> {
+    return Array.from(this.tools.entries()).map(([name, def]) => ({
+      name,
+      description: def.description,
+    }));
   }
 
   /**
