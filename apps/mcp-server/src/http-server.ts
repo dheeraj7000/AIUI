@@ -13,7 +13,21 @@ import type { AiuiMcpServer } from './server';
 // ---------------------------------------------------------------------------
 
 const SERVER_START_TIME = Date.now();
-const TOOLS_COUNT = 10; // Number of registered MCP tools
+
+// Count the actual tools that `registerAllTools` registers by running it
+// against a counter stub once at module load. This replaces a hardcoded
+// constant that drifted every time a tool was added.
+function countRegisteredTools(): number {
+  let count = 0;
+  registerAllTools({
+    registerTool: () => {
+      count++;
+    },
+  } as unknown as AiuiMcpServer);
+  return count;
+}
+
+const TOOLS_COUNT = countRegisteredTools();
 
 const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const CLEANUP_INTERVAL_MS = 60_000; // 1 minute
