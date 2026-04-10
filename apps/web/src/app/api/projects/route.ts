@@ -7,6 +7,7 @@ import {
 } from '@aiui/design-core';
 import { createProjectSchema, listProjectsSchema } from '@aiui/design-core/src/validation/project';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { logWebEvent } from '@/lib/audit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -98,6 +99,8 @@ export async function POST(req: NextRequest) {
     // init_project tool so web-created and MCP-created projects arrive in
     // the same populated state instead of an empty one.
     const result = await createProjectWithStarter(db, parsed.data);
+
+    logWebEvent({ organizationId: parsed.data.orgId, action: 'web.create_project' });
 
     // Return the project row shape the client already expects, augmented
     // with the seeded starter metadata for the dashboard to display.

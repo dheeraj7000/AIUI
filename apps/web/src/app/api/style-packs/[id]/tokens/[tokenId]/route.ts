@@ -7,8 +7,10 @@ import {
   updateTokenSchema,
   designProfiles,
   projects,
+  stylePacks,
 } from '@aiui/design-core';
 import { eq, inArray } from 'drizzle-orm';
+import { logWebEvent } from '@/lib/audit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -94,6 +96,19 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       console.error('Failed to mark design profile stale:', staleErr);
     }
 
+    try {
+      const [pack] = await db
+        .select({ organizationId: stylePacks.organizationId })
+        .from(stylePacks)
+        .where(eq(stylePacks.id, stylePackId))
+        .limit(1);
+      if (pack?.organizationId) {
+        logWebEvent({ organizationId: pack.organizationId, action: 'web.update_token' });
+      }
+    } catch (auditErr) {
+      console.error('Failed to log audit event:', auditErr);
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error('Failed to update token:', error);
@@ -140,6 +155,19 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       }
     } catch (staleErr) {
       console.error('Failed to mark design profile stale:', staleErr);
+    }
+
+    try {
+      const [pack] = await db
+        .select({ organizationId: stylePacks.organizationId })
+        .from(stylePacks)
+        .where(eq(stylePacks.id, stylePackId))
+        .limit(1);
+      if (pack?.organizationId) {
+        logWebEvent({ organizationId: pack.organizationId, action: 'web.delete_token' });
+      }
+    } catch (auditErr) {
+      console.error('Failed to log audit event:', auditErr);
     }
 
     return new NextResponse(null, { status: 204 });

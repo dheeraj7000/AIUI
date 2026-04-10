@@ -8,8 +8,10 @@ import {
   listTokensSchema,
   designProfiles,
   projects,
+  stylePacks,
 } from '@aiui/design-core';
 import { eq, inArray } from 'drizzle-orm';
+import { logWebEvent } from '@/lib/audit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -76,6 +78,19 @@ export async function POST(req: NextRequest, context: RouteContext) {
       }
     } catch (staleErr) {
       console.error('Failed to mark design profile stale:', staleErr);
+    }
+
+    try {
+      const [pack] = await db
+        .select({ organizationId: stylePacks.organizationId })
+        .from(stylePacks)
+        .where(eq(stylePacks.id, stylePackId))
+        .limit(1);
+      if (pack?.organizationId) {
+        logWebEvent({ organizationId: pack.organizationId, action: 'web.create_token' });
+      }
+    } catch (auditErr) {
+      console.error('Failed to log audit event:', auditErr);
     }
 
     return NextResponse.json(result.data, { status: 201 });

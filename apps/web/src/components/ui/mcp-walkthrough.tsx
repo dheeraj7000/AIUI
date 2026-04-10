@@ -3,22 +3,26 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { KeyRound, Terminal, Sparkles, CheckCircle2, Circle, Copy, Check, X } from 'lucide-react';
+import { getActiveOrgId } from '@/lib/session';
 
 interface McpWalkthroughProps {
   hasApiKey: boolean;
+  hasProject: boolean;
 }
 
 const DISMISSED_KEY = 'aiui-mcp-walkthrough-dismissed';
 const STEP_KEY_PREFIX = 'aiui-mcp-walkthrough-step-';
 const TOTAL_STEPS = 5;
+const POLL_INTERVAL_MS = 15_000;
 
 const INIT_SNIPPET = 'init_project { slug: "my-app", targetDir: "/absolute/path/to/your/repo" }';
 
-export function McpWalkthrough({ hasApiKey }: McpWalkthroughProps) {
+export function McpWalkthrough({ hasApiKey, hasProject }: McpWalkthroughProps) {
   const [dismissed, setDismissed] = useState(true); // default hidden to avoid flash
   const [manualDone, setManualDone] = useState<boolean[]>(() => Array(TOTAL_STEPS).fill(false));
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [liveHasProject, setLiveHasProject] = useState<boolean>(hasProject);
 
   useEffect(() => {
     setDismissed(sessionStorage.getItem(DISMISSED_KEY) === 'true');
@@ -30,8 +34,47 @@ export function McpWalkthrough({ hasApiKey }: McpWalkthroughProps) {
     setHydrated(true);
   }, []);
 
+  // Poll /api/projects to detect when the user's first init_project lands
+  // from their editor, so step 3 auto-ticks without a page refresh. Stops
+  // polling the moment a project is found or the walkthrough is dismissed.
+  useEffect(() => {
+    if (!hydrated || dismissed || liveHasProject) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const tick = async () => {
+      try {
+        const orgId = getActiveOrgId();
+        if (!orgId) {
+          timer = setTimeout(tick, POLL_INTERVAL_MS);
+          return;
+        }
+        const res = await fetch(`/api/projects?orgId=${encodeURIComponent(orgId)}&limit=1`, {
+          credentials: 'same-origin',
+        });
+        if (!cancelled && res.ok) {
+          const body = (await res.json()) as { total?: number };
+          if ((body.total ?? 0) > 0) {
+            setLiveHasProject(true);
+            return;
+          }
+        }
+      } catch {
+        /* non-blocking */
+      }
+      if (!cancelled) timer = setTimeout(tick, POLL_INTERVAL_MS);
+    };
+
+    timer = setTimeout(tick, POLL_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [hydrated, dismissed, liveHasProject]);
+
   const isStepDone = (index: number): boolean => {
     if (index === 0 && hasApiKey) return true;
+    if (index === 2 && liveHasProject) return true;
     return manualDone[index] ?? false;
   };
 
@@ -139,6 +182,7 @@ export function McpWalkthrough({ hasApiKey }: McpWalkthroughProps) {
           title="Initialize your project from your editor"
           description="Your MCP client (Claude Code, Cursor, etc.) calls this tool. It creates your project in the dashboard, seeds it with shadcn/ui Essentials tokens, and writes .aiui/design-memory.md into your repo."
           onToggle={toggleStep}
+          autoDone={liveHasProject}
           icon={<Terminal size={16} className="text-emerald-400" />}
         >
           <div className="flex items-center gap-2">

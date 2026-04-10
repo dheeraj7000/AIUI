@@ -46,6 +46,8 @@ function eventTypePill(eventType: string): string {
   switch (eventType) {
     case 'tool_call':
       return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+    case 'web_write':
+      return 'bg-violet-500/10 text-violet-400 border-violet-500/20';
     case 'validation':
       return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
     case 'compilation':
@@ -53,6 +55,16 @@ function eventTypePill(eventType: string): string {
     default:
       return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
   }
+}
+
+function displayActor(ev: { actorName: string; actorPrefix: string | null; eventType: string }): {
+  label: string;
+  sublabel: string | null;
+} {
+  if (ev.eventType === 'web_write') {
+    return { label: 'Web UI', sublabel: null };
+  }
+  return { label: ev.actorName, sublabel: ev.actorPrefix };
 }
 
 // Re-sync the active org from the server. Mirrors the api-keys page pattern
@@ -147,9 +159,8 @@ export default function AuditLogPage() {
           <div>
             <h1 className="text-2xl font-bold text-white">Audit Log</h1>
             <p className="max-w-2xl text-sm text-zinc-400">
-              Every MCP tool call made against your organization&apos;s API keys. Web UI edits
-              aren&apos;t yet tracked in the audit log — only MCP tool calls are. Full event
-              coverage will land in a future update.
+              Every MCP tool call and web dashboard mutation for your organization. MCP events show
+              the API key that made the call; web events are labeled &quot;Web UI&quot;.
             </p>
           </div>
         </div>
@@ -224,14 +235,19 @@ export default function AuditLogPage() {
                     {formatTimestamp(ev.createdAt)}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-col">
-                      <span className="font-medium text-white">{ev.actorName}</span>
-                      {ev.actorPrefix && (
-                        <code className="mt-0.5 w-fit rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-400">
-                          {ev.actorPrefix}...
-                        </code>
-                      )}
-                    </div>
+                    {(() => {
+                      const actor = displayActor(ev);
+                      return (
+                        <div className="flex flex-col">
+                          <span className="font-medium text-white">{actor.label}</span>
+                          {actor.sublabel && (
+                            <code className="mt-0.5 w-fit rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-400">
+                              {actor.sublabel}...
+                            </code>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3">
                     <code className="rounded bg-zinc-800 px-2 py-0.5 font-mono text-xs text-zinc-300">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDb, createApiKey, listApiKeys, verifyOrgMembership } from '@aiui/design-core';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { logWebEvent } from '@/lib/audit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -36,6 +37,8 @@ export async function POST(req: NextRequest) {
     }
 
     const key = await createApiKey(db, { userId, organizationId, projectId, name });
+
+    logWebEvent({ organizationId, action: 'web.create_api_key' });
 
     return NextResponse.json(key, { status: 201 });
   } catch (error) {

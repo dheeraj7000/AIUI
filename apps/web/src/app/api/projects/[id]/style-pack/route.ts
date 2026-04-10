@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, designProfiles } from '@aiui/design-core';
+import { createDb, designProfiles, projects } from '@aiui/design-core';
 import {
   assignStylePack,
   getProjectStylePack,
@@ -8,6 +8,7 @@ import {
 } from '@aiui/design-core/src/operations/project-style-pack';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { logWebEvent } from '@/lib/audit';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -86,6 +87,21 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         .where(eq(designProfiles.projectId, id));
     } catch (staleErr) {
       console.error('Failed to mark design profile stale:', staleErr);
+    }
+
+    // Log the web action to the audit trail. Look up the project's org
+    // since the route doesn't have it in scope.
+    try {
+      const [proj] = await db
+        .select({ organizationId: projects.organizationId })
+        .from(projects)
+        .where(eq(projects.id, id))
+        .limit(1);
+      if (proj) {
+        logWebEvent({ organizationId: proj.organizationId, action: 'web.apply_style_pack' });
+      }
+    } catch (auditErr) {
+      console.error('Failed to log audit event:', auditErr);
     }
 
     return NextResponse.json(result);

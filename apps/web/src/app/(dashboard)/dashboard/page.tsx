@@ -120,7 +120,7 @@ export default async function DashboardPage() {
 
       {/* Onboarding */}
       <div className="mt-6 space-y-4">
-        <McpWalkthrough hasApiKey={stats.hasApiKey} />
+        <McpWalkthrough hasApiKey={stats.hasApiKey} hasProject={stats.projects > 0} />
         <OnboardingChecklist
           hasProject={stats.projects > 0}
           hasStylePack={stats.packs > 0}
