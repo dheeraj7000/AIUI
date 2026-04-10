@@ -24,7 +24,7 @@ import {
   forgotPassword as authForgotPassword,
   confirmForgotPassword as authConfirmForgotPassword,
 } from '@/lib/auth';
-import { clearSession, setActiveOrgId, getActiveOrgId } from '@/lib/session';
+import { clearSession, setActiveOrgId } from '@/lib/session';
 import {
   onSessionMessage,
   broadcastSignOut,
@@ -246,6 +246,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(currentUser);
           setSession(currentSession);
           scheduleRefresh(currentSession);
+
+          // Always re-sync the active org from the server on cold start.
+          // The cached value in localStorage can belong to a previous account
+          // (e.g. after delete-account + fresh sign-up, or when switching
+          // test users), in which case org-scoped requests would 403. The
+          // setup endpoint is idempotent, so overwriting is safe.
+          try {
+            const res = await fetch('/api/auth/setup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'same-origin',
+              body: JSON.stringify({}),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.orgId && !cancelled) setActiveOrgId(data.orgId);
+            }
+          } catch {
+            /* non-blocking */
+          }
         }
         // If no user, leave state null — middleware will redirect protected routes
       } catch {
@@ -266,14 +286,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Auth actions
   // -----------------------------------------------------------------------
 
-  const ensureOrg = useCallback(async (userId: string, email: string) => {
-    if (getActiveOrgId()) return;
+  const ensureOrg = useCallback(async () => {
+    // Always re-sync from the server. A cached orgId in localStorage can
+    // belong to a previous account, so we overwrite rather than guarding.
     try {
       const res = await fetch('/api/auth/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ userId, email }),
+        body: JSON.stringify({}),
       });
       if (res.ok) {
         const data = await res.json();
@@ -296,7 +317,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (currentSession) {
             broadcastSessionUpdate();
             if (currentUser) {
-              await ensureOrg(currentUser.id, currentUser.email);
+              await ensureOrg();
             }
           }
           scheduleRefresh(currentSession);
@@ -323,7 +344,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (currentSession) {
             broadcastSessionUpdate();
             if (currentUser) {
-              await ensureOrg(currentUser.id, currentUser.email);
+              await ensureOrg();
             }
           }
           scheduleRefresh(currentSession);

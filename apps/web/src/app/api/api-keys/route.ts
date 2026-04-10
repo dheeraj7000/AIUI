@@ -39,8 +39,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(key, { status: 201 });
   } catch (error) {
+    // Log the full error server-side and surface the message to the client so
+    // the UI can show something more useful than "Internal server error".
+    const message = error instanceof Error ? error.message : String(error);
     console.error('Failed to create API key:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: message || 'Internal server error' }, { status: 500 });
   }
 }
 

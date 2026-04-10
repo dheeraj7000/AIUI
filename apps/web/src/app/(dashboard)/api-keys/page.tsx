@@ -323,14 +323,54 @@ export default function ApiKeysPage() {
     setError(null);
 
     try {
-      const organizationId = getActiveOrgId() ?? 'default';
+      // Resolve the active org via the setup endpoint whenever the local
+      // cache is empty. We also re-sync on a 403 below in case the cached
+      // orgId belongs to a previous account (e.g. after delete-account + new
+      // sign-up, or switching test users). /api/auth/setup is idempotent.
+      async function syncOrgFromServer(): Promise<string | null> {
+        const setupRes = await fetch('/api/auth/setup', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        if (!setupRes.ok) return null;
+        const setupData = await setupRes.json();
+        if (!setupData.orgId) return null;
+        const { setActiveOrgId } = await import('@/lib/session');
+        setActiveOrgId(setupData.orgId);
+        return setupData.orgId as string;
+      }
 
-      const res = await fetch('/api/api-keys', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newKeyName.trim(), organizationId }),
-      });
+      let organizationId = getActiveOrgId();
+      if (!organizationId) {
+        organizationId = await syncOrgFromServer();
+      }
+
+      if (!organizationId) {
+        throw new Error('Could not determine your workspace. Try refreshing.');
+      }
+
+      async function postKey(orgId: string) {
+        return fetch('/api/api-keys', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newKeyName.trim(), organizationId: orgId }),
+        });
+      }
+
+      let res = await postKey(organizationId);
+
+      // Stale cache recovery: if the cached orgId isn't one the current user
+      // belongs to, re-sync and retry once.
+      if (res.status === 403) {
+        const fresh = await syncOrgFromServer();
+        if (fresh && fresh !== organizationId) {
+          organizationId = fresh;
+          res = await postKey(organizationId);
+        }
+      }
 
       if (!res.ok) {
         const body: { error?: string } = await res.json().catch(() => ({}));
