@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/providers/AuthProvider';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 interface FormErrors {
   email?: string;
@@ -100,6 +101,14 @@ export default function SignUpPage() {
           <p className="text-sm text-red-400">{serverError}</p>
         </div>
       )}
+
+      <GoogleSignInButton label="Sign up with Google" />
+
+      <div className="my-5 flex items-center gap-3">
+        <div className="h-px flex-1 bg-white/10" />
+        <span className="text-xs uppercase tracking-wider text-zinc-600">or</span>
+        <div className="h-px flex-1 bg-white/10" />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>

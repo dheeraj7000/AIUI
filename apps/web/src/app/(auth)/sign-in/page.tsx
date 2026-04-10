@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/providers/AuthProvider';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 interface FormErrors {
   email?: string;
@@ -29,8 +30,27 @@ function validate(email: string, password: string): FormErrors {
 const inputClass =
   'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200';
 
+const oauthErrors: Record<string, string> = {
+  google_not_configured: 'Google sign-in is not configured on this server.',
+  invalid_state: 'Sign-in session expired. Please try again.',
+  token_exchange_failed: 'Could not complete Google sign-in. Please try again.',
+  userinfo_failed: 'Could not read your Google profile. Please try again.',
+  email_not_verified: 'Your Google account email is not verified.',
+  access_denied: 'You declined to grant access to your Google account.',
+  internal_error: 'An unexpected error occurred. Please try again.',
+};
+
 export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInForm />
+    </Suspense>
+  );
+}
+
+function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -38,6 +58,14 @@ export default function SignInPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Surface OAuth errors from the callback redirect
+  useEffect(() => {
+    const err = searchParams?.get('error');
+    if (err) {
+      setServerError(oauthErrors[err] ?? `Sign-in failed (${err})`);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,6 +116,14 @@ export default function SignInPage() {
           <p className="text-sm text-red-400">{serverError}</p>
         </div>
       )}
+
+      <GoogleSignInButton />
+
+      <div className="my-5 flex items-center gap-3">
+        <div className="h-px flex-1 bg-white/10" />
+        <span className="text-xs uppercase tracking-wider text-zinc-600">or</span>
+        <div className="h-px flex-1 bg-white/10" />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>
