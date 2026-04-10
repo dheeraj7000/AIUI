@@ -10,6 +10,34 @@ function getDb() {
   return createDb(url);
 }
 
+/**
+ * Build a redirect URL using the public-facing origin from the load balancer
+ * headers, NOT the internal container hostname that req.url contains.
+ *
+ * The ALB sets x-forwarded-host (e.g. aiui.store) and x-forwarded-proto (https).
+ * Falling back to GOOGLE_REDIRECT_URI's origin guarantees we never accidentally
+ * redirect to the container hostname.
+ */
+function buildPublicUrl(req: NextRequest, path: string): URL {
+  const forwardedHost = req.headers.get('x-forwarded-host');
+  const forwardedProto = req.headers.get('x-forwarded-proto');
+  const host = forwardedHost ?? req.headers.get('host');
+  const proto = forwardedProto ?? 'https';
+
+  if (host && !host.includes(':3000')) {
+    return new URL(path, `${proto}://${host}`);
+  }
+
+  // Last-resort fallback: derive from the configured redirect URI
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  if (redirectUri) {
+    const base = new URL(redirectUri);
+    return new URL(path, base.origin);
+  }
+
+  return new URL(path, req.url);
+}
+
 interface GoogleTokenResponse {
   access_token: string;
   id_token: string;
@@ -153,7 +181,7 @@ export async function GET(req: NextRequest) {
       ? decodeURIComponent(redirectTo)
       : '/dashboard';
 
-    const response = NextResponse.redirect(new URL(safeRedirect, req.url));
+    const response = NextResponse.redirect(buildPublicUrl(req, safeRedirect));
 
     // Set auth cookies
     setAuthCookies(response, accessToken, idToken);
@@ -178,7 +206,7 @@ export async function GET(req: NextRequest) {
 }
 
 function errorRedirect(req: NextRequest, reason: string): NextResponse {
-  const signInUrl = new URL('/sign-in', req.url);
+  const signInUrl = buildPublicUrl(req, '/sign-in');
   signInUrl.searchParams.set('error', reason);
   return NextResponse.redirect(signInUrl);
 }
