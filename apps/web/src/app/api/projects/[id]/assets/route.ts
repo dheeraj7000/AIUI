@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb } from '@aiui/design-core';
 import {
   getProjectAssets,
   unlinkProjectAsset,
 } from '@aiui/design-core/src/operations/project-assets';
 import { z } from 'zod';
-
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL environment variable is not set');
-  return createDb(url);
-}
+import { requireProjectAccess } from '@/lib/project-access';
 
 const deleteSchema = z.object({
   assetId: z.string().uuid(),
@@ -21,12 +15,14 @@ type RouteContext = { params: Promise<{ id: string }> };
 /**
  * GET /api/projects/[id]/assets — List all assets linked to the project.
  */
-export async function GET(_req: NextRequest, context: RouteContext) {
+export async function GET(req: NextRequest, context: RouteContext) {
   const { id } = await context.params;
 
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
+
   try {
-    const db = getDb();
-    const projectAssets = await getProjectAssets(db, id);
+    const projectAssets = await getProjectAssets(access.db, id);
     return NextResponse.json(projectAssets);
   } catch (error) {
     console.error('Failed to get project assets:', error);
@@ -39,12 +35,10 @@ export async function GET(_req: NextRequest, context: RouteContext) {
  * Accepts { assetId } in the request body.
  */
 export async function DELETE(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
+
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
 
   try {
     const body = await req.json();
@@ -57,8 +51,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const db = getDb();
-    const deleted = await unlinkProjectAsset(db, id, parsed.data.assetId);
+    const deleted = await unlinkProjectAsset(access.db, id, parsed.data.assetId);
 
     if (!deleted) {
       return NextResponse.json({ error: 'Asset not found in project' }, { status: 404 });

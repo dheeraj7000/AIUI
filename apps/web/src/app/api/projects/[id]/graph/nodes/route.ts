@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb } from '@aiui/design-core';
 import { createGraphNode } from '@aiui/design-core/src/operations/graph';
 import { z } from 'zod';
-
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL environment variable is not set');
-  return createDb(url);
-}
+import { requireProjectAccess } from '@/lib/project-access';
 
 const createNodeSchema = z.object({
   nodeType: z.enum([
@@ -32,12 +26,10 @@ type RouteContext = { params: Promise<{ id: string }> };
  * POST /api/projects/[id]/graph/nodes — Create a graph node.
  */
 export async function POST(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
+
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
 
   try {
     const body = await req.json();
@@ -50,8 +42,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const db = getDb();
-    const node = await createGraphNode(db, {
+    const node = await createGraphNode(access.db, {
       projectId: id,
       ...parsed.data,
     });

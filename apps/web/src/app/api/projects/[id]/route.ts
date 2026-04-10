@@ -1,20 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  createDb,
-  getProjectById,
-  updateProject,
-  deleteProject,
-  verifyOrgMembership,
-} from '@aiui/design-core';
+import { updateProject, deleteProject } from '@aiui/design-core';
 import { updateProjectSchema } from '@aiui/design-core/src/validation/project';
-
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error('DATABASE_URL environment variable is not set');
-  }
-  return createDb(url);
-}
+import { requireProjectAccess } from '@/lib/project-access';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -22,61 +9,24 @@ type RouteContext = { params: Promise<{ id: string }> };
  * GET /api/projects/[id] — Get project details.
  */
 export async function GET(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
 
-  try {
-    const db = getDb();
-    const project = await getProjectById(db, id);
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
 
-    if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
-
-    if (project.organizationId) {
-      const isMember = await verifyOrgMembership(db, userId, project.organizationId);
-      if (!isMember) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    }
-
-    return NextResponse.json(project);
-  } catch (error) {
-    console.error('Failed to get project:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+  return NextResponse.json(access.project);
 }
 
 /**
  * PUT /api/projects/[id] — Update a project.
  */
 export async function PUT(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
 
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
+
   try {
-    const db = getDb();
-    const existing = await getProjectById(db, id);
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
-
-    if (existing.organizationId) {
-      const isMember = await verifyOrgMembership(db, userId, existing.organizationId);
-      if (!isMember) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    }
-
     const body = await req.json();
     const parsed = updateProjectSchema.safeParse(body);
 
@@ -87,7 +37,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const updated = await updateProject(db, id, parsed.data);
+    const updated = await updateProject(access.db, id, parsed.data);
 
     if (!updated) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
@@ -104,29 +54,13 @@ export async function PUT(req: NextRequest, context: RouteContext) {
  * DELETE /api/projects/[id] — Delete a project.
  */
 export async function DELETE(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
 
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
+
   try {
-    const db = getDb();
-    const existing = await getProjectById(db, id);
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
-
-    if (existing.organizationId) {
-      const isMember = await verifyOrgMembership(db, userId, existing.organizationId);
-      if (!isMember) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    }
-
-    const deleted = await deleteProject(db, id);
+    const deleted = await deleteProject(access.db, id);
 
     if (!deleted) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });

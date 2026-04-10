@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb } from '@aiui/design-core';
 import {
   updateComponentSelection,
   getComponentSelection,
   InvalidComponentIdsError,
 } from '@aiui/design-core/src/operations/project-components';
 import { z } from 'zod';
-
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL environment variable is not set');
-  return createDb(url);
-}
+import { requireProjectAccess } from '@/lib/project-access';
 
 const updateSelectionSchema = z.object({
   componentRecipeIds: z.array(z.string().uuid()).max(500),
@@ -22,12 +16,14 @@ type RouteContext = { params: Promise<{ id: string }> };
 /**
  * GET /api/projects/[id]/components — List selected component recipes.
  */
-export async function GET(_req: NextRequest, context: RouteContext) {
+export async function GET(req: NextRequest, context: RouteContext) {
   const { id } = await context.params;
 
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
+
   try {
-    const db = getDb();
-    const selection = await getComponentSelection(db, id);
+    const selection = await getComponentSelection(access.db, id);
     return NextResponse.json(selection);
   } catch (error) {
     console.error('Failed to get component selection:', error);
@@ -39,12 +35,10 @@ export async function GET(_req: NextRequest, context: RouteContext) {
  * PUT /api/projects/[id]/components — Replace component selection.
  */
 export async function PUT(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
+
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
 
   try {
     const body = await req.json();
@@ -57,8 +51,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const db = getDb();
-    const selection = await updateComponentSelection(db, id, parsed.data.componentRecipeIds);
+    const selection = await updateComponentSelection(access.db, id, parsed.data.componentRecipeIds);
 
     return NextResponse.json(selection);
   } catch (error) {

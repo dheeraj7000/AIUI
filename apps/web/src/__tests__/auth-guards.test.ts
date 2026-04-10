@@ -9,6 +9,7 @@ const {
   mockVerifyOrgMembership,
   mockListProjects,
   mockCreateProject,
+  mockCreateProjectWithStarter,
   mockGetStylePack,
   mockListStylePacks,
   mockCreateApiKey,
@@ -20,6 +21,7 @@ const {
   mockVerifyOrgMembership: vi.fn<() => Promise<boolean>>(),
   mockListProjects: vi.fn(),
   mockCreateProject: vi.fn(),
+  mockCreateProjectWithStarter: vi.fn(),
   mockGetStylePack: vi.fn(),
   mockListStylePacks: vi.fn(),
   mockCreateApiKey: vi.fn(),
@@ -37,6 +39,7 @@ vi.mock('@aiui/design-core', async () => {
     verifyOrgMembership: mockVerifyOrgMembership,
     listProjects: mockListProjects,
     createProject: mockCreateProject,
+    createProjectWithStarter: mockCreateProjectWithStarter,
     getStylePack: mockGetStylePack,
     listStylePacks: mockListStylePacks,
     createStylePack: mockCreateStylePack,
@@ -213,7 +216,16 @@ describe('POST /api/projects', () => {
 
   it('returns 201 when user IS a member', async () => {
     mockVerifyOrgMembership.mockResolvedValue(true);
-    mockCreateProject.mockResolvedValue({ id: 'new-p', name: 'Good Project' });
+    // POST /api/projects calls createProjectWithStarter, which returns a
+    // composite { project, stylePack, tokenCount, componentCount } shape.
+    // The route spreads project into the JSON body, so json.name must still
+    // resolve to the project's name.
+    mockCreateProjectWithStarter.mockResolvedValue({
+      project: { id: 'new-p', name: 'Good Project', organizationId: OWN_ORG_ID },
+      stylePack: { id: 'sp-1', name: 'Essentials', slug: 'shadcn-essentials' },
+      tokenCount: 42,
+      componentCount: 10,
+    });
 
     const req = mockRequest({
       method: 'POST',
@@ -227,6 +239,7 @@ describe('POST /api/projects', () => {
 
     const json = await res.json();
     expect(json.name).toBe('Good Project');
+    expect(json.stylePack.slug).toBe('shadcn-essentials');
   });
 });
 

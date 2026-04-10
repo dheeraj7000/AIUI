@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, designProfiles, projects } from '@aiui/design-core';
+import { designProfiles } from '@aiui/design-core';
 import {
   assignStylePack,
   getProjectStylePack,
@@ -9,12 +9,7 @@ import {
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { logWebEvent } from '@/lib/audit';
-
-function getDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL environment variable is not set');
-  return createDb(url);
-}
+import { requireProjectAccess } from '@/lib/project-access';
 
 const assignSchema = z.object({
   stylePackId: z.string().uuid(),
@@ -26,12 +21,14 @@ type RouteContext = { params: Promise<{ id: string }> };
 /**
  * GET /api/projects/[id]/style-pack — Get current style pack with merged tokens.
  */
-export async function GET(_req: NextRequest, context: RouteContext) {
+export async function GET(req: NextRequest, context: RouteContext) {
   const { id } = await context.params;
 
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
+
   try {
-    const db = getDb();
-    const result = await getProjectStylePack(db, id);
+    const result = await getProjectStylePack(access.db, id);
 
     if (!result) {
       return NextResponse.json(
@@ -51,12 +48,10 @@ export async function GET(_req: NextRequest, context: RouteContext) {
  * PATCH /api/projects/[id]/style-pack — Assign a style pack to the project.
  */
 export async function PATCH(req: NextRequest, context: RouteContext) {
-  const userId = req.headers.get('x-user-id');
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await context.params;
+
+  const access = await requireProjectAccess(req, id);
+  if (!access.ok) return access.response;
 
   try {
     const body = await req.json();
@@ -69,9 +64,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       );
     }
 
-    const db = getDb();
     const result = await assignStylePack(
-      db,
+      access.db,
       id,
       parsed.data.stylePackId,
       parsed.data.tokenOverrides
@@ -81,7 +75,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     // a warning until sync_design_memory is called. Soft signal — log and
     // continue on failure.
     try {
-      await db
+      await access.db
         .update(designProfiles)
         .set({ compilationValid: false, updatedAt: new Date() })
         .where(eq(designProfiles.projectId, id));
@@ -89,19 +83,13 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       console.error('Failed to mark design profile stale:', staleErr);
     }
 
-    // Log the web action to the audit trail. Look up the project's org
-    // since the route doesn't have it in scope.
-    try {
-      const [proj] = await db
-        .select({ organizationId: projects.organizationId })
-        .from(projects)
-        .where(eq(projects.id, id))
-        .limit(1);
-      if (proj) {
-        logWebEvent({ organizationId: proj.organizationId, action: 'web.apply_style_pack' });
-      }
-    } catch (auditErr) {
-      console.error('Failed to log audit event:', auditErr);
+    // Log the web action to the audit trail. We already have the project
+    // from requireProjectAccess, so no extra lookup is needed.
+    if (access.project.organizationId) {
+      logWebEvent({
+        organizationId: access.project.organizationId,
+        action: 'web.apply_style_pack',
+      });
     }
 
     return NextResponse.json(result);
