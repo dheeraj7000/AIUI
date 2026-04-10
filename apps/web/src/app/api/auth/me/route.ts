@@ -31,7 +31,13 @@ export async function GET(req: NextRequest) {
     // Verify user still exists in DB
     const db = getDb();
     const [user] = await db
-      .select({ id: users.id, email: users.email, name: users.name })
+      .select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        avatarUrl: users.avatarUrl,
+        passwordHash: users.passwordHash,
+      })
       .from(users)
       .where(eq(users.id, claims.sub))
       .limit(1);
@@ -45,6 +51,10 @@ export async function GET(req: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
+        avatarUrl: user.avatarUrl,
+        // Tell the client whether this account has a password (vs Google-only).
+        // The hash itself is never exposed.
+        hasPassword: !!user.passwordHash,
         emailVerified: true,
         sub: user.id,
       },
