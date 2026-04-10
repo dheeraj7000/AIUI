@@ -187,7 +187,7 @@ function IdeSetupSection({
             onClick={() => setActiveTab(tab.id)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
               activeTab === tab.id
-                ? 'border border-lime-500 bg-lime-500/10 text-lime-400'
+                ? 'border border-indigo-500 bg-indigo-500/10 text-indigo-400'
                 : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-300'
             }`}
           >
@@ -230,8 +230,8 @@ function IdeSetupSection({
     return (
       <div className="mt-4">
         <div className="flex items-center gap-2 mb-1">
-          <Monitor size={16} className="text-lime-400" />
-          <span className="text-sm font-medium text-lime-300">IDE Setup</span>
+          <Monitor size={16} className="text-indigo-400" />
+          <span className="text-sm font-medium text-indigo-300">IDE Setup</span>
         </div>
         {content}
       </div>
@@ -246,8 +246,8 @@ function IdeSetupSection({
         className="flex w-full items-center justify-between px-5 py-4 text-left"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-lime-500/10">
-            <Terminal size={18} className="text-lime-400" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10">
+            <Terminal size={18} className="text-indigo-400" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white">IDE Setup Instructions</h3>
@@ -412,8 +412,8 @@ export default function ApiKeysPage() {
     <div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime-500/10">
-            <Key size={20} className="text-lime-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/10">
+            <Key size={20} className="text-indigo-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">API Keys</h1>
@@ -425,7 +425,7 @@ export default function ApiKeysPage() {
         {!showCreateForm && !createdKey && (
           <button
             onClick={() => setShowCreateForm(true)}
-            className="flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 transition-all duration-200 hover:bg-lime-400 hover:shadow-md"
+            className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-indigo-400 hover:shadow-md"
           >
             <Plus size={16} />
             Create API Key
@@ -529,13 +529,13 @@ export default function ApiKeysPage() {
             value={newKeyName}
             onChange={(e) => setNewKeyName(e.target.value)}
             placeholder='e.g. "Claude Code - My Project"'
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
           <div className="mt-4 flex gap-2">
             <button
               type="submit"
               disabled={creating || !newKeyName.trim()}
-              className="flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 transition-all duration-200 hover:bg-lime-400 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-indigo-400 disabled:opacity-50"
             >
               {creating ? (
                 <>

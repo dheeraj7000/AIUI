@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight } from 'lucide-react';
+import { Wordmark } from '@/components/ui/Wordmark';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -29,9 +30,7 @@ export function LandingNav() {
       <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
-            AIUI
-          </span>
+          <Wordmark size="lg" />
         </Link>
 
         {/* Desktop nav links — centered */}
@@ -46,7 +45,7 @@ export function LandingNav() {
                 className="relative text-sm font-medium text-zinc-400 transition-colors hover:text-white group"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-lime-400 to-cyan-400 transition-all duration-300 group-hover:w-full" />
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-indigo-400 to-indigo-300 transition-all duration-300 group-hover:w-full" />
               </Link>
             ) : (
               <a
@@ -55,7 +54,7 @@ export function LandingNav() {
                 className="relative text-sm font-medium text-zinc-400 transition-colors hover:text-white group"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-lime-400 to-cyan-400 transition-all duration-300 group-hover:w-full" />
+                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-indigo-400 to-indigo-300 transition-all duration-300 group-hover:w-full" />
               </a>
             );
           })}
@@ -71,7 +70,7 @@ export function LandingNav() {
           </Link>
           <Link
             href="/sign-up"
-            className="group flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm shadow-lime-500/20 transition-all duration-200 hover:shadow-md hover:shadow-lime-500/25"
+            className="group flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-500/20 transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/25"
           >
             Get Started
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -132,7 +131,7 @@ export function LandingNav() {
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-3 py-2.5 text-center text-sm font-medium text-zinc-950 shadow-sm"
+                  className="rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-3 py-2.5 text-center text-sm font-medium text-white shadow-sm"
                 >
                   Get Started
                 </Link>

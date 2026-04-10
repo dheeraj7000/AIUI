@@ -17,11 +17,11 @@ export function CTA() {
             <div className="relative inline-block">
               <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
                 Early Access{' '}
-                <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
                   Beta
                 </span>
               </h2>
-              <div className="absolute -inset-x-8 -inset-y-4 -z-10 rounded-3xl bg-gradient-to-r from-lime-500/5 to-cyan-500/5 blur-xl" />
+              <div className="absolute -inset-x-8 -inset-y-4 -z-10 rounded-3xl bg-gradient-to-r from-indigo-500/5 to-violet-500/5 blur-xl" />
             </div>
 
             <p className="mt-6 text-lg leading-8 text-zinc-400">
@@ -32,7 +32,7 @@ export function CTA() {
             <div className="mt-10">
               <Link
                 href="/sign-up"
-                className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-8 py-4 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/30 hover:-translate-y-0.5"
+                className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5"
               >
                 Join the Beta
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -77,7 +77,7 @@ export function CTA() {
                 </p>
                 <a
                   href="mailto:bugs@aiui.store"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-lime-400 transition-colors hover:text-lime-300"
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
                 >
                   bugs@aiui.store
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -98,7 +98,7 @@ export function CTA() {
                 </p>
                 <a
                   href="mailto:features@aiui.store"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-lime-400 transition-colors hover:text-lime-300"
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
                 >
                   features@aiui.store
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -127,12 +127,12 @@ export function CTA() {
             <StaggerChild>
               <div className="rounded-2xl glass-card p-6 transition-all duration-300 hover:bg-white/[0.06]">
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5">
-                  <Mail className="h-5 w-5 text-lime-400" />
+                  <Mail className="h-5 w-5 text-indigo-400" />
                 </div>
                 <p className="text-sm font-medium text-zinc-500">Email</p>
                 <a
                   href="mailto:hello@aiui.store"
-                  className="mt-1 block text-base font-medium text-white transition-colors hover:text-lime-400"
+                  className="mt-1 block text-base font-medium text-white transition-colors hover:text-indigo-400"
                 >
                   hello@aiui.store
                 </a>
@@ -141,7 +141,7 @@ export function CTA() {
             <StaggerChild>
               <div className="rounded-2xl glass-card p-6 transition-all duration-300 hover:bg-white/[0.06]">
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5">
-                  <svg className="h-5 w-5 text-lime-400" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                 </div>
@@ -152,7 +152,7 @@ export function CTA() {
             <StaggerChild>
               <div className="rounded-2xl glass-card p-6 transition-all duration-300 hover:bg-white/[0.06]">
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5">
-                  <MessageCircle className="h-5 w-5 text-lime-400" />
+                  <MessageCircle className="h-5 w-5 text-indigo-400" />
                 </div>
                 <p className="text-sm font-medium text-zinc-500">Discord</p>
                 <p className="mt-1 text-base font-medium text-white">Coming Soon</p>

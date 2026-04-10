@@ -122,14 +122,14 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
           onClick={() => handleTypeChange('All')}
           className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
             activeType === 'All'
-              ? 'border-lime-500 bg-lime-500 text-zinc-950 shadow-sm'
+              ? 'border-indigo-500 bg-indigo-500 text-white shadow-sm'
               : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:shadow-sm'
           }`}
         >
           All
           <span
             className={`ml-0.5 rounded-full px-1.5 py-px text-[10px] ${
-              activeType === 'All' ? 'bg-black/20 text-zinc-950' : 'bg-zinc-800 text-zinc-500'
+              activeType === 'All' ? 'bg-black/20 text-white' : 'bg-zinc-800 text-zinc-500'
             }`}
           >
             {recipes.length}
@@ -145,7 +145,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
               onClick={() => handleTypeChange(t)}
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 isActive
-                  ? 'border-lime-500 bg-lime-500 text-zinc-950 shadow-sm'
+                  ? 'border-indigo-500 bg-indigo-500 text-white shadow-sm'
                   : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600 hover:shadow-sm'
               }`}
             >
@@ -153,7 +153,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
               {t}
               <span
                 className={`ml-0.5 rounded-full px-1.5 py-px text-[10px] ${
-                  isActive ? 'bg-black/20 text-zinc-950' : 'bg-zinc-800 text-zinc-500'
+                  isActive ? 'bg-black/20 text-white' : 'bg-zinc-800 text-zinc-500'
                 }`}
               >
                 {typeCounts[t] ?? 0}
@@ -231,7 +231,7 @@ export function ComponentGrid({ recipes }: ComponentGridProps) {
                 onClick={() => setPage(p)}
                 className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
                   p === safePage
-                    ? 'bg-lime-500 text-zinc-950'
+                    ? 'bg-indigo-500 text-white'
                     : 'border border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
                 }`}
               >

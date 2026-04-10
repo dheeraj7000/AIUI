@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { Wordmark } from '@/components/ui/Wordmark';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -8,14 +9,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-12 overflow-hidden">
         <div className="absolute inset-0 bg-aurora" />
         <div className="absolute inset-0 bg-grid" />
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-lime-500/8 blur-[120px]" />
-        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-cyan-400/8 blur-[120px]" />
+        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-indigo-500/8 blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-indigo-400/8 blur-[120px]" />
 
         <div className="relative max-w-md">
           <Link href="/">
-            <span className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
-              AIUI
-            </span>
+            <Wordmark />
           </Link>
           <p className="mt-5 text-lg text-zinc-400 leading-relaxed">
             Control how AI builds your UI. Pick a design system, get a config block, and Claude
@@ -26,11 +25,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </h2>
           <ul className="mt-5 space-y-3.5 text-zinc-400 leading-relaxed">
             <li className="flex items-start gap-3">
-              <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-lime-400" />
+              <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-indigo-400" />
               Consistent tokens across every AI tool
             </li>
             <li className="flex items-start gap-3">
-              <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-cyan-400" />
+              <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-400" />
               One source of truth for your design system
             </li>
             <li className="flex items-start gap-3">
@@ -55,9 +54,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="w-full max-w-md">
           <div className="mb-8 text-center lg:text-left">
             <Link href="/" className="lg:hidden">
-              <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
-                AIUI
-              </span>
+              <Wordmark />
             </Link>
           </div>
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8">

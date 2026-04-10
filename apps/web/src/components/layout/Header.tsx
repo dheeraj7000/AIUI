@@ -89,7 +89,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         <button
           onClick={() => setDropdownOpen((prev) => !prev)}
           aria-label="User menu"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-lime-500 to-cyan-500 text-sm font-bold text-zinc-950 transition-all duration-200 hover:shadow-md hover:shadow-lime-500/20"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-bold text-white transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/20"
         >
           {userInitial}
         </button>

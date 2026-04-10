@@ -54,18 +54,18 @@ export default function DocsPage() {
       {/* ---------------------------------------------------------------- */}
       <section className="relative overflow-hidden border-b border-zinc-800/60">
         <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute top-20 left-1/4 h-72 w-72 rounded-full bg-lime-500/5 blur-3xl" />
-        <div className="absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-cyan-400/5 blur-3xl" />
+        <div className="absolute top-20 left-1/4 h-72 w-72 rounded-full bg-indigo-500/5 blur-3xl" />
+        <div className="absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-violet-400/5 blur-3xl" />
 
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-xs font-medium text-zinc-300 mb-6">
-            <span className="h-1.5 w-1.5 rounded-full bg-lime-400 animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
             Documentation &amp; Technical Deep Dive
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-display">
             <span className="text-white">The Design Control Layer</span>
             <br />
-            <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
               for AI Coding Assistants
             </span>
           </h1>
@@ -111,7 +111,7 @@ export default function DocsPage() {
               <div className="mt-8 border-t border-zinc-800 pt-6">
                 <Link
                   href="/sign-up"
-                  className="flex items-center justify-center rounded-lg bg-lime-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-sm transition-colors hover:bg-lime-400"
+                  className="flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400"
                 >
                   Get Started Free
                 </Link>
@@ -210,10 +210,10 @@ export default function DocsPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-lime-500/30 bg-lime-950/10 p-1">
+                  <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/10 p-1">
                     <div className="flex items-center gap-2 px-4 py-2">
-                      <Check className="h-4 w-4 text-lime-400" />
-                      <span className="text-sm font-medium text-lime-400">With AIUI</span>
+                      <Check className="h-4 w-4 text-indigo-400" />
+                      <span className="text-sm font-medium text-indigo-400">With AIUI</span>
                     </div>
                     <div className="rounded-lg bg-zinc-950 p-4 font-mono text-xs text-zinc-300 overflow-x-auto">
                       <pre>{`// Every prompt, every session, every developer:
@@ -241,7 +241,7 @@ export default function DocsPage() {
               <SectionBadge label="Market Opportunity" />
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
                 A{' '}
-                <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
                   $12.8 billion
                 </span>{' '}
                 market with no design guardrails.
@@ -263,14 +263,14 @@ export default function DocsPage() {
                     label="Total Addressable Market"
                     value="$12.8B"
                     description="AI coding tools market (2026). Every team using AI assistants needs design consistency."
-                    color="lime"
+                    color="indigo"
                   />
                   <MarketTier
                     tier="SAM"
                     label="Serviceable Addressable Market"
                     value="$2.1B"
                     description="Teams with design systems actively using AI coding assistants — the direct AIUI audience."
-                    color="cyan"
+                    color="violet"
                   />
                   <MarketTier
                     tier="SOM"
@@ -329,7 +329,7 @@ export default function DocsPage() {
               <SectionBadge label="Core Innovation" />
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
                 Design Memory:{' '}
-                <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
                   persistent context for AI
                 </span>
               </h2>
@@ -351,7 +351,7 @@ export default function DocsPage() {
                     layer={4}
                     title="Persistence Layer"
                     subtitle="Cross-session memory"
-                    color="lime"
+                    color="indigo"
                     items={[
                       'Hash-based staleness detection — knows when tokens have changed',
                       'Auto-sync from database via MCP — always up to date',
@@ -366,7 +366,7 @@ export default function DocsPage() {
                     layer={3}
                     title="Enforcement Layer"
                     subtitle="Real-time compliance validation"
-                    color="cyan"
+                    color="violet"
                     items={[
                       '8 token categories validated: color, font, spacing, radius, font-size, z-index, opacity, border-width',
                       '6 accessibility checks: img alt, button labels, form labels, heading order, ARIA, WCAG AA',
@@ -419,7 +419,7 @@ export default function DocsPage() {
                   <span className="text-xs text-zinc-500 font-mono ml-2">
                     .aiui/design-memory.md
                   </span>
-                  <span className="ml-auto text-xs text-lime-400/60 font-mono">auto-synced</span>
+                  <span className="ml-auto text-xs text-indigo-400/60 font-mono">auto-synced</span>
                 </div>
                 <div className="p-4 sm:p-6 font-mono text-xs text-zinc-400 overflow-x-auto">
                   <pre className="leading-relaxed">{`# Design Memory — my-saas-app
@@ -457,12 +457,12 @@ export default function DocsPage() {
               {/* What makes it different */}
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <DifferentiatorCard
-                  icon={<Hash className="h-5 w-5 text-lime-400" />}
+                  icon={<Hash className="h-5 w-5 text-indigo-400" />}
                   title="Hash-Versioned"
                   description="Every sync computes a token hash. AI agents detect drift automatically — no stale designs, ever."
                 />
                 <DifferentiatorCard
-                  icon={<RefreshCw className="h-5 w-5 text-cyan-400" />}
+                  icon={<RefreshCw className="h-5 w-5 text-violet-400" />}
                   title="Live-Synced"
                   description="Change a token in the dashboard, call sync, and every AI session picks up the change immediately."
                 />
@@ -499,17 +499,17 @@ export default function DocsPage() {
                   />
                   <ArchArrow />
                   <ArchBlock
-                    icon={<Database className="h-6 w-6 text-lime-400" />}
+                    icon={<Database className="h-6 w-6 text-indigo-400" />}
                     title="AIUI Platform"
                     items={['Dashboard', 'MCP Server', 'Validator']}
-                    color="lime"
+                    color="indigo"
                   />
                   <ArchArrow />
                   <ArchBlock
-                    icon={<Plug className="h-6 w-6 text-cyan-400" />}
+                    icon={<Plug className="h-6 w-6 text-violet-400" />}
                     title="MCP Protocol"
                     items={['12 tools', 'HTTP transport', 'Streaming']}
-                    color="cyan"
+                    color="violet"
                   />
                   <ArchArrow />
                   <ArchBlock
@@ -520,10 +520,10 @@ export default function DocsPage() {
                   />
                   <ArchArrow />
                   <ArchBlock
-                    icon={<Check className="h-6 w-6 text-lime-400" />}
+                    icon={<Check className="h-6 w-6 text-indigo-400" />}
                     title="Consistent UI"
                     items={['On-brand', 'Validated', 'Accessible']}
-                    color="lime"
+                    color="indigo"
                   />
                 </div>
               </div>
@@ -651,7 +651,7 @@ export default function DocsPage() {
                   icon={<Eye className="h-6 w-6" />}
                   title="Visual Studio"
                   description="Real-time design editor and previewer. See how your tokens look together before connecting them to AI tools. Live component previews."
-                  color="cyan"
+                  color="violet"
                   stat="Real-time preview engine"
                 />
               </div>
@@ -702,7 +702,7 @@ export default function DocsPage() {
                         <th className="text-left px-4 py-3 text-zinc-400 font-medium">
                           Capability
                         </th>
-                        <th className="text-center px-4 py-3 font-semibold bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+                        <th className="text-center px-4 py-3 font-semibold bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
                           AIUI
                         </th>
                         <th className="text-center px-4 py-3 text-zinc-500 font-medium">
@@ -896,7 +896,7 @@ export default function DocsPage() {
                 Start shipping consistent UI in 60 seconds
               </h2>
 
-              <div className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-lime-500/5 to-cyan-500/5 p-8 sm:p-10">
+              <div className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-indigo-500/5 to-violet-500/5 p-8 sm:p-10">
                 <div className="grid gap-8 lg:grid-cols-2 items-center">
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-3">
@@ -910,7 +910,7 @@ export default function DocsPage() {
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Link
                         href="/sign-up"
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-lime-500 px-6 py-3 text-sm font-semibold text-zinc-950 shadow-sm transition-colors hover:bg-lime-400"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400"
                       >
                         Create Free Account
                         <ArrowRight className="h-4 w-4" />
@@ -931,14 +931,14 @@ export default function DocsPage() {
                     <div className="space-y-1">
                       <p>
                         <span className="text-zinc-500">$</span>{' '}
-                        <span className="text-lime-400">claude mcp add</span> aiui
+                        <span className="text-indigo-400">claude mcp add</span> aiui
                       </p>
                       <p className="text-zinc-600">✓ Connected to AIUI</p>
                       <p className="text-zinc-600">✓ Design memory loaded (31 tokens)</p>
                       <p className="text-zinc-600">✓ 57 component recipes available</p>
                       <p className="mt-3">
                         <span className="text-zinc-500">$</span>{' '}
-                        <span className="text-lime-400">claude</span>{' '}
+                        <span className="text-indigo-400">claude</span>{' '}
                         <span className="text-zinc-300">
                           &quot;Build a pricing page for my SaaS&quot;
                         </span>
@@ -967,14 +967,14 @@ export default function DocsPage() {
 
 function SectionBadge({ label }: { label: string }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-wider text-lime-400 mb-3">{label}</p>
+    <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-3">{label}</p>
   );
 }
 
 function QuickStat({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center">
-      <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+      <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
         {value}
       </p>
       <p className="text-xs text-zinc-500 mt-1">{label}</p>
@@ -1023,11 +1023,11 @@ function MarketTier({
   label: string;
   value: string;
   description: string;
-  color: 'lime' | 'cyan' | 'white';
+  color: 'indigo' | 'violet' | 'white';
 }) {
   const colorMap = {
-    lime: 'text-lime-400 border-lime-500/30',
-    cyan: 'text-cyan-400 border-cyan-500/30',
+    indigo: 'text-indigo-400 border-indigo-500/30',
+    violet: 'text-violet-400 border-violet-500/30',
     white: 'text-white border-zinc-600',
   };
   return (
@@ -1064,7 +1064,7 @@ function SignalCard({
 function WhyNowItem({ text }: { text: string }) {
   return (
     <div className="flex gap-2">
-      <ChevronRight className="h-4 w-4 text-lime-400 shrink-0 mt-0.5" />
+      <ChevronRight className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
       <p className="text-sm text-zinc-400">{text}</p>
     </div>
   );
@@ -1081,31 +1081,27 @@ function MemoryLayer({
   layer: number;
   title: string;
   subtitle: string;
-  color: 'lime' | 'cyan' | 'violet' | 'amber';
+  color: 'indigo' | 'violet' | 'amber';
   items: string[];
   icon: React.ReactNode;
 }) {
   const borderColors = {
-    lime: 'border-lime-500/40',
-    cyan: 'border-cyan-500/40',
+    indigo: 'border-indigo-500/40',
     violet: 'border-violet-500/40',
     amber: 'border-amber-500/40',
   };
   const bgColors = {
-    lime: 'bg-lime-500/5',
-    cyan: 'bg-cyan-500/5',
+    indigo: 'bg-indigo-500/5',
     violet: 'bg-violet-500/5',
     amber: 'bg-amber-500/5',
   };
   const textColors = {
-    lime: 'text-lime-400',
-    cyan: 'text-cyan-400',
+    indigo: 'text-indigo-400',
     violet: 'text-violet-400',
     amber: 'text-amber-400',
   };
   const badgeBg = {
-    lime: 'bg-lime-500/20',
-    cyan: 'bg-cyan-500/20',
+    indigo: 'bg-indigo-500/20',
     violet: 'bg-violet-500/20',
     amber: 'bg-amber-500/20',
   };
@@ -1165,12 +1161,11 @@ function ArchBlock({
   icon: React.ReactNode;
   title: string;
   items: string[];
-  color: 'amber' | 'lime' | 'cyan' | 'violet';
+  color: 'amber' | 'indigo' | 'violet';
 }) {
   const borderColors = {
     amber: 'border-amber-500/30',
-    lime: 'border-lime-500/30',
-    cyan: 'border-cyan-500/30',
+    indigo: 'border-indigo-500/30',
     violet: 'border-violet-500/30',
   };
   return (
@@ -1201,7 +1196,7 @@ function ArchArrow() {
 function ToolMini({ name, desc }: { name: string; desc: string }) {
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-4 py-3">
-      <p className="text-xs font-mono text-lime-400 mb-0.5">{name}</p>
+      <p className="text-xs font-mono text-indigo-400 mb-0.5">{name}</p>
       <p className="text-xs text-zinc-500">{desc}</p>
     </div>
   );
@@ -1223,7 +1218,7 @@ function StepCard({
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 sm:p-6">
       <div className="flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-lime-500 to-cyan-500 text-sm font-bold text-zinc-950">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-bold text-white">
           {number}
         </div>
         <div className="flex-1">
@@ -1251,7 +1246,7 @@ function FeatureCard({
   icon: React.ReactNode;
   title: string;
   description: string;
-  color: 'pink' | 'blue' | 'violet' | 'green' | 'amber' | 'cyan';
+  color: 'pink' | 'blue' | 'violet' | 'green' | 'amber';
   stat: string;
 }) {
   const colorMap = {
@@ -1260,10 +1255,9 @@ function FeatureCard({
     violet: 'bg-violet-500/10 text-violet-400',
     green: 'bg-green-500/10 text-green-400',
     amber: 'bg-amber-500/10 text-amber-400',
-    cyan: 'bg-cyan-500/10 text-cyan-400',
   };
   return (
-    <div className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-lime-500/5">
+    <div className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/5">
       <div className={`inline-flex rounded-lg p-2.5 ${colorMap[color]} mb-3`}>{icon}</div>
       <h3 className="text-sm font-semibold text-white mb-1.5">{title}</h3>
       <p className="text-sm text-zinc-400 leading-relaxed mb-3">{description}</p>
@@ -1275,7 +1269,7 @@ function FeatureCard({
 function CapabilityItem({ text }: { text: string }) {
   return (
     <li className="flex items-center gap-2">
-      <Check className="h-3.5 w-3.5 text-lime-400 shrink-0" />
+      <Check className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
       <span className="text-sm text-zinc-400">{text}</span>
     </li>
   );
@@ -1305,7 +1299,7 @@ function CompRow({
     <tr>
       <td className="px-4 py-2.5 text-zinc-300 text-sm">{feature}</td>
       <td className="px-4 py-2.5 text-center">
-        <Check className="h-4 w-4 text-lime-400 mx-auto" />
+        <Check className="h-4 w-4 text-indigo-400 mx-auto" />
       </td>
       <td className="px-4 py-2.5 text-center">{renderCheck(ts)}</td>
       <td className="px-4 py-2.5 text-center">{renderCheck(sn)}</td>
@@ -1366,7 +1360,7 @@ function IDECard({
           {setup}
         </span>
       </div>
-      <p className="text-xs text-lime-400/60 mb-2">{tagline}</p>
+      <p className="text-xs text-indigo-400/60 mb-2">{tagline}</p>
       <p className="text-sm text-zinc-400 leading-relaxed mb-3">{description}</p>
       <div className="rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2">
         <pre className="text-xs font-mono text-zinc-500 whitespace-pre-wrap">{code}</pre>

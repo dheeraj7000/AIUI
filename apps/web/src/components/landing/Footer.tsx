@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Wordmark } from '@/components/ui/Wordmark';
 
 const footerSections = [
   {
@@ -38,9 +39,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Top: logo + tagline */}
         <div className="mb-12">
-          <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
-            AIUI
-          </span>
+          <Wordmark size="lg" />
           <p className="mt-3 max-w-xs text-sm leading-6 text-zinc-500">
             The AI Design Control Layer. Pick your design system, add one config block, and Claude
             follows it everywhere.
@@ -60,14 +59,14 @@ export function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-zinc-500 transition-colors hover:text-lime-400"
+                        className="text-sm text-zinc-500 transition-colors hover:text-indigo-400"
                       >
                         {link.label}
                       </a>
                     ) : (
                       <Link
                         href={link.href}
-                        className="text-sm text-zinc-500 transition-colors hover:text-lime-400"
+                        className="text-sm text-zinc-500 transition-colors hover:text-indigo-400"
                       >
                         {link.label}
                       </Link>

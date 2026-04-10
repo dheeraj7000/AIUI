@@ -161,14 +161,14 @@ export default async function DashboardPage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Link
             href="/api-keys"
-            className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-lime-500/20 hover:shadow-lg hover:shadow-lime-500/5"
+            className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/5"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lime-500/10 border border-lime-500/10">
-                <Key size={20} className="text-lime-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/10">
+                <Key size={20} className="text-indigo-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white group-hover:text-lime-400 transition-colors">
+                <h3 className="text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors">
                   API Keys
                 </h3>
                 <p className="text-xs text-zinc-500">
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
           {stats.recentProjects.length > 0 && (
             <Link
               href="/projects"
-              className="group flex items-center gap-1 text-sm font-medium text-lime-400 transition-colors hover:text-lime-300"
+              className="group flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
             >
               View all
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
@@ -225,7 +225,7 @@ export default async function DashboardPage() {
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/5">
                     <FolderOpen
                       size={18}
-                      className="text-zinc-400 group-hover:text-lime-400 transition-colors"
+                      className="text-zinc-400 group-hover:text-indigo-400 transition-colors"
                     />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -244,11 +244,11 @@ export default async function DashboardPage() {
             <p className="text-sm font-medium text-zinc-400">No projects yet</p>
             <p className="mt-1 text-xs text-zinc-500">
               Projects are created via the API. Browse{' '}
-              <Link href="/style-packs" className="text-lime-400 hover:underline">
+              <Link href="/style-packs" className="text-indigo-400 hover:underline">
                 Style Packs
               </Link>{' '}
               and{' '}
-              <Link href="/components" className="text-lime-400 hover:underline">
+              <Link href="/components" className="text-indigo-400 hover:underline">
                 Components
               </Link>{' '}
               to explore your design library.

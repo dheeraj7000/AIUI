@@ -165,7 +165,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
                     {project.pack.category} · v{project.pack.version}
                   </span>
                 </div>
-                <span className="text-xs text-lime-400">View pack</span>
+                <span className="text-xs text-indigo-400">View pack</span>
               </div>
               {project.pack.description && (
                 <p className="mt-1 text-sm text-zinc-500">{project.pack.description}</p>
@@ -207,7 +207,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
             <p className="text-sm text-zinc-500">No style pack assigned.</p>
             <Link
               href="/style-packs"
-              className="mt-1 inline-block text-sm text-lime-400 hover:underline"
+              className="mt-1 inline-block text-sm text-indigo-400 hover:underline"
             >
               Browse style packs
             </Link>
@@ -238,7 +238,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
             <p className="text-sm text-zinc-500">No components selected.</p>
             <Link
               href="/components"
-              className="mt-1 inline-block text-sm text-lime-400 hover:underline"
+              className="mt-1 inline-block text-sm text-indigo-400 hover:underline"
             >
               Browse components
             </Link>
@@ -253,7 +253,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
           {/* Step 1: MCP Config */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-zinc-950">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold text-white">
                 1
               </span>
               <h3 className="text-sm font-semibold text-white">Add MCP Server</h3>
@@ -266,7 +266,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
             {/* Remote MCP (recommended) */}
             <div className="mt-3">
               <div className="mb-2 flex items-center gap-2">
-                <span className="rounded-full bg-lime-500/10 px-2 py-0.5 text-xs font-medium text-lime-400">
+                <span className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs font-medium text-indigo-400">
                   Recommended
                 </span>
                 <span className="text-xs font-medium text-zinc-500">Remote — zero install</span>
@@ -285,11 +285,11 @@ export default async function ProjectDetailPage(props: RouteContext) {
 }`}
               </pre>
               <p className="mt-2 text-xs text-zinc-500">
-                <a href="/quick-setup" className="text-lime-400 hover:underline">
+                <a href="/quick-setup" className="text-indigo-400 hover:underline">
                   Quick Setup
                 </a>{' '}
                 — get an API key and connect in 30 seconds. Or{' '}
-                <a href="/api-keys" className="text-lime-400 hover:underline">
+                <a href="/api-keys" className="text-indigo-400 hover:underline">
                   manage API keys
                 </a>{' '}
                 to replace <code className="rounded bg-zinc-800 px-1">YOUR_API_KEY</code> above.
@@ -320,7 +320,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
           {/* Step 2: Sync design memory */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-zinc-950">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold text-white">
                 2
               </span>
               <h3 className="text-sm font-semibold text-white">Sync Design Memory</h3>
@@ -329,7 +329,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
               Ask Claude to sync your design system. This creates persistent memory files that
               Claude reads automatically:
             </p>
-            <div className="mt-3 rounded-md bg-lime-500/10 border border-lime-500/20 px-4 py-3 text-sm text-lime-300">
+            <div className="mt-3 rounded-md bg-indigo-500/10 border border-indigo-500/20 px-4 py-3 text-sm text-indigo-300">
               &quot;Sync the AIUI design memory for project <strong>{project.slug}</strong> to this
               directory&quot;
             </div>
@@ -351,7 +351,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
           {/* Step 3: CLAUDE.md one-liner */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-lime-500 text-xs font-bold text-zinc-950">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold text-white">
                 3
               </span>
               <h3 className="text-sm font-semibold text-white">Add to CLAUDE.md</h3>

@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
+import { Wordmark } from '@/components/ui/Wordmark';
 
 interface NavItem {
   label: string;
@@ -51,11 +52,11 @@ function NavLink({
       onClick={onClose}
       className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
         active
-          ? 'bg-lime-500/10 text-lime-400 border border-lime-500/10'
+          ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/10'
           : 'text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent'
       }`}
     >
-      <Icon size={18} className={active ? 'text-lime-400' : 'text-zinc-500'} />
+      <Icon size={18} className={active ? 'text-indigo-400' : 'text-zinc-500'} />
       {item.label}
     </Link>
   );
@@ -77,9 +78,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       {/* Logo */}
       <div className="flex h-14 items-center border-b border-white/5 px-4">
         <Link href="/dashboard" className="text-lg font-bold tracking-tight">
-          <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
-            AIUI
-          </span>
+          <Wordmark size="md" />
         </Link>
       </div>
 

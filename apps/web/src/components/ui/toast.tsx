@@ -14,14 +14,18 @@ const variantStyles: Record<
   ToastVariant,
   { bg: string; icon: typeof CheckCircle; iconColor: string }
 > = {
-  success: { bg: 'border-lime-500/30 bg-zinc-900', icon: CheckCircle, iconColor: 'text-lime-400' },
+  success: {
+    bg: 'border-indigo-500/30 bg-zinc-900',
+    icon: CheckCircle,
+    iconColor: 'text-indigo-400',
+  },
   error: { bg: 'border-red-500/30 bg-zinc-900', icon: AlertCircle, iconColor: 'text-red-400' },
   warning: {
     bg: 'border-amber-500/30 bg-zinc-900',
     icon: AlertTriangle,
     iconColor: 'text-amber-400',
   },
-  info: { bg: 'border-cyan-500/30 bg-zinc-900', icon: Info, iconColor: 'text-cyan-400' },
+  info: { bg: 'border-violet-500/30 bg-zinc-900', icon: Info, iconColor: 'text-violet-400' },
 };
 
 export function Toast({ toast, onDismiss }: { toast: ToastData; onDismiss: (id: string) => void }) {

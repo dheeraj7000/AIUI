@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Check, Copy, ArrowRight, Sparkles } from 'lucide-react';
+import { TokenChip } from '@/components/ui/TokenChip';
 
 const installCommand = 'claude mcp add aiui';
 
@@ -33,43 +34,45 @@ export function Hero() {
       <div className="absolute inset-0 bg-grid" />
 
       {/* Decorative blurs */}
-      <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-lime-500/8 blur-[120px]" />
-      <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-cyan-400/8 blur-[120px]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[700px] w-[700px] rounded-full bg-lime-500/4 blur-[150px]" />
+      <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-indigo-500/8 blur-[120px]" />
+      <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-violet-400/8 blur-[120px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[700px] w-[700px] rounded-full bg-indigo-500/4 blur-[150px]" />
 
       {/* Floating token cards */}
-      <div
-        className="absolute top-24 left-[8%] hidden lg:block animate-float"
-        style={{ '--float-rotate': '-6deg' } as React.CSSProperties}
-      >
-        <div className="rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-zinc-400 border border-white/10 shadow-lg shadow-black/20">
-          color.primary.600
-        </div>
-      </div>
-      <div
-        className="absolute top-44 right-[6%] hidden lg:block animate-float-delayed"
-        style={{ '--float-rotate': '4deg' } as React.CSSProperties}
-      >
-        <div className="rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-zinc-400 border border-white/10 shadow-lg shadow-black/20">
-          radius.lg: 12px
-        </div>
-      </div>
-      <div
-        className="absolute bottom-36 left-[4%] hidden lg:block animate-float-slow"
-        style={{ '--float-rotate': '3deg' } as React.CSSProperties}
-      >
-        <div className="rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-zinc-400 border border-white/10 shadow-lg shadow-black/20">
-          shadow.md
-        </div>
-      </div>
-      <div
-        className="absolute bottom-28 right-[10%] hidden lg:block animate-float"
-        style={{ '--float-rotate': '-3deg' } as React.CSSProperties}
-      >
-        <div className="rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-zinc-400 border border-white/10 shadow-lg shadow-black/20">
-          font.heading: Inter
-        </div>
-      </div>
+      <TokenChip
+        variant="floating"
+        animated
+        label="color.primary.600"
+        className="absolute top-24 left-[8%]"
+        floatRotate="-6deg"
+        floatSpeed="normal"
+      />
+      <TokenChip
+        variant="floating"
+        animated
+        label="radius.lg"
+        value="12px"
+        className="absolute top-44 right-[6%]"
+        floatRotate="4deg"
+        floatSpeed="delayed"
+      />
+      <TokenChip
+        variant="floating"
+        animated
+        label="shadow.md"
+        className="absolute bottom-36 left-[4%]"
+        floatRotate="3deg"
+        floatSpeed="slow"
+      />
+      <TokenChip
+        variant="floating"
+        animated
+        label="font.heading"
+        value="Inter"
+        className="absolute bottom-28 right-[10%]"
+        floatRotate="-3deg"
+        floatSpeed="normal"
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
@@ -84,7 +87,7 @@ export function Hero() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 rounded-full bg-lime-500/10 px-4 py-1.5 text-sm font-medium text-lime-400 backdrop-blur-sm border border-lime-500/20 mb-8"
+              className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-4 py-1.5 text-sm font-medium text-indigo-400 backdrop-blur-sm border border-indigo-500/20 mb-8"
             >
               <Sparkles className="h-3.5 w-3.5" />
               AI Design Control Layer
@@ -95,7 +98,7 @@ export function Hero() {
               style={{ lineHeight: '1.05' }}
             >
               Your Design System,{' '}
-              <span className="bg-gradient-to-r from-lime-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent">
                 Always in Sync
               </span>
             </h1>
@@ -119,7 +122,7 @@ export function Hero() {
             >
               <Link
                 href="/sign-up"
-                className="group w-full sm:w-auto rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-7 py-3.5 text-center text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/30 hover:-translate-y-0.5"
+                className="group w-full sm:w-auto rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-7 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5"
               >
                 <span className="flex items-center justify-center gap-2">
                   Get Started Free
@@ -161,8 +164,8 @@ export function Hero() {
                 >
                   {copied ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-lime-400" />
-                      <span className="text-lime-400">Copied</span>
+                      <Check className="h-3.5 w-3.5 text-indigo-400" />
+                      <span className="text-indigo-400">Copied</span>
                     </>
                   ) : (
                     <>
@@ -178,11 +181,11 @@ export function Hero() {
                 <pre className="text-base leading-relaxed font-mono">
                   <code>
                     <span className="text-zinc-600">$</span>{' '}
-                    <span className="text-lime-400">claude mcp add aiui</span>
+                    <span className="text-indigo-400">claude mcp add aiui</span>
                   </code>
                 </pre>
                 <div className="mt-4 flex items-center gap-2">
-                  <div className="h-1 w-1 rounded-full bg-lime-400 animate-pulse" />
+                  <div className="h-1 w-1 rounded-full bg-indigo-400 animate-pulse" />
                   <p className="text-sm text-zinc-500">
                     One command. That&apos;s it. Your design system is now connected.
                   </p>
@@ -191,7 +194,7 @@ export function Hero() {
             </div>
 
             {/* Glow effect behind terminal */}
-            <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-r from-lime-500/20 via-emerald-500/10 to-cyan-500/20 blur-2xl" />
+            <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-r from-indigo-500/20 via-violet-500/10 to-indigo-500/20 blur-2xl" />
           </motion.div>
         </div>
 
@@ -206,8 +209,8 @@ export function Hero() {
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 pt-8">
             {trustItems.map((item) => (
               <div key={item.label} className="flex items-center gap-2.5 text-sm text-zinc-400">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-lime-500/15">
-                  <Check className="h-3 w-3 text-lime-400" />
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/15">
+                  <Check className="h-3 w-3 text-indigo-400" />
                 </div>
                 {item.label}
               </div>

@@ -121,7 +121,7 @@ export default async function StylePacksPage() {
         </div>
         <Link
           href="/import"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm shadow-lime-500/20 transition-all duration-200 hover:shadow-md hover:shadow-lime-500/25"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-500/20 transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/25"
         >
           <Download size={16} />
           Import Design

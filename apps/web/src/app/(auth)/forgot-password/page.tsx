@@ -8,7 +8,7 @@ import { useAuth } from '@/providers/AuthProvider';
 type Step = 'request' | 'confirm';
 
 const inputClass =
-  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-lime-500/50 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200';
+  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Sending code...' : 'Send reset code'}
           </button>
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
         <p className="mt-6 text-center text-sm text-zinc-500">
           <Link
             href="/sign-in"
-            className="text-lime-400 hover:text-lime-300 font-medium transition-colors"
+            className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
           >
             Back to sign in
           </Link>
@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Resetting password...' : 'Reset password'}
         </button>
@@ -192,13 +192,13 @@ export default function ForgotPasswordPage() {
             setNewPassword('');
             setError('');
           }}
-          className="text-lime-400 hover:text-lime-300 font-medium transition-colors"
+          className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
         >
           Try a different email
         </button>
         <Link
           href="/sign-in"
-          className="text-lime-400 hover:text-lime-300 font-medium transition-colors"
+          className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
         >
           Back to sign in
         </Link>

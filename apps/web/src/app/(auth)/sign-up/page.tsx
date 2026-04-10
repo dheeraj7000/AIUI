@@ -42,7 +42,7 @@ function validate(email: string, password: string, confirmPassword: string): For
 }
 
 const inputClass =
-  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-lime-500/50 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200';
+  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -174,7 +174,7 @@ export default function SignUpPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-lime-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-lime-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-lime-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
           {isSubmitting ? (
             <>
@@ -206,7 +206,7 @@ export default function SignUpPage() {
           Already have an account?{' '}
           <Link
             href="/sign-in"
-            className="font-semibold text-lime-400 hover:text-lime-300 transition-colors"
+            className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
           >
             Sign in
           </Link>

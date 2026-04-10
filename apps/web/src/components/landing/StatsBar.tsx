@@ -12,8 +12,8 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { value: '360+', label: 'Design tokens', icon: Layers, color: 'text-lime-400' },
-  { value: '142', label: 'Component recipes', icon: LayoutGrid, color: 'text-cyan-400' },
+  { value: '360+', label: 'Design tokens', icon: Layers, color: 'text-indigo-400' },
+  { value: '142', label: 'Component recipes', icon: LayoutGrid, color: 'text-violet-400' },
   { value: '14', label: 'Style packs', icon: Palette, color: 'text-violet-400' },
   { value: '12', label: 'MCP tools', icon: Wrench, color: 'text-amber-400' },
 ];
@@ -32,7 +32,7 @@ export function StatsBar() {
                   <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/5 transition-colors group-hover:bg-white/10">
                     <Icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
-                  <div className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent sm:text-4xl">
+                  <div className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent sm:text-4xl">
                     {stat.value}
                   </div>
                   <div className="mt-1 text-sm font-medium text-zinc-500">{stat.label}</div>

@@ -3,6 +3,7 @@
 import { Palette, LayoutGrid, Brain, ShieldCheck, Wand2, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { FadeUp, StaggerContainer, StaggerChild } from './motion';
+import { TokenChip } from '@/components/ui/TokenChip';
 
 interface Feature {
   title: string;
@@ -11,6 +12,7 @@ interface Feature {
   color: string;
   glowColor: string;
   span?: string; // grid span class for bento layout
+  tokens: string[];
 }
 
 const features: Feature[] = [
@@ -22,6 +24,7 @@ const features: Feature[] = [
     color: 'text-pink-400',
     glowColor: 'group-hover:shadow-pink-500/20',
     span: 'md:col-span-2',
+    tokens: ['color.primary', 'font.heading', 'radius.lg'],
   },
   {
     title: 'Component Recipes',
@@ -30,6 +33,7 @@ const features: Feature[] = [
     icon: LayoutGrid,
     color: 'text-blue-400',
     glowColor: 'group-hover:shadow-blue-500/20',
+    tokens: ['Button.variant', 'Card.props'],
   },
   {
     title: 'Design Memory',
@@ -38,6 +42,7 @@ const features: Feature[] = [
     icon: Brain,
     color: 'text-violet-400',
     glowColor: 'group-hover:shadow-violet-500/20',
+    tokens: ['.aiui/tokens', '.aiui/rules'],
   },
   {
     title: 'Token Compliance',
@@ -46,6 +51,7 @@ const features: Feature[] = [
     icon: ShieldCheck,
     color: 'text-emerald-400',
     glowColor: 'group-hover:shadow-emerald-500/20',
+    tokens: ['validate.colors', 'validate.spacing'],
   },
   {
     title: 'Visual Studio',
@@ -54,15 +60,17 @@ const features: Feature[] = [
     icon: Wand2,
     color: 'text-amber-400',
     glowColor: 'group-hover:shadow-amber-500/20',
+    tokens: ['preview.live', 'export.config'],
   },
   {
     title: 'Quick Setup',
     description:
       'Get your API key, paste one config block, and start building. CLI-free onboarding in under 60 seconds.',
     icon: Zap,
-    color: 'text-cyan-400',
-    glowColor: 'group-hover:shadow-cyan-500/20',
+    color: 'text-violet-400',
+    glowColor: 'group-hover:shadow-violet-500/20',
     span: 'md:col-span-2',
+    tokens: ['mcp.connect', 'api.key'],
   },
 ];
 
@@ -75,12 +83,12 @@ export function FeatureGrid() {
         {/* Section header */}
         <FadeUp>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-lime-400">
+            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">
               Features
             </p>
             <h2 className="mt-3 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
               Everything you need to control{' '}
-              <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
                 AI-generated UI
               </span>
             </h2>
@@ -111,6 +119,12 @@ export function FeatureGrid() {
 
                   <h3 className="mt-4 text-lg font-semibold text-white">{feature.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-zinc-400">{feature.description}</p>
+
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {feature.tokens.map((t) => (
+                      <TokenChip key={t} variant="bullet" label={t} />
+                    ))}
+                  </div>
 
                   {/* Subtle shimmer on hover */}
                   <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden pointer-events-none">

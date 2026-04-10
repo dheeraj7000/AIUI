@@ -63,7 +63,7 @@ export default function ProfilePage() {
       {/* User Info Card */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-lime-500 to-cyan-500 text-2xl font-bold text-zinc-950">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-2xl font-bold text-white">
             {userInitial}
           </div>
           <div className="min-w-0 flex-1">
@@ -108,7 +108,7 @@ export default function ProfilePage() {
             href="/api-keys"
             className="flex items-center gap-3 rounded-lg border border-zinc-800 px-4 py-3 text-sm text-zinc-300 transition-colors hover:bg-zinc-800"
           >
-            <Key size={18} className="text-lime-400" />
+            <Key size={18} className="text-indigo-400" />
             <div>
               <div className="font-medium text-white">Generate API Key</div>
               <div className="text-xs text-zinc-500">Connect Claude Code or your AI assistant</div>
@@ -130,7 +130,7 @@ export default function ProfilePage() {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-lime-500 focus:ring-1 focus:ring-lime-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               placeholder="Enter current password"
               aria-invalid={!!passwordMessage && !passwordMessage.includes('successfully')}
               aria-describedby={passwordMessage ? 'password-message' : undefined}
@@ -145,7 +145,7 @@ export default function ProfilePage() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-lime-500 focus:ring-1 focus:ring-lime-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               placeholder="Enter new password"
               aria-invalid={!!passwordMessage && !passwordMessage.includes('successfully')}
               aria-describedby={passwordMessage ? 'password-message' : undefined}
@@ -160,7 +160,7 @@ export default function ProfilePage() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-lime-500 focus:ring-1 focus:ring-lime-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               placeholder="Confirm new password"
               aria-invalid={!!passwordMessage && !passwordMessage.includes('successfully')}
               aria-describedby={passwordMessage ? 'password-message' : undefined}
@@ -170,7 +170,7 @@ export default function ProfilePage() {
           {passwordMessage && (
             <p
               id="password-message"
-              className={`text-sm ${passwordMessage.includes('successfully') ? 'text-lime-400' : 'text-red-400'}`}
+              className={`text-sm ${passwordMessage.includes('successfully') ? 'text-indigo-400' : 'text-red-400'}`}
             >
               {passwordMessage}
             </p>
@@ -178,7 +178,7 @@ export default function ProfilePage() {
 
           <button
             type="submit"
-            className="rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-lime-400"
+            className="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-400"
           >
             Update Password
           </button>

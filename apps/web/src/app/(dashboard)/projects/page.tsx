@@ -59,7 +59,7 @@ export default async function ProjectsPage() {
               href={`/projects/${p.slug}`}
               className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] hover:border-white/10 hover:shadow-lg"
             >
-              <h3 className="text-base font-semibold text-white group-hover:text-lime-400 transition-colors">
+              <h3 className="text-base font-semibold text-white group-hover:text-indigo-400 transition-colors">
                 {p.name}
               </h3>
               {p.description && (
@@ -70,7 +70,7 @@ export default async function ProjectsPage() {
                   {p.frameworkTarget}
                 </span>
                 {p.packName && (
-                  <span className="rounded-full bg-lime-500/10 border border-lime-500/10 px-2.5 py-0.5 text-xs text-lime-400">
+                  <span className="rounded-full bg-indigo-500/10 border border-indigo-500/10 px-2.5 py-0.5 text-xs text-indigo-400">
                     {p.packName}
                   </span>
                 )}
@@ -84,11 +84,11 @@ export default async function ProjectsPage() {
           <p className="text-sm text-zinc-400">No projects yet.</p>
           <p className="mt-2 text-xs text-zinc-500">
             Go to a{' '}
-            <Link href="/style-packs" className="text-lime-400 hover:underline">
+            <Link href="/style-packs" className="text-indigo-400 hover:underline">
               Style Pack
             </Link>{' '}
             or{' '}
-            <Link href="/components" className="text-lime-400 hover:underline">
+            <Link href="/components" className="text-indigo-400 hover:underline">
               Component
             </Link>{' '}
             and click &quot;Add to Project&quot; to create one.

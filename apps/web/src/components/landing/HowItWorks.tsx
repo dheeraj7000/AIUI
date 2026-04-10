@@ -48,12 +48,12 @@ export function HowItWorks() {
         {/* Section header */}
         <FadeUp>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-lime-400">
+            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">
               How It Works
             </p>
             <h2 className="mt-3 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
               Up and running in{' '}
-              <span className="bg-gradient-to-r from-lime-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
                 3 steps
               </span>
             </h2>
@@ -69,8 +69,8 @@ export function HowItWorks() {
           {/* Connecting line (desktop) */}
           <div className="absolute top-20 left-0 right-0 hidden lg:block">
             <div className="mx-auto flex max-w-4xl items-center justify-between px-20">
-              <div className="h-px flex-1 bg-gradient-to-r from-lime-500/40 to-cyan-500/40" />
-              <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/40 to-lime-500/40" />
+              <div className="h-px flex-1 bg-gradient-to-r from-indigo-500/40 to-violet-500/40" />
+              <div className="h-px flex-1 bg-gradient-to-r from-violet-500/40 to-indigo-500/40" />
             </div>
           </div>
 
@@ -81,9 +81,9 @@ export function HowItWorks() {
                 <StaggerChild key={step.number}>
                   <div className="relative text-center">
                     {/* Step number badge */}
-                    <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-lime-500 to-cyan-500 text-xl font-bold text-white shadow-lg shadow-lime-500/25">
+                    <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-xl font-bold text-white shadow-lg shadow-indigo-500/25">
                       {step.number}
-                      <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-lime-500/20 to-cyan-500/20 blur-lg -z-10" />
+                      <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 blur-lg -z-10" />
                     </div>
 
                     {/* Icon */}
@@ -109,7 +109,7 @@ export function HowItWorks() {
                           <pre className="text-xs font-mono">
                             <code>
                               <span className="text-zinc-600">$</span>{' '}
-                              <span className="text-lime-400">claude mcp add aiui</span>
+                              <span className="text-indigo-400">claude mcp add aiui</span>
                             </code>
                           </pre>
                         </div>

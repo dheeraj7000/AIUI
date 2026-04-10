@@ -105,7 +105,7 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
     <div className="mt-6 space-y-4 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
       {/* Stats badges */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-lime-500/10 px-3 py-1 text-xs font-semibold text-lime-400">
+        <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400">
           {totalCount} total tokens
         </span>
         {statEntries.map(([key, val]) => {
@@ -265,7 +265,7 @@ function FigmaTab() {
           placeholder="https://www.figma.com/file/..."
           value={fileUrl}
           onChange={(e) => setFileUrl(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
       </div>
 
@@ -279,13 +279,13 @@ function FigmaTab() {
           placeholder="figd_..."
           value={figmaToken}
           onChange={(e) => setFigmaToken(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
         <a
           href="https://www.figma.com/developers/api#access-tokens"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1.5 inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300"
+          className="mt-1.5 inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"
         >
           Get your token
           <ExternalLink size={10} />
@@ -321,7 +321,7 @@ function FigmaTab() {
           <>
             <button
               onClick={handleImport}
-              className="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm transition-colors hover:bg-lime-400"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-400"
             >
               Import Tokens
             </button>
@@ -443,7 +443,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
           placeholder={FORMAT_PLACEHOLDERS[format]}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 font-mono text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 font-mono text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
       </div>
 
@@ -457,7 +457,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
           placeholder="My Imported Tokens"
           value={packName}
           onChange={(e) => setPackName(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
       </div>
 
@@ -491,7 +491,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
             <button
               onClick={handleImport}
               disabled={!packName}
-              className="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm transition-colors hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Import Tokens
             </button>
@@ -551,7 +551,7 @@ export default function ImportPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'border-lime-500 text-lime-400'
+                    ? 'border-indigo-500 text-indigo-400'
                     : 'border-transparent text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
                 }`}
               >
