@@ -9,10 +9,14 @@ import {
   componentRecipes,
   designProfiles,
   assets,
+  usageEvents,
 } from '@aiui/design-core';
-import { eq, count, inArray } from 'drizzle-orm';
+import { eq, count, inArray, and, desc } from 'drizzle-orm';
+import { DesignMemoryStalenessBanner } from '@/components/ui/design-memory-staleness-banner';
 
 export const dynamic = 'force-dynamic';
+
+const DESIGN_MEMORY_STALE_DAYS = 30;
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -79,12 +83,42 @@ async function getProject(slug: string) {
     .from(assets)
     .where(eq(assets.projectId, project.id));
 
+  // Most recent successful sync_design_memory for this project
+  const [lastSync] = await db
+    .select({ createdAt: usageEvents.createdAt })
+    .from(usageEvents)
+    .where(
+      and(
+        eq(usageEvents.projectId, project.id),
+        eq(usageEvents.toolName, 'sync_design_memory'),
+        eq(usageEvents.status, 'ok')
+      )
+    )
+    .orderBy(desc(usageEvents.createdAt))
+    .limit(1);
+
+  let daysStale: number | null = null;
+  let isStale = false;
+  if (!lastSync) {
+    isStale = true;
+    daysStale = null;
+  } else {
+    const diffMs = Date.now() - new Date(lastSync.createdAt).getTime();
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (days >= DESIGN_MEMORY_STALE_DAYS) {
+      isStale = true;
+      daysStale = days;
+    }
+  }
+
   return {
     ...project,
     pack,
     tokens,
     selectedRecipes,
     assetCount: assetCount?.count ?? 0,
+    designMemoryStale: isStale,
+    designMemoryDaysStale: daysStale,
   };
 }
 
@@ -132,6 +166,13 @@ export default async function ProjectDetailPage(props: RouteContext) {
           View Graph
         </Link>
       </div>
+
+      {project.designMemoryStale && (
+        <DesignMemoryStalenessBanner
+          projectSlug={project.slug}
+          daysStale={project.designMemoryDaysStale}
+        />
+      )}
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">

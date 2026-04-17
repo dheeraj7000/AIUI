@@ -20,6 +20,22 @@ interface OnboardingChecklistProps {
 
 const DISMISSED_KEY = 'aiui-onboarding-dismissed';
 
+/**
+ * Fire-and-forget PATCH to /api/onboarding. Failures are swallowed so the
+ * UI stays responsive even offline — sessionStorage keeps local state in
+ * sync until the next successful request.
+ */
+function patchOnboarding(patch: Record<string, unknown>): void {
+  fetch('/api/onboarding', {
+    method: 'PATCH',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  }).catch(() => {
+    /* non-blocking */
+  });
+}
+
 export function OnboardingChecklist({
   hasProject,
   hasStylePack,
@@ -31,7 +47,31 @@ export function OnboardingChecklist({
   useEffect(() => {
     // Migrate from localStorage (permanent) to sessionStorage (per-session)
     localStorage.removeItem(DISMISSED_KEY);
-    setDismissed(sessionStorage.getItem(DISMISSED_KEY) === 'true');
+
+    // Optimistic hydration from sessionStorage so we don't flash on reload.
+    const localDismissed = sessionStorage.getItem(DISMISSED_KEY) === 'true';
+    setDismissed(localDismissed);
+
+    // Prefer the server's durable state. If the fetch fails we keep the
+    // sessionStorage-derived value so the UI still works offline.
+    let cancelled = false;
+    fetch('/api/onboarding', { credentials: 'same-origin', cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        const state = data.onboardingState ?? {};
+        if (state.checklistDismissedAt) {
+          setDismissed(true);
+          sessionStorage.setItem(DISMISSED_KEY, 'true');
+        }
+      })
+      .catch(() => {
+        /* keep local value */
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const steps: OnboardingStep[] = [
@@ -41,6 +81,20 @@ export function OnboardingChecklist({
     { label: 'Generate an API key', href: '/api-keys', icon: Key, done: hasApiKey },
   ];
 
+  // Mirror the prop-derived "done" flags into the durable server state so
+  // other surfaces (other tabs, future refactors, analytics) can read a
+  // single source of truth.
+  useEffect(() => {
+    patchOnboarding({
+      checklistSteps: {
+        pack_browsed: hasStylePack,
+        project_created: hasProject,
+        component_added: hasComponent,
+        api_key_created: hasApiKey,
+      },
+    });
+  }, [hasStylePack, hasProject, hasComponent, hasApiKey]);
+
   const completedCount = steps.filter((s) => s.done).length;
   const allDone = completedCount === steps.length;
 
@@ -49,6 +103,7 @@ export function OnboardingChecklist({
   const handleDismiss = () => {
     sessionStorage.setItem(DISMISSED_KEY, 'true');
     setDismissed(true);
+    patchOnboarding({ checklistDismissedAt: new Date().toISOString() });
   };
 
   return (

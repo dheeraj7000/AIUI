@@ -45,6 +45,7 @@ function formatTimestamp(iso: string): string {
 function eventTypePill(eventType: string): string {
   switch (eventType) {
     case 'tool_call':
+    case 'mcp_tool_call':
       return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
     case 'web_write':
       return 'bg-violet-500/10 text-violet-400 border-violet-500/20';

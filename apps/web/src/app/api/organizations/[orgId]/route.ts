@@ -5,7 +5,10 @@ import {
   getOrganization,
   updateOrganization,
   deleteOrganization,
+  verifyOrgMembership,
+  organizationMembers,
 } from '@aiui/design-core';
+import { eq, and } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -20,11 +23,20 @@ type RouteContext = { params: Promise<{ orgId: string }> };
 /**
  * GET /api/organizations/[orgId] — Get organization details with member count.
  */
-export async function GET(_req: NextRequest, context: RouteContext) {
+export async function GET(req: NextRequest, context: RouteContext) {
+  const userId = req.headers.get('x-user-id');
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { orgId } = await context.params;
 
   try {
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const org = await getOrganization(db, orgId);
 
     if (!org) {
@@ -61,6 +73,22 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     const db = getDb();
+
+    // Only owners/admins may mutate organization metadata.
+    const [membership] = await db
+      .select({ role: organizationMembers.role })
+      .from(organizationMembers)
+      .where(
+        and(eq(organizationMembers.organizationId, orgId), eq(organizationMembers.userId, userId))
+      )
+      .limit(1);
+    if (!membership) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (membership.role !== 'owner' && membership.role !== 'admin') {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
     const updated = await updateOrganization(db, orgId, parsed.data);
 
     if (!updated) {
@@ -87,6 +115,25 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
   try {
     const db = getDb();
+
+    // Only owners may delete an organization.
+    const [membership] = await db
+      .select({ role: organizationMembers.role })
+      .from(organizationMembers)
+      .where(
+        and(eq(organizationMembers.organizationId, orgId), eq(organizationMembers.userId, userId))
+      )
+      .limit(1);
+    if (!membership) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (membership.role !== 'owner') {
+      return NextResponse.json(
+        { error: 'Only the organization owner can delete it' },
+        { status: 403 }
+      );
+    }
+
     const deleted = await deleteOrganization(db, orgId);
 
     if (!deleted) {

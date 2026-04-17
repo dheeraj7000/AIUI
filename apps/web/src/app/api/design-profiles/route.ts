@@ -1,10 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb } from '@aiui/design-core';
+import { createDb, projects, verifyOrgMembership } from '@aiui/design-core';
 import { createProfile, listProfiles } from '@aiui/design-core/src/operations/design-profiles';
 import {
   createProfileSchema,
   listProfilesSchema,
 } from '@aiui/design-core/src/validation/design-profile';
+import { eq } from 'drizzle-orm';
+
+async function authorizeProjectAccess(
+  db: ReturnType<typeof createDb>,
+  userId: string,
+  projectId: string
+): Promise<NextResponse | null> {
+  const [row] = await db
+    .select({ organizationId: projects.organizationId })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
+  if (!row) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+  }
+  if (row.organizationId) {
+    const isMember = await verifyOrgMembership(db, userId, row.organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+  return null;
+}
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -32,6 +55,8 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+    const denied = await authorizeProjectAccess(db, userId, parsed.data.projectId);
+    if (denied) return denied;
     const profile = await createProfile(db, parsed.data);
     return NextResponse.json(profile, { status: 201 });
   } catch (error) {
@@ -62,6 +87,8 @@ export async function GET(req: NextRequest) {
     }
 
     const db = getDb();
+    const denied = await authorizeProjectAccess(db, userId, parsed.data.projectId);
+    if (denied) return denied;
     const profiles = await listProfiles(db, parsed.data.projectId);
     return NextResponse.json({ data: profiles });
   } catch (error) {

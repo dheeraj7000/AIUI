@@ -1,6 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createDb, createAsset, listAssets } from '@aiui/design-core';
+import {
+  createDb,
+  createAsset,
+  listAssets,
+  projects,
+  verifyOrgMembership,
+} from '@aiui/design-core';
+import { eq } from 'drizzle-orm';
+
+/**
+ * Resolve the organization that owns the given project and verify the caller
+ * belongs to it. Returns null on success, or a NextResponse on failure.
+ */
+async function authorizeProjectAccess(
+  db: ReturnType<typeof createDb>,
+  userId: string,
+  projectId: string
+): Promise<NextResponse | null> {
+  const [row] = await db
+    .select({ organizationId: projects.organizationId })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
+  if (!row) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+  }
+  if (row.organizationId) {
+    const isMember = await verifyOrgMembership(db, userId, row.organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+  return null;
+}
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -51,6 +84,12 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+
+    // Authorize: caller must belong to the target project's organization
+    // before we attach an asset to that project.
+    const denied = await authorizeProjectAccess(db, userId, parsed.data.projectId);
+    if (denied) return denied;
+
     const asset = await createAsset(db, parsed.data);
     return NextResponse.json(asset, { status: 201 });
   } catch (error) {
@@ -88,6 +127,12 @@ export async function GET(req: NextRequest) {
     const tagIds = parsed.data.tagIds ? parsed.data.tagIds.split(',').filter(Boolean) : undefined;
 
     const db = getDb();
+
+    // Authorize: caller must belong to the target project's organization
+    // before we list its assets.
+    const denied = await authorizeProjectAccess(db, userId, parsed.data.projectId);
+    if (denied) return denied;
+
     const result = await listAssets(db, {
       projectId: parsed.data.projectId,
       type: parsed.data.type,

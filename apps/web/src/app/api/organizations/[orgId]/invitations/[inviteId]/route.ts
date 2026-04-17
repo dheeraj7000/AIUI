@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, revokeInvitation } from '@aiui/design-core';
+import { createDb, revokeInvitation, organizationMembers } from '@aiui/design-core';
+import { eq, and } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -19,8 +20,25 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   }
 
   try {
-    const { inviteId } = await context.params;
+    const { orgId, inviteId } = await context.params;
     const db = getDb();
+
+    // Only owners/admins of the org may revoke its invitations. Prevents
+    // any authenticated user from revoking unrelated orgs' invites.
+    const [membership] = await db
+      .select({ role: organizationMembers.role })
+      .from(organizationMembers)
+      .where(
+        and(eq(organizationMembers.organizationId, orgId), eq(organizationMembers.userId, userId))
+      )
+      .limit(1);
+    if (!membership) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (membership.role !== 'owner' && membership.role !== 'admin') {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
     const revoked = await revokeInvitation(db, inviteId);
 
     if (!revoked) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, getUsage } from '@aiui/design-core';
+import { createDb, getUsage, verifyOrgMembership } from '@aiui/design-core';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -23,6 +23,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const usage = await getUsage(db, orgId);
     return NextResponse.json(usage);
   } catch (error) {

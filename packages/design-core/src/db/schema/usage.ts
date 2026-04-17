@@ -5,14 +5,24 @@ import {
   integer,
   timestamp,
   date,
+  jsonb,
   uniqueIndex,
   index,
 } from 'drizzle-orm/pg-core';
 import { organizations } from './organizations';
 import { apiKeys } from './api-keys';
+import { users } from './users';
+import { projects } from './projects';
 
 /**
  * Tracks individual usage events (tool calls, validations, compilations).
+ *
+ * MCP dispatch audit fields (nullable, additive):
+ *   - userId        : JWT-derived user that invoked the tool
+ *   - projectId     : project the tool operated on (if any)
+ *   - argsSummary   : redacted JSON summary of args (see mcp-server/lib/audit-wrapper.ts)
+ *   - status        : 'ok' | 'error' for MCP dispatches; null for legacy rows
+ *   - durationMs    : handler wall-clock time in ms
  */
 export const usageEvents = pgTable(
   'usage_events',
@@ -22,8 +32,13 @@ export const usageEvents = pgTable(
     organizationId: uuid('organization_id')
       .notNull()
       .references(() => organizations.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    projectId: uuid('project_id').references(() => projects.id, { onDelete: 'set null' }),
     toolName: varchar('tool_name', { length: 100 }).notNull(),
-    eventType: varchar('event_type', { length: 20 }).notNull(), // tool_call, validation, compilation
+    eventType: varchar('event_type', { length: 20 }).notNull(), // tool_call, validation, compilation, web_write, mcp_tool_call
+    status: varchar('status', { length: 10 }), // 'ok' | 'error' — null for legacy rows
+    durationMs: integer('duration_ms'),
+    argsSummary: jsonb('args_summary'),
     creditsCost: integer('credits_cost').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

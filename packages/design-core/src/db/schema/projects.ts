@@ -1,6 +1,28 @@
-import { pgTable, uuid, varchar, text, timestamp, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  uniqueIndex,
+  index,
+  jsonb,
+} from 'drizzle-orm/pg-core';
 import { frameworkTargetEnum } from './enums';
 import { organizations } from './organizations';
+
+/**
+ * Shape of the Design Studio draft stored on each project. The client in
+ * apps/web/src/app/studio/StudioClient.tsx debounces PUTs to
+ * /api/projects/[id]/studio-draft so a closed-tab session can be restored
+ * on next open. All fields optional — only `updatedAt` is always written.
+ */
+export type StudioDraft = {
+  packId?: string;
+  selectedComponentIds?: string[];
+  tokenOverrides?: Record<string, string>;
+  updatedAt: string;
+};
 
 export const projects = pgTable(
   'projects',
@@ -14,6 +36,8 @@ export const projects = pgTable(
     description: text('description'),
     frameworkTarget: frameworkTargetEnum('framework_target').default('nextjs-tailwind').notNull(),
     activeStylePackId: uuid('active_style_pack_id'),
+    // Nullable Design Studio draft — see StudioDraft type above.
+    studioDraft: jsonb('studio_draft').$type<StudioDraft>(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

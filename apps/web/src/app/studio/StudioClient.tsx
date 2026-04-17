@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -88,6 +88,15 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string>('All');
+  const [hasDraft, setHasDraft] = useState(false);
+
+  // Debounced autosave for Design Studio drafts. Stored server-side so a
+  // user who closes the tab can resume on next open. Fire-and-forget — a
+  // failed PUT must never break the UI.
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Suppress the first autosave after hydrating from the server, so we
+  // don't immediately overwrite the draft we just loaded.
+  const skipNextSaveRef = useRef(false);
 
   // Auth form
   const [email, setEmail] = useState('');
@@ -140,7 +149,69 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
     }
   }, [user, session, setupOrg]);
 
-  // Load existing project state (style pack + components)
+  // Debounced draft autosave (500ms). Only runs once a project is selected.
+  // Not fired on `step === 'done'` — once saved for real, the draft is
+  // cleared explicitly below.
+  useEffect(() => {
+    if (!selectedProject || !session) return;
+    if (step === 'auth' || step === 'project' || step === 'done') return;
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
+      return;
+    }
+
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      const body = {
+        packId: selectedPackId,
+        selectedComponentIds: [...selectedRecipeIds],
+      };
+      fetch(`/api/projects/${selectedProject.id}/studio-draft`, {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+        .then((res) => {
+          if (res.ok) setHasDraft(true);
+        })
+        .catch(() => {
+          // Intentional no-op — autosave failures must not disrupt the UI.
+        });
+    }, 500);
+
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [selectedPackId, selectedRecipeIds, selectedProject, session, step]);
+
+  // Clear the server-side draft. Resets the in-memory edits too so the
+  // user sees the wizard in its persisted state.
+  const clearDraft = useCallback(async () => {
+    if (!selectedProject || !session) return;
+    // Cancel any pending autosave so it doesn't resurrect the draft we're
+    // about to delete.
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    skipNextSaveRef.current = true;
+    setSelectedPackId(null);
+    setSelectedRecipeIds(new Set());
+    setHasDraft(false);
+    try {
+      await fetch(`/api/projects/${selectedProject.id}/studio-draft`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      });
+    } catch {
+      // Fire-and-forget — local state is already reset.
+    }
+  }, [selectedProject, session]);
+
+  // Load existing project state (style pack + components). Draft takes
+  // precedence over persisted config — it represents the user's in-flight
+  // edits from a previous studio session.
   const loadProjectState = async (projectId: string) => {
     if (!session) return;
     try {
@@ -162,6 +233,26 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
         const items = Array.isArray(data) ? data : [];
         setSelectedRecipeIds(new Set(items.map((c: { id: string }) => c.id)));
       }
+
+      // Hydrate unsaved draft last so it overrides persisted state.
+      const draftRes = await fetch(`/api/projects/${projectId}/studio-draft`, {
+        credentials: 'same-origin',
+      });
+      if (draftRes.ok) {
+        const draft = (await draftRes.json()) as {
+          packId?: string;
+          selectedComponentIds?: string[];
+        };
+        if (draft.packId) setSelectedPackId(draft.packId);
+        if (Array.isArray(draft.selectedComponentIds)) {
+          setSelectedRecipeIds(new Set(draft.selectedComponentIds));
+        }
+        setHasDraft(true);
+        // Skip the next autosave — state just came from the server and
+        // doesn't represent a user edit.
+        skipNextSaveRef.current = true;
+      }
+      // 404 (no draft) is fine — we keep the persisted state.
     } catch {
       // Ignore — start fresh
     }
@@ -262,6 +353,20 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
       });
       if (!res.ok) throw new Error('Failed to save components');
 
+      // Persisted successfully — clear the in-flight draft. Fire-and-forget.
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+      fetch(`/api/projects/${selectedProject.id}/studio-draft`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      })
+        .then(() => setHasDraft(false))
+        .catch(() => {
+          // Intentional no-op — draft cleanup failure is not user-facing.
+        });
+
       setStep('done');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Save failed');
@@ -287,9 +392,20 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
             <span className="text-sm font-medium text-gray-600">Design Studio</span>
           </div>
           {selectedProject && (
-            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-              {selectedProject.name}
-            </span>
+            <div className="flex items-center gap-2">
+              {hasDraft && step !== 'done' && (
+                <button
+                  onClick={clearDraft}
+                  title="Discard unsaved draft and reset the wizard"
+                  className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                >
+                  Clear draft
+                </button>
+              )}
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                {selectedProject.name}
+              </span>
+            </div>
           )}
         </div>
         {/* Progress */}

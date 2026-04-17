@@ -5,7 +5,10 @@ import {
   updateRecipe,
   deleteRecipe,
   updateRecipeSchema,
+  componentRecipes,
+  verifyOrgMembership,
 } from '@aiui/design-core';
+import { eq } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -18,13 +21,46 @@ function getDb() {
 type RouteContext = { params: Promise<{ id: string }> };
 
 /**
+ * Resolve the organization that owns the given recipe and verify the caller
+ * belongs to it. Returns null on success, or a NextResponse to return.
+ */
+async function authorizeRecipeAccess(
+  db: ReturnType<typeof createDb>,
+  userId: string,
+  recipeId: string
+): Promise<NextResponse | null> {
+  const [row] = await db
+    .select({ organizationId: componentRecipes.organizationId })
+    .from(componentRecipes)
+    .where(eq(componentRecipes.id, recipeId))
+    .limit(1);
+  if (!row) {
+    return NextResponse.json({ error: 'Component recipe not found' }, { status: 404 });
+  }
+  if (row.organizationId) {
+    const isMember = await verifyOrgMembership(db, userId, row.organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+  return null;
+}
+
+/**
  * GET /api/component-recipes/[id] — Get a single component recipe with style pack name.
  */
-export async function GET(_req: NextRequest, context: RouteContext) {
+export async function GET(req: NextRequest, context: RouteContext) {
+  const userId = req.headers.get('x-user-id');
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { id } = await context.params;
 
   try {
     const db = getDb();
+    const denied = await authorizeRecipeAccess(db, userId, id);
+    if (denied) return denied;
     const recipe = await getRecipe(db, id);
 
     if (!recipe) {
@@ -61,6 +97,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     const db = getDb();
+    const denied = await authorizeRecipeAccess(db, userId, id);
+    if (denied) return denied;
     const updated = await updateRecipe(db, id, parsed.data);
 
     if (!updated) {
@@ -87,6 +125,8 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
   try {
     const db = getDb();
+    const denied = await authorizeRecipeAccess(db, userId, id);
+    if (denied) return denied;
     const deleted = await deleteRecipe(db, id);
 
     if (!deleted) {

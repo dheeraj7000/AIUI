@@ -508,7 +508,7 @@ export default function DocsPage() {
                   <ArchBlock
                     icon={<Plug className="h-6 w-6 text-violet-400" />}
                     title="MCP Protocol"
-                    items={['12 tools', 'HTTP transport', 'Streaming']}
+                    items={['18 tools', 'HTTP transport', 'Streaming']}
                     color="violet"
                   />
                   <ArchArrow />

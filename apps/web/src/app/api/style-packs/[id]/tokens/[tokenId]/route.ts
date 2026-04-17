@@ -8,7 +8,35 @@ import {
   designProfiles,
   projects,
   stylePacks,
+  verifyOrgMembership,
 } from '@aiui/design-core';
+
+/**
+ * Authorize a token-scoped request: confirm the style pack exists and the
+ * user belongs to its organization. Returns null on success, or a ready
+ * NextResponse to return on failure.
+ */
+async function authorizeStylePackAccess(
+  db: ReturnType<typeof createDb>,
+  userId: string,
+  stylePackId: string
+): Promise<NextResponse | null> {
+  const [ownerPack] = await db
+    .select({ organizationId: stylePacks.organizationId })
+    .from(stylePacks)
+    .where(eq(stylePacks.id, stylePackId))
+    .limit(1);
+  if (!ownerPack) {
+    return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
+  }
+  if (ownerPack.organizationId) {
+    const isMember = await verifyOrgMembership(db, userId, ownerPack.organizationId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+  return null;
+}
 import { eq, inArray } from 'drizzle-orm';
 import { logWebEvent } from '@/lib/audit';
 
@@ -32,6 +60,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
   try {
     const { id: stylePackId, tokenId } = await context.params;
     const db = getDb();
+    const denied = await authorizeStylePackAccess(db, userId, stylePackId);
+    if (denied) return denied;
     const token = await getToken(db, tokenId, stylePackId);
 
     if (!token) {
@@ -67,6 +97,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     const db = getDb();
+    const denied = await authorizeStylePackAccess(db, userId, stylePackId);
+    if (denied) return denied;
     const updated = await updateToken(db, tokenId, stylePackId, parsed.data);
 
     if (!updated) {
@@ -128,6 +160,8 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   try {
     const { id: stylePackId, tokenId } = await context.params;
     const db = getDb();
+    const denied = await authorizeStylePackAccess(db, userId, stylePackId);
+    if (denied) return denied;
     const deleted = await deleteToken(db, tokenId, stylePackId);
 
     if (!deleted) {

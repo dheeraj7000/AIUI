@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-04-17T19:10:42.903Z",
+  "count": 18,
+  "tools": [
+    {
+      "name": "check_design_memory",
+      "description": "Check if the design memory for a project is up to date. Returns freshness status without regenerating.",
+      "category": "read"
+    },
+    {
+      "name": "get_asset_manifest",
+      "description": "Return a categorized list of project assets with public URLs and metadata.",
+      "category": "read"
+    },
+    {
+      "name": "get_component_recipe",
+      "description": "Get the full recipe for a component including code template, JSON schema, slots, and AI usage rules.",
+      "category": "read"
+    },
+    {
+      "name": "get_design_memory",
+      "description": "Get the current design memory content for a project without writing files. Useful for previewing the design context or loading it into the conversation. Includes age-based warnings if the memory is potentially stale.",
+      "category": "read"
+    },
+    {
+      "name": "get_project_context",
+      "description": "Fetch the complete design profile for a project by slug. Returns framework target, active style pack, components, assets, and token count. Also checks for stale design memory.",
+      "category": "read"
+    },
+    {
+      "name": "get_theme_tokens",
+      "description": "Export the project token map in tailwind config, CSS custom properties, or raw JSON format.",
+      "category": "read"
+    },
+    {
+      "name": "list_components",
+      "description": "List all available component recipes with summary metadata. Optionally filter by style pack compatibility.",
+      "category": "read"
+    },
+    {
+      "name": "open_design_studio",
+      "description": "Open the AIUI Design Studio in the browser. Returns a URL where the user can visually select style packs, pick components, and configure their design system. After the user is done, call sync_design_memory to pull the updated design into the project.",
+      "category": "read"
+    },
+    {
+      "name": "resolve_tag",
+      "description": "Resolve a human-friendly tag name to its associated token values, component recipe IDs, or asset URLs.",
+      "category": "read"
+    },
+    {
+      "name": "sync_design_memory",
+      "description": "Generate or update the persistent design memory files for a project. Creates .aiui/design-memory.md (full design context for Claude) and .aiui/tokens.json (machine-readable tokens). Supports incremental mode that computes a diff and returns early if nothing changed. Add \"See .aiui/design-memory.md for the active design system\" to your CLAUDE.md so Claude loads it automatically in every conversation.",
+      "category": "read"
+    },
+    {
+      "name": "validate_ui_output",
+      "description": "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
+      "category": "read"
+    },
+    {
+      "name": "apply_style_pack",
+      "description": "Apply a style pack to a project by slug. Updates the project active style pack and returns confirmation.",
+      "category": "write"
+    },
+    {
+      "name": "create_style_pack",
+      "description": "Create a new style pack with design tokens. Returns the pack ID and slug.",
+      "category": "write"
+    },
+    {
+      "name": "fix_compliance_issues",
+      "description": "Auto-fix design token compliance violations in code. Replaces non-compliant values with approved design tokens.",
+      "category": "write"
+    },
+    {
+      "name": "init_project",
+      "description": "Bootstrap a brand-new project from scratch with a starter style pack, design profile, and complete design memory files. Use this as the FIRST call on any fresh or empty repo — there is no need to import tokens, pick a style pack, or pre-create anything in the dashboard beforehand. Creates a dashboard-visible project in your active organization, seeds it with the shadcn/ui Essentials starter pack (or whichever pack you pass), and writes .aiui/design-memory.md, .aiui/tokens.json, and .aiui/project.json into the target directory. Idempotent: calling it twice with the same slug in the same org returns the existing project untouched — no overwrite.",
+      "category": "write"
+    },
+    {
+      "name": "reset_project_to_starter",
+      "description": "Reset a project back to a freshly-seeded starter pack state, discarding the active-pack selection and selected-component customizations on its design profile. Use this as a safety net when a project's design configuration has been mangled and you want a clean slate without deleting the project row or its private style packs. Deletes the existing design profile, re-runs the starter seed (defaults to shadcn-essentials-v4), and returns fresh .aiui/design-memory.md, .aiui/tokens.json, and .aiui/project.json file contents to write back into the repo. Destructive on the design profile — any unsaved profile customizations will be lost.",
+      "category": "write"
+    },
+    {
+      "name": "undo_last_token_change",
+      "description": "(stub) Revert the most recent design token change for a project. Not yet implemented: per-token before/after history is not currently tracked. Returns a not_implemented status with suggested alternatives. Will land when the changelog gains per-token before/after state. For now, use `apply_style_pack` to swap packs or `update_tokens` to manually revert values.",
+      "category": "write"
+    },
+    {
+      "name": "update_tokens",
+      "description": "Add, update, or delete design tokens in a style pack. Returns counts of added, modified, and deleted tokens.",
+      "category": "write"
+    }
+  ]
+}

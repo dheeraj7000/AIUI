@@ -6,7 +6,7 @@ import { projects, styleTokens, designProfiles, computeTokensHash } from '@aiui/
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
 
-interface Violation {
+export interface Violation {
   type:
     | 'color'
     | 'font'
@@ -29,17 +29,298 @@ interface Violation {
 // ---------------------------------------------------------------------------
 
 /**
- * Extract color hex values from code string.
+ * CSS Level 4 named colors. Hardcoded set used for detection.
+ * Excludes neutral keywords that are semantically safe: transparent, currentColor,
+ * inherit, initial, unset, revert, none — these are intentionally not flagged.
  */
-function extractColors(code: string): string[] {
-  const matches = code.match(/#[0-9a-fA-F]{3,8}\b/g);
-  return matches ? [...new Set(matches)] : [];
+export const CSS_NAMED_COLORS: ReadonlySet<string> = new Set([
+  'aliceblue',
+  'antiquewhite',
+  'aqua',
+  'aquamarine',
+  'azure',
+  'beige',
+  'bisque',
+  'black',
+  'blanchedalmond',
+  'blue',
+  'blueviolet',
+  'brown',
+  'burlywood',
+  'cadetblue',
+  'chartreuse',
+  'chocolate',
+  'coral',
+  'cornflowerblue',
+  'cornsilk',
+  'crimson',
+  'cyan',
+  'darkblue',
+  'darkcyan',
+  'darkgoldenrod',
+  'darkgray',
+  'darkgrey',
+  'darkgreen',
+  'darkkhaki',
+  'darkmagenta',
+  'darkolivegreen',
+  'darkorange',
+  'darkorchid',
+  'darkred',
+  'darksalmon',
+  'darkseagreen',
+  'darkslateblue',
+  'darkslategray',
+  'darkslategrey',
+  'darkturquoise',
+  'darkviolet',
+  'deeppink',
+  'deepskyblue',
+  'dimgray',
+  'dimgrey',
+  'dodgerblue',
+  'firebrick',
+  'floralwhite',
+  'forestgreen',
+  'fuchsia',
+  'gainsboro',
+  'ghostwhite',
+  'gold',
+  'goldenrod',
+  'gray',
+  'grey',
+  'green',
+  'greenyellow',
+  'honeydew',
+  'hotpink',
+  'indianred',
+  'indigo',
+  'ivory',
+  'khaki',
+  'lavender',
+  'lavenderblush',
+  'lawngreen',
+  'lemonchiffon',
+  'lightblue',
+  'lightcoral',
+  'lightcyan',
+  'lightgoldenrodyellow',
+  'lightgray',
+  'lightgrey',
+  'lightgreen',
+  'lightpink',
+  'lightsalmon',
+  'lightseagreen',
+  'lightskyblue',
+  'lightslategray',
+  'lightslategrey',
+  'lightsteelblue',
+  'lightyellow',
+  'lime',
+  'limegreen',
+  'linen',
+  'magenta',
+  'maroon',
+  'mediumaquamarine',
+  'mediumblue',
+  'mediumorchid',
+  'mediumpurple',
+  'mediumseagreen',
+  'mediumslateblue',
+  'mediumspringgreen',
+  'mediumturquoise',
+  'mediumvioletred',
+  'midnightblue',
+  'mintcream',
+  'mistyrose',
+  'moccasin',
+  'navajowhite',
+  'navy',
+  'oldlace',
+  'olive',
+  'olivedrab',
+  'orange',
+  'orangered',
+  'orchid',
+  'palegoldenrod',
+  'palegreen',
+  'paleturquoise',
+  'palevioletred',
+  'papayawhip',
+  'peachpuff',
+  'peru',
+  'pink',
+  'plum',
+  'powderblue',
+  'purple',
+  'rebeccapurple',
+  'red',
+  'rosybrown',
+  'royalblue',
+  'saddlebrown',
+  'salmon',
+  'sandybrown',
+  'seagreen',
+  'seashell',
+  'sienna',
+  'silver',
+  'skyblue',
+  'slateblue',
+  'slategray',
+  'slategrey',
+  'snow',
+  'springgreen',
+  'steelblue',
+  'tan',
+  'teal',
+  'thistle',
+  'tomato',
+  'turquoise',
+  'violet',
+  'wheat',
+  'white',
+  'whitesmoke',
+  'yellow',
+  'yellowgreen',
+]);
+
+/**
+ * Tailwind default palette color names (used to recognize utility classes).
+ */
+export const TAILWIND_PALETTE: ReadonlySet<string> = new Set([
+  'red',
+  'blue',
+  'green',
+  'slate',
+  'zinc',
+  'stone',
+  'gray',
+  'neutral',
+  'amber',
+  'yellow',
+  'lime',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+  'orange',
+]);
+
+const TAILWIND_COLOR_PREFIXES = [
+  'bg',
+  'text',
+  'border',
+  'ring',
+  'from',
+  'to',
+  'via',
+  'fill',
+  'stroke',
+  'divide',
+  'outline',
+  'decoration',
+  'placeholder',
+  'caret',
+  'accent',
+  'shadow',
+];
+
+/**
+ * Extract hardcoded color literals of every common form.
+ * Covers: #rgb/#rrggbb/#rrggbbaa, rgb()/rgba(), hsl()/hsla(), oklch(), oklab(),
+ * color(), and CSS named colors.
+ * Skips var(--...) references and neutral keywords (transparent, currentColor).
+ */
+export function extractColors(code: string): string[] {
+  const found: Set<string> = new Set();
+
+  // Hex
+  const hexMatches = code.match(/#[0-9a-fA-F]{3,8}\b/g);
+  if (hexMatches) for (const c of hexMatches) found.add(c);
+
+  // Functional color notations — match the whole function call
+  const fnPattern = /\b(?:rgb|rgba|hsl|hsla|hwb|oklch|oklab|lab|lch|color)\s*\([^()]*\)/gi;
+  const fnMatches = code.match(fnPattern);
+  if (fnMatches) for (const c of fnMatches) found.add(c.toLowerCase());
+
+  // Named colors — require word boundary and avoid matching inside identifiers/props.
+  // We look for a named color preceded by `:` or whitespace or a quote (common in CSS/JSX
+  // style values) and followed by a non-identifier char.
+  const named = Array.from(CSS_NAMED_COLORS).join('|');
+  const namedPattern = new RegExp(`(?:^|[\\s:"'\`(,;])(${named})(?=[\\s;,"'\`)}]|$)`, 'gi');
+  let nm: RegExpExecArray | null;
+  while ((nm = namedPattern.exec(code)) !== null) {
+    found.add(nm[1].toLowerCase());
+  }
+
+  return [...found];
+}
+
+/**
+ * Detect Tailwind hardcoded-color utility classes and arbitrary-value classes.
+ * - Palette classes like `bg-red-500`, `text-blue-600` are flagged unless present
+ *   in the `approved` set.
+ * - Arbitrary values `any-[...]` are always flagged when the bracket contains a
+ *   raw color or length (hex/rgb/hsl/px/rem/em/%/vh/vw or a number).
+ */
+export function extractTailwindViolations(
+  code: string,
+  approved: ReadonlySet<string> = new Set()
+): { value: string; kind: 'utility' | 'arbitrary' }[] {
+  const out: { value: string; kind: 'utility' | 'arbitrary' }[] = [];
+  const seen: Set<string> = new Set();
+
+  // Palette utilities: bg-red-500, hover:text-blue-600, md:border-slate-200/80, -ring-...
+  const paletteAlt = Array.from(TAILWIND_PALETTE).join('|');
+  const prefixAlt = TAILWIND_COLOR_PREFIXES.join('|');
+  const paletteRe = new RegExp(
+    `(?<![A-Za-z0-9_-])-?(?:${prefixAlt})-(?:${paletteAlt})-(?:50|[1-9]00|950)(?:\\/\\d{1,3})?\\b`,
+    'g'
+  );
+  let pm: RegExpExecArray | null;
+  while ((pm = paletteRe.exec(code)) !== null) {
+    const cls = pm[0].replace(/^-/, '');
+    if (approved.has(cls.toLowerCase())) continue;
+    const key = `u:${cls}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ value: cls, kind: 'utility' });
+  }
+
+  // Arbitrary values: foo-[...] — flag when the inside contains a color/length/number
+  const arbRe = /(?<![A-Za-z0-9_-])-?[a-z][a-z0-9-]*-\[([^\]\s]+)\]/gi;
+  let am: RegExpExecArray | null;
+  while ((am = arbRe.exec(code)) !== null) {
+    const whole = am[0].replace(/^-/, '');
+    const inside = am[1];
+    // Skip obviously non-styling content (var(--x), URL, theme tokens)
+    if (/^var\(/i.test(inside)) continue;
+    if (/^url\(/i.test(inside)) continue;
+    const looksLikeStyle =
+      /^#[0-9a-f]{3,8}$/i.test(inside) ||
+      /^(?:rgb|rgba|hsl|hsla|oklch|oklab|color)\(/i.test(inside) ||
+      /^-?\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw|ch|pt)?$/i.test(inside) ||
+      CSS_NAMED_COLORS.has(inside.toLowerCase());
+    if (!looksLikeStyle) continue;
+    const key = `a:${whole}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ value: whole, kind: 'arbitrary' });
+  }
+
+  return out;
 }
 
 /**
  * Extract font family references from code.
  */
-function extractFonts(code: string): string[] {
+export function extractFonts(code: string): string[] {
   const matches = code.match(/font-(?:family|sans|serif|mono)[\s:]*["']?([^"';,}]+)/g);
   return matches ? [...new Set(matches)] : [];
 }
@@ -48,7 +329,7 @@ function extractFonts(code: string): string[] {
  * Extract hardcoded spacing values (px/rem) from margin, padding, gap declarations.
  * Skips CSS custom property references (var(--...)).
  */
-function extractSpacingValues(code: string): string[] {
+export function extractSpacingValues(code: string): string[] {
   const pattern =
     /(?:margin|padding|gap)(?:-(?:top|right|bottom|left|inline|block))?[\s]*:[\s]*([^;{}]+)/gi;
   const values: Set<string> = new Set();
@@ -71,7 +352,7 @@ function extractSpacingValues(code: string): string[] {
 /**
  * Extract hardcoded border-radius values.
  */
-function extractBorderRadiusValues(code: string): string[] {
+export function extractBorderRadiusValues(code: string): string[] {
   const pattern = /border-radius[\s]*:[\s]*([^;{}]+)/gi;
   const values: Set<string> = new Set();
   let m: RegExpExecArray | null;
@@ -89,7 +370,7 @@ function extractBorderRadiusValues(code: string): string[] {
 /**
  * Extract hardcoded font-size values.
  */
-function extractFontSizes(code: string): string[] {
+export function extractFontSizes(code: string): string[] {
   const pattern = /font-size[\s]*:[\s]*([^;{}]+)/gi;
   const values: Set<string> = new Set();
   let m: RegExpExecArray | null;
@@ -107,7 +388,7 @@ function extractFontSizes(code: string): string[] {
 /**
  * Extract hardcoded z-index values.
  */
-function extractZIndexValues(code: string): string[] {
+export function extractZIndexValues(code: string): string[] {
   const pattern = /z-index[\s]*:[\s]*([^;{}]+)/gi;
   const values: Set<string> = new Set();
   let m: RegExpExecArray | null;
@@ -125,7 +406,7 @@ function extractZIndexValues(code: string): string[] {
 /**
  * Extract hardcoded opacity values.
  */
-function extractOpacityValues(code: string): string[] {
+export function extractOpacityValues(code: string): string[] {
   const pattern = /opacity[\s]*:[\s]*([^;{}]+)/gi;
   const values: Set<string> = new Set();
   let m: RegExpExecArray | null;
@@ -143,7 +424,7 @@ function extractOpacityValues(code: string): string[] {
 /**
  * Extract hardcoded border-width values.
  */
-function extractBorderWidthValues(code: string): string[] {
+export function extractBorderWidthValues(code: string): string[] {
   const pattern = /border(?:-(?:top|right|bottom|left))?-width[\s]*:[\s]*([^;{}]+)/gi;
   const values: Set<string> = new Set();
   let m: RegExpExecArray | null;
@@ -424,6 +705,23 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
             });
           }
         }
+      }
+
+      // Check Tailwind utility/arbitrary-value color classes
+      // Build an approved set by extracting approved Tailwind-style tokens if any
+      // of the token values happen to look like utility classes.
+      const approvedTailwind = new Set<string>();
+      for (const v of approvedColors) approvedTailwind.add(v);
+      const tailwindViolations = extractTailwindViolations(code, approvedTailwind);
+      for (const tv of tailwindViolations) {
+        violations.push({
+          type: 'color',
+          severity: 'warning',
+          message:
+            tv.kind === 'utility'
+              ? `Tailwind utility "${tv.value}" uses a hardcoded palette color not in the approved token set`
+              : `Tailwind arbitrary value "${tv.value}" bypasses the design token system`,
+        });
       }
 
       // Check fonts

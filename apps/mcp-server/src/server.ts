@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { log, ToolError } from './lib/errors';
+import { wrapWithAudit } from './lib/audit-wrapper';
 
 type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
@@ -39,9 +40,16 @@ export class AiuiMcpServer {
   ) {
     this.tools.set(name, { description, schema, handler });
 
+    // Every tool dispatch is wrapped with server-side audit logging. The
+    // wrapper records {userId, orgId, projectId, toolName, args_summary,
+    // status, duration_ms} into usage_events (see lib/audit-wrapper.ts). It
+    // is applied once, here, so both stdio and HTTP registration paths
+    // inherit the behavior — no changes needed at call sites.
+    const auditedHandler = wrapWithAudit(name, handler);
+
     this.server.tool(name, description, schema, async (args) => {
       try {
-        const result = await handler(args as Record<string, unknown>);
+        const result = await auditedHandler(args as Record<string, unknown>);
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };

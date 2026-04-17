@@ -107,24 +107,30 @@ packages/
 
 ## MCP Tools
 
-AIUI exposes 12 tools via the Model Context Protocol:
+AIUI exposes 18 tools via the Model Context Protocol. The live, authoritative
+list is published at `GET /mcp/catalog` on the MCP server and surfaced in the
+dashboard at `/mcp-tools`. Highlights:
 
-| Tool                    | Description                                 |
-| ----------------------- | ------------------------------------------- |
-| `get_project_context`   | Load project design profile by slug         |
-| `get_design_memory`     | Get the full design memory markdown         |
-| `sync_design_memory`    | Generate `.aiui/` files in a target project |
-| `open_design_studio`    | Get a URL to the visual design configurator |
-| `get_theme_tokens`      | Export tokens as Tailwind / CSS / JSON      |
-| `list_components`       | Browse all component recipes                |
-| `get_component_recipe`  | Get full code template + props + AI rules   |
-| `get_asset_manifest`    | Get project assets with public URLs         |
-| `validate_ui_output`    | Check generated code for design compliance  |
-| `resolve_tag`           | Resolve tags to associated resources        |
-| `create_style_pack`     | Create a new style pack with tokens         |
-| `update_tokens`         | Modify tokens in a style pack               |
-| `apply_style_pack`      | Assign a pack to a project and compile      |
-| `fix_compliance_issues` | Auto-fix token violations in generated code |
+| Tool                       | Description                                       |
+| -------------------------- | ------------------------------------------------- |
+| `init_project`             | Bootstrap a fresh repo with starter pack + .aiui/ |
+| `get_project_context`      | Load project design profile by slug               |
+| `get_design_memory`        | Get the full design memory markdown               |
+| `sync_design_memory`       | Generate `.aiui/` files in a target project       |
+| `check_design_memory`      | Check whether design memory is fresh or stale     |
+| `open_design_studio`       | Get a URL to the visual design configurator       |
+| `get_theme_tokens`         | Export tokens as Tailwind / CSS / JSON            |
+| `list_components`          | Browse all component recipes                      |
+| `get_component_recipe`     | Get full code template + props + AI rules         |
+| `get_asset_manifest`       | Get project assets with public URLs               |
+| `validate_ui_output`       | Check generated code for design compliance        |
+| `resolve_tag`              | Resolve tags to associated resources              |
+| `create_style_pack`        | Create a new style pack with tokens               |
+| `update_tokens`            | Modify tokens in a style pack                     |
+| `apply_style_pack`         | Assign a pack to a project and compile            |
+| `fix_compliance_issues`    | Auto-fix token violations in generated code       |
+| `reset_project_to_starter` | Reset a project back to a clean starter state     |
+| `undo_last_token_change`   | (stub) Revert the most recent token change        |
 
 ## Using AIUI with Claude Code
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb } from '@aiui/design-core';
-import { compileDesignProfile } from '@aiui/design-core/src/operations/design-profiles';
+import { createDb, projects, verifyOrgMembership } from '@aiui/design-core';
+import { compileDesignProfile, getProfile } from '@aiui/design-core/src/operations/design-profiles';
+import { eq } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -22,6 +23,25 @@ export async function POST(req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const db = getDb();
+
+    // Resolve the profile's project → org and verify membership before
+    // triggering compilation (potentially expensive side-effectful op).
+    const existing = await getProfile(db, id);
+    if (!existing) {
+      return NextResponse.json({ error: 'Design profile not found' }, { status: 404 });
+    }
+    const [project] = await db
+      .select({ organizationId: projects.organizationId })
+      .from(projects)
+      .where(eq(projects.id, existing.projectId))
+      .limit(1);
+    if (project?.organizationId) {
+      const isMember = await verifyOrgMembership(db, userId, project.organizationId);
+      if (!isMember) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     const compiled = await compileDesignProfile(db, id);
 
     if (!compiled) {

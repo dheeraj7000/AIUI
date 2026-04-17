@@ -78,6 +78,11 @@ export async function trackUsage(
     toolName: string;
     eventType: string;
     creditsCost?: number;
+    userId?: string | null;
+    projectId?: string | null;
+    status?: 'ok' | 'error' | null;
+    durationMs?: number | null;
+    argsSummary?: unknown;
   }
 ): Promise<void> {
   const { start } = getCurrentPeriod();
@@ -90,6 +95,11 @@ export async function trackUsage(
     toolName: params.toolName,
     eventType: params.eventType,
     creditsCost: cost,
+    userId: params.userId ?? null,
+    projectId: params.projectId ?? null,
+    status: params.status ?? null,
+    durationMs: params.durationMs ?? null,
+    argsSummary: params.argsSummary ?? null,
   });
 
   // Increment ledger

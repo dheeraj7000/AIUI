@@ -17,6 +17,21 @@ const POLL_INTERVAL_MS = 15_000;
 
 const INIT_SNIPPET = 'init_project { slug: "my-app", targetDir: "/absolute/path/to/your/repo" }';
 
+/**
+ * Fire-and-forget PATCH to /api/onboarding. Failures are swallowed so the
+ * UI stays functional offline — sessionStorage is the fallback.
+ */
+function patchOnboarding(patch: Record<string, unknown>): void {
+  fetch('/api/onboarding', {
+    method: 'PATCH',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  }).catch(() => {
+    /* non-blocking */
+  });
+}
+
 export function McpWalkthrough({ hasApiKey, hasProject }: McpWalkthroughProps) {
   const [dismissed, setDismissed] = useState(true); // default hidden to avoid flash
   const [manualDone, setManualDone] = useState<boolean[]>(() => Array(TOTAL_STEPS).fill(false));
@@ -25,13 +40,48 @@ export function McpWalkthrough({ hasApiKey, hasProject }: McpWalkthroughProps) {
   const [liveHasProject, setLiveHasProject] = useState<boolean>(hasProject);
 
   useEffect(() => {
-    setDismissed(sessionStorage.getItem(DISMISSED_KEY) === 'true');
-    const next: boolean[] = [];
+    // 1. Optimistic hydrate from sessionStorage so we don't flash on reload.
+    const localDismissed = sessionStorage.getItem(DISMISSED_KEY) === 'true';
+    setDismissed(localDismissed);
+    const localSteps: boolean[] = [];
     for (let i = 1; i <= TOTAL_STEPS; i++) {
-      next.push(sessionStorage.getItem(`${STEP_KEY_PREFIX}${i}`) === 'true');
+      localSteps.push(sessionStorage.getItem(`${STEP_KEY_PREFIX}${i}`) === 'true');
     }
-    setManualDone(next);
+    setManualDone(localSteps);
     setHydrated(true);
+
+    // 2. Prefer the server's durable state. If the fetch fails we keep the
+    // sessionStorage-derived values so the UI still works offline.
+    let cancelled = false;
+    fetch('/api/onboarding', { credentials: 'same-origin', cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        const state = data.onboardingState ?? {};
+        if (state.walkthroughDismissedAt || state.walkthroughCompletedAt) {
+          setDismissed(true);
+          sessionStorage.setItem(DISMISSED_KEY, 'true');
+        }
+        const remoteSteps = state.walkthroughSteps as Record<string, boolean> | undefined;
+        if (remoteSteps) {
+          const merged: boolean[] = [];
+          for (let i = 1; i <= TOTAL_STEPS; i++) {
+            const serverVal = remoteSteps[String(i)];
+            const localVal = sessionStorage.getItem(`${STEP_KEY_PREFIX}${i}`) === 'true';
+            const done = Boolean(serverVal) || localVal;
+            merged.push(done);
+            if (done) sessionStorage.setItem(`${STEP_KEY_PREFIX}${i}`, 'true');
+          }
+          setManualDone(merged);
+        }
+      })
+      .catch(() => {
+        /* keep local value */
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Poll /api/projects to detect when the user's first init_project lands
@@ -56,6 +106,9 @@ export function McpWalkthrough({ hasApiKey, hasProject }: McpWalkthroughProps) {
           const body = (await res.json()) as { total?: number };
           if ((body.total ?? 0) > 0) {
             setLiveHasProject(true);
+            // Persist durable mark for step 3 so it survives refresh/tab
+            // switch without relying on sessionStorage.
+            patchOnboarding({ walkthroughSteps: { '3': true } });
             return;
           }
         }
@@ -83,11 +136,19 @@ export function McpWalkthrough({ hasApiKey, hasProject }: McpWalkthroughProps) {
   ).length;
   const allDone = completedCount === TOTAL_STEPS;
 
+  // Stamp durable completion once the user reaches 5/5.
+  useEffect(() => {
+    if (hydrated && allDone) {
+      patchOnboarding({ walkthroughCompletedAt: new Date().toISOString() });
+    }
+  }, [hydrated, allDone]);
+
   if (!hydrated || dismissed || allDone) return null;
 
   const handleDismiss = () => {
     sessionStorage.setItem(DISMISSED_KEY, 'true');
     setDismissed(true);
+    patchOnboarding({ walkthroughDismissedAt: new Date().toISOString() });
   };
 
   const toggleStep = (index: number) => {
@@ -95,6 +156,7 @@ export function McpWalkthrough({ hasApiKey, hasProject }: McpWalkthroughProps) {
     next[index] = !next[index];
     setManualDone(next);
     sessionStorage.setItem(`${STEP_KEY_PREFIX}${index + 1}`, String(next[index]));
+    patchOnboarding({ walkthroughSteps: { [String(index + 1)]: next[index] } });
   };
 
   const handleCopy = async () => {

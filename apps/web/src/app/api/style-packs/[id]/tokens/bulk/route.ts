@@ -5,6 +5,8 @@ import {
   bulkImportSchema,
   designProfiles,
   projects,
+  stylePacks,
+  verifyOrgMembership,
 } from '@aiui/design-core';
 import { eq, inArray } from 'drizzle-orm';
 
@@ -38,6 +40,24 @@ export async function POST(req: NextRequest, context: RouteContext) {
     }
 
     const db = getDb();
+
+    // Authorize: confirm the user is a member of the style pack's org
+    // before mutating tokens. Blocks cross-org bulk-import attacks.
+    const [ownerPack] = await db
+      .select({ organizationId: stylePacks.organizationId })
+      .from(stylePacks)
+      .where(eq(stylePacks.id, stylePackId))
+      .limit(1);
+    if (!ownerPack) {
+      return NextResponse.json({ error: 'Style pack not found' }, { status: 404 });
+    }
+    if (ownerPack.organizationId) {
+      const isMember = await verifyOrgMembership(db, userId, ownerPack.organizationId);
+      if (!isMember) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     const result = await bulkImportTokens(db, stylePackId, parsed.data.tokens);
 
     if ('error' in result) {

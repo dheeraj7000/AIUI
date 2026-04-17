@@ -4,7 +4,10 @@ import {
   createInvitation,
   listPendingInvitations,
   createInvitationSchema,
+  verifyOrgMembership,
+  organizationMembers,
 } from '@aiui/design-core';
+import { eq, and } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -36,6 +39,22 @@ export async function POST(req: NextRequest, context: RouteContext) {
     }
 
     const db = getDb();
+
+    // Only owners/admins may invite new members.
+    const [membership] = await db
+      .select({ role: organizationMembers.role })
+      .from(organizationMembers)
+      .where(
+        and(eq(organizationMembers.organizationId, orgId), eq(organizationMembers.userId, userId))
+      )
+      .limit(1);
+    if (!membership) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (membership.role !== 'owner' && membership.role !== 'admin') {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
     const result = await createInvitation(db, orgId, parsed.data.email, parsed.data.role, userId);
 
     if ('error' in result) {
@@ -66,6 +85,10 @@ export async function GET(req: NextRequest, context: RouteContext) {
   try {
     const { orgId } = await context.params;
     const db = getDb();
+    const isMember = await verifyOrgMembership(db, userId, orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const invitations = await listPendingInvitations(db, orgId);
     return NextResponse.json({ data: invitations });
   } catch (error) {
