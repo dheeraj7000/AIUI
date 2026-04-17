@@ -1,126 +1,191 @@
-'use client';
-
-import { Palette, Plug, Rocket } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { FadeUp, StaggerContainer, StaggerChild } from './motion';
-
 interface Step {
-  number: string;
+  id: string;
   title: string;
-  description: string;
-  icon: LucideIcon;
-  detail: string;
+  body: string;
+  specimen: React.ReactNode;
+  takeaway: string;
 }
 
 const steps: Step[] = [
   {
-    number: '1',
-    title: 'Define your design system',
-    description:
-      'Import your tokens, pick a style pack, or build from scratch in the visual studio. No credit card required.',
-    icon: Palette,
-    detail: 'Colors, typography, spacing, components, and rules — all in one place.',
+    id: '01',
+    title: 'Write down your design decisions.',
+    body: 'Pick a style pack in the studio, import tokens you already have, or bring a Figma file. AIUI turns those decisions into a small set of files inside your project — .aiui/ — that become the source of truth.',
+    specimen: (
+      <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
+        <code>
+          <span className="cm-dim">// .aiui/tokens.json</span>
+          {'\n'}
+          {'{\n  '}
+          <span className="cm-key">&quot;color.primary&quot;</span>
+          <span className="cm-punct">:</span>{' '}
+          <span className="cm-string">&quot;oklch(44% 0.14 28)&quot;</span>
+          <span className="cm-punct">,</span>
+          {'\n  '}
+          <span className="cm-key">&quot;radius.md&quot;</span>
+          <span className="cm-punct">:</span> <span className="cm-string">&quot;2px&quot;</span>
+          <span className="cm-punct">,</span>
+          {'\n  '}
+          <span className="cm-key">&quot;type.body&quot;</span>
+          <span className="cm-punct">:</span>{' '}
+          <span className="cm-string">&quot;Switzer, sans-serif&quot;</span>
+          {'\n}'}
+        </code>
+      </pre>
+    ),
+    takeaway: 'Your tokens, written once, in one place.',
   },
   {
-    number: '2',
-    title: 'Connect your IDE',
-    description:
-      'One command connects Claude, Cursor, or VS Code to your design system. Setup takes under a minute.',
-    icon: Plug,
-    detail: 'Works with any MCP-compatible AI tool, automatically stays in sync.',
+    id: '02',
+    title: 'Connect your editor.',
+    body: 'Run one command. Claude Code, Cursor, Windsurf, and VS Code all pick up the same AIUI server — no packages, no build plugins, no config to maintain. (AIUI runs over MCP, the standard extension protocol Claude and Cursor already use; think of it as a VS Code plugin, but for any AI editor.)',
+    specimen: (
+      <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
+        <code>
+          <span className="cm-dim">$</span> <span className="cm-key">claude</span>{' '}
+          <span className="cm-tag">mcp</span> <span className="cm-attr">add</span>{' '}
+          <span className="cm-string">aiui</span>
+          {'\n'}
+          <span className="cm-dim">✓ connected to aiui.store</span>
+          {'\n'}
+          <span className="cm-dim">✓ 24 tokens · 12 components · 8 rules in scope</span>
+        </code>
+      </pre>
+    ),
+    takeaway: 'Ninety seconds, tops.',
   },
   {
-    number: '3',
-    title: 'Ship consistent UIs',
-    description:
-      'Every AI-generated component follows your tokens, patterns, and rules. Your product stays on-brand across every screen.',
-    icon: Rocket,
-    detail: 'Design decisions persist across all sessions and team members.',
+    id: '03',
+    title: 'Build as usual. The AI follows.',
+    body: 'Keep prompting the way you already do. Every UI Claude produces now pulls from your tokens, uses your approved components, and respects your rules. Output gets validated against the tokens before it lands.',
+    specimen: (
+      <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
+        <code>
+          <span className="cm-dim">you:</span> &quot;Add a settings page.&quot;
+          {'\n\n'}
+          <span className="cm-dim">claude:</span>
+          {'\n'}
+          <span className="cm-punct">{'<'}</span>
+          <span className="cm-tag">Page</span> <span className="cm-attr">title</span>
+          <span className="cm-punct">=</span>
+          <span className="cm-string">&quot;Settings&quot;</span>
+          <span className="cm-punct">{'>'}</span>
+          {'\n  '}
+          <span className="cm-punct">{'<'}</span>
+          <span className="cm-tag">Button</span> <span className="cm-attr">variant</span>
+          <span className="cm-punct">=</span>
+          <span className="cm-string">&quot;primary&quot;</span>
+          <span className="cm-punct">{'>'}</span>
+          Save<span className="cm-punct">{'</'}</span>
+          <span className="cm-tag">Button</span>
+          <span className="cm-punct">{'>'}</span>
+          {'\n'}
+          <span className="cm-punct">{'</'}</span>
+          <span className="cm-tag">Page</span>
+          <span className="cm-punct">{'>'}</span>
+        </code>
+      </pre>
+    ),
+    takeaway: 'Your design, on every screen, automatically.',
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative bg-zinc-950 py-24 sm:py-32">
-      <div className="absolute inset-0 bg-aurora-subtle" />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <FadeUp>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">
-              How It Works
-            </p>
-            <h2 className="mt-3 text-4xl font-bold tracking-[-0.02em] text-white sm:text-5xl">
-              Up and running in{' '}
-              <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
-                3 steps
-              </span>
+    <section id="how-it-works" className="relative" style={{ background: 'var(--paper-deep)' }}>
+      <div className="mx-auto max-w-[1240px] px-6 lg:px-10 py-24 lg:py-32">
+        {/* Opener */}
+        <div className="grid grid-cols-12 gap-6 items-baseline">
+          <div className="col-span-12 md:col-span-3 lg:col-span-2">
+            <span className="section-numeral">03</span>
+          </div>
+          <div className="col-span-12 md:col-span-9 lg:col-span-10">
+            <span className="eyebrow">How it works</span>
+            <h2
+              className="display mt-3"
+              style={{ fontSize: 'clamp(2rem, 3.6vw, 3rem)', lineHeight: 1.05 }}
+            >
+              Three steps. Read top to bottom.
             </h2>
-            <p className="mt-5 text-lg leading-8 text-zinc-400">
-              No packages to install. No build plugins to configure. Just your design decisions,
-              delivered to Claude.
+            <p className="lede mt-5">
+              No build plugins to configure. No packages to install. Just three moments where you
+              make a decision, and then the AI stops inventing.
             </p>
           </div>
-        </FadeUp>
-
-        {/* Steps */}
-        <div className="relative mt-20">
-          {/* Connecting line (desktop) */}
-          <div className="absolute top-20 left-0 right-0 hidden lg:block">
-            <div className="mx-auto flex max-w-4xl items-center justify-between px-20">
-              <div className="h-px flex-1 bg-gradient-to-r from-indigo-500/40 to-violet-500/40" />
-              <div className="h-px flex-1 bg-gradient-to-r from-violet-500/40 to-indigo-500/40" />
-            </div>
-          </div>
-
-          <StaggerContainer className="grid gap-12 lg:grid-cols-3 lg:gap-8">
-            {steps.map((step) => {
-              const Icon = step.icon;
-              return (
-                <StaggerChild key={step.number}>
-                  <div className="relative text-center">
-                    {/* Step number badge */}
-                    <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-xl font-bold text-white shadow-lg shadow-indigo-500/25">
-                      {step.number}
-                      <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 blur-lg -z-10" />
-                    </div>
-
-                    {/* Icon */}
-                    <div className="mt-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 border border-white/5">
-                      <Icon className="h-5 w-5 text-zinc-400" />
-                    </div>
-
-                    <h3 className="mt-4 text-xl font-semibold text-white">{step.title}</h3>
-                    <p className="mt-3 text-sm leading-6 text-zinc-400 max-w-xs mx-auto">
-                      {step.description}
-                    </p>
-                    {step.detail && (
-                      <p className="mt-2 text-xs text-zinc-500 max-w-xs mx-auto">{step.detail}</p>
-                    )}
-
-                    {/* Terminal command for step 2 — floating chip style */}
-                    {step.number === '2' && (
-                      <div className="mt-6 flex justify-center">
-                        <div
-                          className="inline-block rounded-lg bg-white/5 backdrop-blur-md px-3 py-1.5 border border-white/10 shadow-lg shadow-black/20 animate-float"
-                          style={{ '--float-rotate': '-3deg' } as React.CSSProperties}
-                        >
-                          <pre className="text-xs font-mono">
-                            <code>
-                              <span className="text-zinc-600">$</span>{' '}
-                              <span className="text-indigo-400">claude mcp add aiui</span>
-                            </code>
-                          </pre>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </StaggerChild>
-              );
-            })}
-          </StaggerContainer>
         </div>
+
+        <hr className="rule mt-12" style={{ height: 1, border: 0, background: 'var(--ink)' }} />
+
+        <ol>
+          {steps.map((step, idx) => (
+            <li
+              key={step.id}
+              className="grid grid-cols-12 gap-6 py-12 lg:py-16"
+              style={{
+                borderBottom: idx < steps.length - 1 ? '1px solid var(--rule)' : undefined,
+              }}
+            >
+              <div className="col-span-2 md:col-span-1">
+                <span
+                  className="display"
+                  style={{
+                    fontSize: 'clamp(2.25rem, 3vw, 2.75rem)',
+                    lineHeight: 1,
+                    color: 'var(--accent)',
+                    fontVariantNumeric: 'oldstyle-nums',
+                  }}
+                >
+                  {step.id}
+                </span>
+              </div>
+
+              <div className="col-span-10 md:col-span-5 lg:col-span-5">
+                <h3
+                  className="display"
+                  style={{
+                    fontSize: 'clamp(1.625rem, 2.2vw, 2rem)',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className="mt-4"
+                  style={{
+                    color: 'var(--ink-soft)',
+                    fontSize: '1rem',
+                    lineHeight: 1.6,
+                    maxWidth: '52ch',
+                  }}
+                >
+                  {step.body}
+                </p>
+                <p
+                  className="mt-5"
+                  style={{
+                    color: 'var(--ink)',
+                    fontSize: '0.9375rem',
+                    fontStyle: 'italic',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 500,
+                    maxWidth: '48ch',
+                  }}
+                >
+                  {step.takeaway}
+                </p>
+              </div>
+
+              <div className="col-span-12 md:col-span-6 lg:col-span-6 md:pl-4">
+                {step.specimen}
+                <div className="figure-caption" style={{ justifyContent: 'space-between' }}>
+                  <span className="fig-id">Fig. 03.{step.id.replace('0', '')}</span>
+                  <span className="leader" aria-hidden />
+                  <span>Step {step.id}, in detail.</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );

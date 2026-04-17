@@ -3,143 +3,166 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight } from 'lucide-react';
-import { Wordmark } from '@/components/ui/Wordmark';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'How it works', href: '#how-it-works' },
   { label: 'Docs', href: '/docs' },
   { label: 'Contact', href: '#contact' },
 ];
+
+function EditorialMark() {
+  return (
+    <span
+      className="inline-flex items-baseline gap-[1px] text-[1.375rem] leading-none"
+      style={{ fontFamily: 'var(--font-display)' }}
+      aria-label="AIUI"
+    >
+      <span style={{ color: 'var(--ink)' }}>AI</span>
+      <span aria-hidden style={{ color: 'var(--accent)' }}>
+        ·
+      </span>
+      <span style={{ color: 'var(--ink)' }}>UI</span>
+    </span>
+  );
+}
 
 export function LandingNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
-  // On non-home pages, anchor links should navigate to the homepage sections
   const resolveHref = (href: string) => {
     if (href.startsWith('#') && !isHomePage) return `/${href}`;
     return href;
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <Wordmark size="lg" />
+    <nav
+      className="sticky top-0 z-50"
+      style={{
+        background: 'color-mix(in oklab, var(--paper) 88%, transparent)',
+        backdropFilter: 'saturate(1.4) blur(6px)',
+        WebkitBackdropFilter: 'saturate(1.4) blur(6px)',
+        borderBottom: '1px solid var(--rule)',
+      }}
+    >
+      <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-10 px-6 lg:px-10">
+        <Link href="/" className="flex items-center" aria-label="AIUI home">
+          <EditorialMark />
         </Link>
 
-        {/* Desktop nav links — centered */}
-        <div className="hidden md:flex flex-1 items-center justify-center gap-8">
+        {/* Desktop */}
+        <div className="hidden md:flex flex-1 items-center gap-7">
           {navLinks.map((link) => {
             const href = resolveHref(link.href);
             const isPage = href.startsWith('/') && !href.startsWith('/#');
-            return isPage ? (
-              <Link
-                key={link.href}
-                href={href}
-                className="relative text-sm font-medium text-zinc-400 transition-colors hover:text-white group"
-              >
+            const className =
+              'group relative text-[0.875rem] leading-none transition-colors duration-150';
+            const style = { color: 'var(--ink-soft)' } as React.CSSProperties;
+            const children = (
+              <>
                 {link.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-indigo-400 to-indigo-300 transition-all duration-300 group-hover:w-full" />
+                <span
+                  aria-hidden
+                  className="absolute -bottom-[18px] left-0 h-px w-0 transition-[width] duration-200 group-hover:w-full"
+                  style={{ background: 'var(--ink)' }}
+                />
+              </>
+            );
+            return isPage ? (
+              <Link key={link.href} href={href} className={className} style={style}>
+                {children}
               </Link>
             ) : (
-              <a
-                key={link.href}
-                href={href}
-                className="relative text-sm font-medium text-zinc-400 transition-colors hover:text-white group"
-              >
-                {link.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-indigo-400 to-indigo-300 transition-all duration-300 group-hover:w-full" />
+              <a key={link.href} href={href} className={className} style={style}>
+                {children}
               </a>
             );
           })}
         </div>
 
-        {/* Desktop actions */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="ml-auto hidden md:flex items-center gap-5">
           <Link
             href="/sign-in"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-400 transition-all duration-200 hover:text-white"
+            className="text-[0.875rem] transition-colors duration-150"
+            style={{ color: 'var(--ink-soft)' }}
           >
-            Sign In
+            Sign in
           </Link>
-          <Link
-            href="/sign-up"
-            className="group flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-500/20 transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/25"
-          >
-            Get Started
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          <Link href="/sign-up" className="btn-ink !py-2 !px-4 !text-sm">
+            Get started
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
+        {/* Mobile */}
         <button
           type="button"
-          className="md:hidden rounded-lg p-2 text-zinc-400 hover:bg-white/10 hover:text-white transition-colors"
+          className="md:hidden ml-auto p-2 -mr-2 rounded-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          style={{ color: 'var(--ink)', outlineColor: 'var(--accent)' }}
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-expanded={mobileOpen}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {mobileOpen ? (
+            <X className="h-5 w-5" strokeWidth={1.25} />
+          ) : (
+            <Menu className="h-5 w-5" strokeWidth={1.25} />
+          )}
         </button>
       </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden border-t border-white/5 bg-zinc-950/95 backdrop-blur-xl overflow-hidden"
-          >
-            <div className="px-4 py-4 space-y-1">
-              {navLinks.map((link) => {
-                const href = resolveHref(link.href);
-                const isPage = href.startsWith('/') && !href.startsWith('/#');
-                return isPage ? (
-                  <Link
-                    key={link.href}
-                    href={href}
-                    className="block rounded-lg px-3 py-2.5 text-base font-medium text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.href}
-                    href={href}
-                    className="block rounded-lg px-3 py-2.5 text-base font-medium text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </a>
-                );
-              })}
-              <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-2">
+      {mobileOpen && (
+        <div
+          className="md:hidden"
+          style={{ borderTop: '1px solid var(--rule)', background: 'var(--paper)' }}
+        >
+          <div className="px-6 py-6 flex flex-col gap-5">
+            {navLinks.map((link) => {
+              const href = resolveHref(link.href);
+              const isPage = href.startsWith('/') && !href.startsWith('/#');
+              return isPage ? (
                 <Link
-                  href="/sign-in"
-                  className="rounded-lg px-3 py-2.5 text-center text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
+                  key={link.href}
+                  href={href}
+                  className="text-base"
+                  style={{ color: 'var(--ink)' }}
+                  onClick={() => setMobileOpen(false)}
                 >
-                  Sign In
+                  {link.label}
                 </Link>
-                <Link
-                  href="/sign-up"
-                  className="rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-3 py-2.5 text-center text-sm font-medium text-white shadow-sm"
+              ) : (
+                <a
+                  key={link.href}
+                  href={href}
+                  className="text-base"
+                  style={{ color: 'var(--ink)' }}
+                  onClick={() => setMobileOpen(false)}
                 >
-                  Get Started
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  {link.label}
+                </a>
+              );
+            })}
+            <hr className="rule" style={{ margin: '4px 0' }} />
+            <Link
+              href="/sign-in"
+              className="text-base"
+              style={{ color: 'var(--ink-soft)' }}
+              onClick={() => setMobileOpen(false)}
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/sign-up"
+              className="btn-ink w-full justify-center"
+              onClick={() => setMobileOpen(false)}
+            >
+              Get started
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

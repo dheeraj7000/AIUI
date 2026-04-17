@@ -1,164 +1,106 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Bug, Lightbulb, Mail, MessageCircle } from 'lucide-react';
-import { FadeUp, StaggerContainer, StaggerChild } from './motion';
+
+interface ContactLine {
+  label: string;
+  target: string;
+  href: string;
+  note?: string;
+}
+
+const contactLines: ContactLine[] = [
+  {
+    label: 'Report a bug',
+    target: 'bugs@aiui.store',
+    href: 'mailto:bugs@aiui.store',
+    note: 'Something broken. We fix it fast.',
+  },
+  {
+    label: 'Request a feature',
+    target: 'features@aiui.store',
+    href: 'mailto:features@aiui.store',
+    note: 'We ship based on what you ask for.',
+  },
+  {
+    label: 'Say hello',
+    target: 'hello@aiui.store',
+    href: 'mailto:hello@aiui.store',
+    note: 'Everything else.',
+  },
+];
 
 export function CTA() {
   return (
-    <section className="relative overflow-hidden bg-zinc-950 noise-overlay">
-      {/* Aurora background */}
-      <div className="absolute inset-0 bg-aurora" />
-
-      {/* Section A: Beta Access */}
-      <div id="beta" className="relative py-24 sm:py-32">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <FadeUp>
-            <div className="relative inline-block">
-              <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                Early Access{' '}
-                <span className="bg-gradient-to-r from-indigo-400 to-indigo-300 bg-clip-text text-transparent">
-                  Beta
-                </span>
-              </h2>
-              <div className="absolute -inset-x-8 -inset-y-4 -z-10 rounded-3xl bg-gradient-to-r from-indigo-500/5 to-violet-500/5 blur-xl" />
-            </div>
-
-            <p className="mt-6 text-lg leading-8 text-zinc-400">
-              AIUI is in active development. Join the beta to shape the future of AI-driven design
-              systems. Free during beta — no credit card required.
+    <section id="beta" className="relative" style={{ background: 'var(--paper-deep)' }}>
+      <div className="mx-auto max-w-[1240px] px-6 lg:px-10 py-24 lg:py-32">
+        {/* Closing statement */}
+        <div className="grid grid-cols-12 gap-6 items-baseline">
+          <div className="col-span-12 md:col-span-3 lg:col-span-2">
+            <span className="section-numeral">05</span>
+          </div>
+          <div className="col-span-12 md:col-span-9 lg:col-span-10">
+            <span className="eyebrow">Closing</span>
+            <h2
+              className="display mt-3"
+              style={{
+                fontSize: 'clamp(2.25rem, 5vw, 3.75rem)',
+                lineHeight: 1.02,
+                maxWidth: '22ch',
+              }}
+            >
+              Take the controls <em>back</em>.
+            </h2>
+            <p className="lede mt-6" style={{ maxWidth: '52ch' }}>
+              AIUI is in open beta — free to use, no credit card. If your AI has been quietly
+              redesigning your product for months, this is the quickest way to stop it.
             </p>
 
-            <div className="mt-10">
-              <Link
-                href="/sign-up"
-                className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5"
-              >
-                Join the Beta
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <div className="mt-10 flex flex-wrap items-center gap-6">
+              <Link href="/sign-up" className="btn-ink">
+                Join the beta
+                <span aria-hidden style={{ fontFamily: 'var(--font-display)' }}>
+                  →
+                </span>
+              </Link>
+              <Link href="/docs" className="ink-link text-[0.9375rem]">
+                Read the docs
               </Link>
             </div>
-
-            <p className="mt-5 text-sm text-zinc-500">
-              Currently supporting Claude Code, Cursor, Windsurf, and VS Code
-            </p>
-          </FadeUp>
+          </div>
         </div>
-      </div>
 
-      {/* Divider */}
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="section-divider" />
-      </div>
+        <hr className="rule mt-20" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
 
-      {/* Section B: Feedback */}
-      <div id="feedback" className="relative py-24 sm:py-32">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <FadeUp>
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Help Us Build Better
-            </h2>
-            <p className="mt-5 text-lg leading-8 text-zinc-400">
-              We ship based on what you tell us. Found a bug? Have a feature idea? Your feedback
-              directly shapes the roadmap.
-            </p>
-          </FadeUp>
+        {/* Colophon — contact addresses */}
+        <div id="contact" className="pt-12">
+          <div className="flex items-baseline gap-3">
+            <span className="eyebrow">Colophon · reach the makers</span>
+            <span className="leader" aria-hidden />
+          </div>
 
-          <StaggerContainer className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {/* Card 1: Report a Bug */}
-            <StaggerChild>
-              <div className="group h-full rounded-2xl glass-card glass-card-hover p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/10">
-                  <Bug className="h-5 w-5 text-red-400" />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">Report a Bug</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
-                  Something broken or not working as expected? Let us know and we will fix it fast.
-                </p>
-                <a
-                  href="mailto:bugs@aiui.store"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
-                >
-                  bugs@aiui.store
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+          <dl className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-y-8 md:gap-x-10">
+            {contactLines.map((line) => (
+              <div key={line.label}>
+                <dt className="eyebrow" style={{ fontSize: '0.6875rem' }}>
+                  {line.label}
+                </dt>
+                <dd className="mt-3">
+                  <a href={line.href} className="ink-link text-[1rem]">
+                    {line.target}
+                  </a>
+                </dd>
+                {line.note && (
+                  <dd
+                    className="mt-2 text-[0.8125rem]"
+                    style={{ color: 'var(--ink-muted)', maxWidth: '28ch' }}
+                  >
+                    {line.note}
+                  </dd>
+                )}
               </div>
-            </StaggerChild>
-
-            {/* Card 2: Request a Feature */}
-            <StaggerChild>
-              <div className="group h-full rounded-2xl glass-card glass-card-hover p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/10">
-                  <Lightbulb className="h-5 w-5 text-amber-400" />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">Request a Feature</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
-                  Have an idea that would make AIUI better? We prioritize features based on user
-                  requests.
-                </p>
-                <a
-                  href="mailto:features@aiui.store"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
-                >
-                  features@aiui.store
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            </StaggerChild>
-          </StaggerContainer>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="section-divider" />
-      </div>
-
-      {/* Section C: Contact */}
-      <div id="contact" className="relative py-24 sm:py-32">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <FadeUp>
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Get in Touch
-            </h2>
-          </FadeUp>
-
-          <StaggerContainer className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <StaggerChild>
-              <div className="rounded-2xl glass-card p-6 transition-all duration-300 hover:bg-white/[0.06]">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5">
-                  <Mail className="h-5 w-5 text-indigo-400" />
-                </div>
-                <p className="text-sm font-medium text-zinc-500">Email</p>
-                <a
-                  href="mailto:hello@aiui.store"
-                  className="mt-1 block text-base font-medium text-white transition-colors hover:text-indigo-400"
-                >
-                  hello@aiui.store
-                </a>
-              </div>
-            </StaggerChild>
-            <StaggerChild>
-              <div className="rounded-2xl glass-card p-6 transition-all duration-300 hover:bg-white/[0.06]">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5">
-                  <svg className="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </div>
-                <p className="text-sm font-medium text-zinc-500">Twitter / X</p>
-                <p className="mt-1 text-base font-medium text-white">@aiikistore</p>
-              </div>
-            </StaggerChild>
-            <StaggerChild>
-              <div className="rounded-2xl glass-card p-6 transition-all duration-300 hover:bg-white/[0.06]">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/5">
-                  <MessageCircle className="h-5 w-5 text-indigo-400" />
-                </div>
-                <p className="text-sm font-medium text-zinc-500">Discord</p>
-                <p className="mt-1 text-base font-medium text-white">Coming Soon</p>
-              </div>
-            </StaggerChild>
-          </StaggerContainer>
+            ))}
+          </dl>
         </div>
       </div>
     </section>

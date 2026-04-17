@@ -2,18 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Check, Copy, ArrowRight, Sparkles } from 'lucide-react';
-import { TokenChip } from '@/components/ui/TokenChip';
+import { Check, Copy } from 'lucide-react';
 
 const installCommand = 'claude mcp add aiui';
-
-const trustItems = [
-  { label: 'Works with Claude' },
-  { label: 'Works with Cursor' },
-  { label: 'Works with Windsurf' },
-  { label: 'Works with VS Code' },
-];
 
 export function Hero() {
   const [copied, setCopied] = useState(false);
@@ -26,198 +17,320 @@ export function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-zinc-950 noise-overlay">
-      {/* Aurora background */}
-      <div className="absolute inset-0 bg-aurora" />
+    <section className="relative">
+      <div className="mx-auto max-w-[1240px] px-6 lg:px-10 pt-20 pb-28 lg:pt-28 lg:pb-36">
+        {/* Front matter: section numeral + eyebrow meta */}
+        <div className="grid grid-cols-12 gap-x-6 gap-y-10">
+          {/* Left — editorial opening */}
+          <div className="col-span-12 lg:col-span-7">
+            <div className="flex items-baseline gap-6">
+              <span className="section-numeral">00</span>
+              <span className="eyebrow">The AI design control layer</span>
+            </div>
 
-      {/* Grid pattern */}
-      <div className="absolute inset-0 bg-grid" />
-
-      {/* Decorative blurs */}
-      <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-indigo-500/8 blur-[120px]" />
-      <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-violet-400/8 blur-[120px]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[700px] w-[700px] rounded-full bg-indigo-500/4 blur-[150px]" />
-
-      {/* Floating token cards */}
-      <TokenChip
-        variant="floating"
-        animated
-        label="color.primary.600"
-        className="absolute top-24 left-[8%]"
-        floatRotate="-6deg"
-        floatSpeed="normal"
-      />
-      <TokenChip
-        variant="floating"
-        animated
-        label="radius.lg"
-        value="12px"
-        className="absolute top-44 right-[6%]"
-        floatRotate="4deg"
-        floatSpeed="delayed"
-      />
-      <TokenChip
-        variant="floating"
-        animated
-        label="shadow.md"
-        className="absolute bottom-36 left-[4%]"
-        floatRotate="3deg"
-        floatSpeed="slow"
-      />
-      <TokenChip
-        variant="floating"
-        animated
-        label="font.heading"
-        value="Inter"
-        className="absolute bottom-28 right-[10%]"
-        floatRotate="-3deg"
-        floatSpeed="normal"
-      />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-          {/* Left: copy */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="text-center lg:text-left"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-4 py-1.5 text-sm font-medium text-indigo-400 backdrop-blur-sm border border-indigo-500/20 mb-8"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              AI Design Control Layer
-            </motion.div>
+            <hr className="rule mt-8" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
 
             <h1
-              className="text-5xl font-extrabold tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl"
-              style={{ lineHeight: '1.05' }}
+              className="display mt-10"
+              style={{
+                fontSize: 'clamp(2.75rem, 6.5vw, 5rem)',
+                lineHeight: 0.98,
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+              }}
             >
-              Your Design System,{' '}
-              <span className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent">
-                Always in Sync
-              </span>
+              Design that doesn&rsquo;t <em>drift</em>,
+              <br />
+              no matter who builds it.
             </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-6 text-lg leading-8 text-zinc-400 max-w-xl mx-auto lg:mx-0"
+            <p
+              className="mt-8"
+              style={{
+                fontSize: '1.25rem',
+                lineHeight: 1.45,
+                color: 'var(--ink)',
+                maxWidth: '48ch',
+                fontWeight: 500,
+              }}
             >
-              Every AI tool generates UI differently. AIUI ensures your tokens, components, and
-              design rules are followed in every conversation — so your product stays consistent no
-              matter who (or what) builds it.
-            </motion.p>
+              Every time your AI generates UI, it invents new colors, spacing, and components —
+              quietly breaking your design system. AIUI stops that.
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+            <p className="lede mt-6" style={{ maxWidth: '52ch' }}>
+              A persistent design memory for Claude, Cursor, and your other AI tools. Your tokens,
+              your components, your rules — followed on every screen, in every conversation.
+            </p>
+
+            <p
+              className="mt-4 text-[0.8125rem]"
+              style={{
+                color: 'var(--ink-muted)',
+                fontFamily: 'var(--font-mono-editorial)',
+                letterSpacing: '0.04em',
+              }}
             >
-              <Link
-                href="/sign-up"
-                className="group w-full sm:w-auto rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-7 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  Get Started Free
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </Link>
-              <a
-                href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-7 py-3.5 text-center text-sm font-semibold text-zinc-300 transition-all duration-300 hover:bg-white/10 hover:border-white/20"
-              >
-                See How It Works
-              </a>
-            </motion.div>
-          </motion.div>
+              Free in open beta · No credit card · Ninety-second install
+            </p>
 
-          {/* Right: install command terminal */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="relative mx-auto w-full max-w-lg lg:max-w-none"
-          >
-            <div className="rounded-2xl bg-zinc-900/80 backdrop-blur-xl shadow-2xl shadow-black/40 border border-white/10 overflow-hidden">
-              {/* Terminal title bar */}
-              <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                    <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                    <div className="h-3 w-3 rounded-full bg-green-500/80" />
-                  </div>
-                  <span className="ml-2 text-xs text-zinc-500 font-mono">Terminal</span>
-                </div>
+            {/* Install, first. Morgan copies in one click. */}
+            <div className="mt-10 flex flex-col gap-3" style={{ maxWidth: '34rem' }}>
+              <div className="flex items-baseline gap-3">
+                <span className="eyebrow shrink-0">Already using Claude? Copy one line</span>
+                <span className="leader" aria-hidden />
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-zinc-400 transition-all duration-200 hover:bg-white/10 hover:text-zinc-200"
+                  className="inline-flex items-center gap-1.5 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{
+                    fontFamily: 'var(--font-mono-editorial)',
+                    color: copied ? 'var(--accent)' : 'var(--ink-muted)',
+                    outlineColor: 'var(--accent)',
+                  }}
                   aria-label="Copy install command"
                 >
                   {copied ? (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-indigo-400" />
-                      <span className="text-indigo-400">Copied</span>
-                    </>
+                    <Check className="h-3 w-3" strokeWidth={1.5} />
                   ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" />
-                      Copy
-                    </>
+                    <Copy className="h-3 w-3" strokeWidth={1.5} />
                   )}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
-
-              {/* Command content */}
-              <div className="p-6">
-                <pre className="text-base leading-relaxed font-mono">
-                  <code>
-                    <span className="text-zinc-600">$</span>{' '}
-                    <span className="text-indigo-400">claude mcp add aiui</span>
-                  </code>
-                </pre>
-                <div className="mt-4 flex items-center gap-2">
-                  <div className="h-1 w-1 rounded-full bg-indigo-400 animate-pulse" />
-                  <p className="text-sm text-zinc-500">
-                    One command. That&apos;s it. Your design system is now connected.
-                  </p>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="specimen text-left transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{
+                  padding: '1.25rem 1.5rem',
+                  fontSize: '0.9375rem',
+                  background: copied ? 'var(--accent-soft)' : 'var(--paper-sunk)',
+                  outlineColor: 'var(--accent)',
+                }}
+                aria-label="Copy claude mcp add aiui"
+              >
+                <code>
+                  <span className="cm-dim">$</span> <span className="cm-key">claude</span>{' '}
+                  <span className="cm-tag">mcp</span> <span className="cm-attr">add</span>{' '}
+                  <span className="cm-string">aiui</span>
+                </code>
+              </button>
             </div>
 
-            {/* Glow effect behind terminal */}
-            <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-r from-indigo-500/20 via-violet-500/10 to-indigo-500/20 blur-2xl" />
-          </motion.div>
-        </div>
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <Link href="/sign-up" className="btn-ink">
+                Start free in the studio
+                <span aria-hidden style={{ fontFamily: 'var(--font-display)' }}>
+                  →
+                </span>
+              </Link>
+              <a href="#how-it-works" className="ink-link text-[0.9375rem]">
+                Or see how it works
+              </a>
+            </div>
+          </div>
 
-        {/* Trust indicators */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="mt-20"
-        >
-          <div className="section-divider" />
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 pt-8">
-            {trustItems.map((item) => (
-              <div key={item.label} className="flex items-center gap-2.5 text-sm text-zinc-400">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/15">
-                  <Check className="h-3 w-3 text-indigo-400" />
-                </div>
-                {item.label}
-              </div>
+          {/* Right — token specimen sheet */}
+          <aside className="col-span-12 lg:col-span-5 lg:pl-8">
+            <TokenSpecimen />
+          </aside>
+        </div>
+      </div>
+
+      {/* Bottom rule + colophon-style meta */}
+      <div className="mx-auto max-w-[1240px] px-6 lg:px-10">
+        <hr className="rule" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
+        <div className="py-5 flex flex-wrap items-baseline justify-between gap-y-2">
+          <span className="eyebrow">Compatible with</span>
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+            {['Claude Code', 'Cursor', 'Windsurf', 'VS Code'].map((item) => (
+              <span
+                key={item}
+                className="text-sm"
+                style={{ color: 'var(--ink-soft)', fontFeatureSettings: '"ss01","kern"' }}
+              >
+                {item}
+              </span>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------------- */
+/* Right-column specimen: shows AIUI as a design specimen sheet              */
+/* ------------------------------------------------------------------------- */
+
+function TokenSpecimen() {
+  const swatches = [
+    { name: 'color.surface', sample: 'oklch(97.5% 0.008 60)' },
+    { name: 'color.ink', sample: 'oklch(22% 0.020 30)' },
+    { name: 'color.accent', sample: 'oklch(44% 0.140 28)' },
+    { name: 'color.muted', sample: 'oklch(48% 0.016 45)' },
+  ];
+
+  return (
+    <figure
+      style={{
+        background: 'var(--paper-deep)',
+        border: '1px solid var(--rule)',
+        padding: '1.75rem 1.75rem 1.5rem',
+      }}
+    >
+      {/* Header row */}
+      <header className="flex items-baseline justify-between">
+        <span className="eyebrow">Specimen</span>
+        <span
+          className="text-[0.6875rem]"
+          style={{
+            fontFamily: 'var(--font-mono-editorial)',
+            color: 'var(--ink-muted)',
+            letterSpacing: '0.08em',
+          }}
+        >
+          PROFILE · WARM PAPER
+        </span>
+      </header>
+
+      <h3 className="display mt-3" style={{ fontSize: '1.625rem', lineHeight: 1.05 }}>
+        Your tokens,
+        <br />
+        set in type.
+      </h3>
+
+      <hr className="rule mt-5" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
+
+      {/* Color section */}
+      <section className="mt-5">
+        <div className="flex items-baseline justify-between mb-3">
+          <span className="eyebrow" style={{ fontSize: '0.6875rem' }}>
+            § 01 · Color
+          </span>
+          <span className="caption" style={{ fontSize: '0.6875rem' }}>
+            4 of 360
+          </span>
+        </div>
+        <ul className="flex flex-col gap-2">
+          {swatches.map((s) => (
+            <li key={s.name} className="flex items-center gap-3">
+              <span
+                aria-hidden
+                className="block"
+                style={{
+                  width: 22,
+                  height: 22,
+                  background: s.sample,
+                  border: '1px solid var(--rule)',
+                }}
+              />
+              <span
+                className="text-[0.8125rem]"
+                style={{ color: 'var(--ink)', fontFamily: 'var(--font-mono-editorial)' }}
+              >
+                {s.name}
+              </span>
+              <span className="leader" aria-hidden />
+              <span
+                className="text-[0.6875rem] text-right tabular-nums"
+                style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono-editorial)' }}
+              >
+                {s.sample}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <hr className="rule mt-5" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
+
+      {/* Type section */}
+      <section className="mt-5">
+        <div className="flex items-baseline justify-between mb-3">
+          <span className="eyebrow" style={{ fontSize: '0.6875rem' }}>
+            § 02 · Type
+          </span>
+          <span className="caption" style={{ fontSize: '0.6875rem' }}>
+            Display + Body
+          </span>
+        </div>
+        <div className="flex items-baseline gap-4">
+          <span
+            className="display"
+            style={{ fontSize: '2.75rem', lineHeight: 1, color: 'var(--ink)' }}
+          >
+            Aa
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[0.75rem]" style={{ color: 'var(--ink)' }}>
+              Gambarino · Display
+            </span>
+            <span className="caption" style={{ fontSize: '0.6875rem' }}>
+              type.display · 400
+            </span>
+          </div>
+        </div>
+        <div className="mt-3 flex items-baseline gap-4">
+          <span
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '1.875rem',
+              lineHeight: 1,
+              color: 'var(--ink)',
+              fontWeight: 500,
+            }}
+          >
+            Aa
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[0.75rem]" style={{ color: 'var(--ink)' }}>
+              Switzer · Body
+            </span>
+            <span className="caption" style={{ fontSize: '0.6875rem' }}>
+              type.body · 500
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <hr className="rule mt-5" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
+
+      {/* Radius + spacing */}
+      <section className="mt-5">
+        <div className="flex items-baseline justify-between mb-3">
+          <span className="eyebrow" style={{ fontSize: '0.6875rem' }}>
+            § 03 · Measure
+          </span>
+          <span className="caption" style={{ fontSize: '0.6875rem' }}>
+            scale.step · 1.333
+          </span>
+        </div>
+        <div className="flex items-end gap-2 h-10">
+          {[6, 9, 12, 18, 24, 32, 44].map((w) => (
+            <span
+              key={w}
+              aria-hidden
+              style={{
+                width: w,
+                height: w,
+                border: '1px solid var(--ink)',
+                background: 'var(--paper)',
+              }}
+            />
+          ))}
+        </div>
+      </section>
+
+      <figcaption
+        className="figure-caption"
+        style={{ marginTop: '1.25rem', paddingTop: '0.75rem', borderTop: '1px solid var(--rule)' }}
+      >
+        <span className="fig-id">Fig. 00.2</span>
+        <span className="leader" aria-hidden />
+        <span>A slice of one project&rsquo;s design memory.</span>
+      </figcaption>
+    </figure>
   );
 }

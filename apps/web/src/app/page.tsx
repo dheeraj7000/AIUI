@@ -5,19 +5,20 @@ import { StatsBar } from '@/components/landing/StatsBar';
 import { FeatureGrid } from '@/components/landing/FeatureGrid';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { CodeComparison } from '@/components/landing/CodeComparison';
+import { Manifesto } from '@/components/landing/Manifesto';
 import { StylePackDemo } from '@/components/landing/StylePackDemo';
 import { CTA } from '@/components/landing/CTA';
 import { Footer } from '@/components/landing/Footer';
 
 export const metadata: Metadata = {
-  title: 'AIUI - AI Design Control Layer',
+  title: 'AIUI — design that doesn\u2019t drift',
   description:
-    'Control how AI builds your UI. Choose styles, components, and tokens from a visual console. Claude Code uses them automatically via MCP.',
+    'A persistent design memory for your AI coding tools. Your tokens, your components, your rules — followed on every screen.',
 };
 
 export default function HomePage() {
   return (
-    <>
+    <main className="editorial">
       <LandingNav />
       <Hero />
       <StatsBar />
@@ -25,8 +26,9 @@ export default function HomePage() {
       <StylePackDemo />
       <HowItWorks />
       <CodeComparison />
+      <Manifesto />
       <CTA />
       <Footer />
-    </>
+    </main>
   );
 }
