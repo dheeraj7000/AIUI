@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { validate } from './commands/validate.js';
 import type { ValidateOptions } from './commands/validate.js';
 
 const program = new Command();
@@ -54,11 +53,15 @@ program
   .option('--api-url <url>', 'AIUI API URL', 'https://aiui.store')
   .option('--project <slug>', 'Project slug (with --api-key)')
   .option('--format <fmt>', 'Output: text | json | github', 'text')
+  .option('--json', 'Shortcut for --format json (machine-readable output)')
+  .option('--ci', 'Exit 1 if any errors are found (warnings allowed)')
   .option('--strict', 'Exit 1 on any violation')
   .option('--max-violations <n>', 'Max violations before failing')
   .option('--ignore <patterns>', 'Comma-separated patterns to ignore')
   .action(async (options) => {
     const strict = options.strict ?? false;
+    const ci = options.ci ?? false;
+    if (options.json) options.format = 'json';
     let maxViolations: number;
     if (options.maxViolations !== undefined) {
       maxViolations = parseInt(options.maxViolations, 10);
@@ -80,15 +83,18 @@ program
     const opts: ValidateOptions = {
       files: options.files,
       tokensPath: options.tokens,
-      apiKey: options.apiKey,
+      // Env fallback — convenient for CI pipelines.
+      apiKey: options.apiKey ?? process.env.AIUI_API_KEY,
       apiUrl: options.apiUrl,
       project: options.project,
       format: options.format as 'text' | 'json' | 'github',
       strict,
+      ci,
       maxViolations,
       ignore,
     };
 
+    const { validate } = await import('./commands/validate.js');
     const exitCode = await validate(opts);
     process.exit(exitCode);
   });

@@ -6,6 +6,32 @@ import type {
   ComplianceViolation,
   ComplianceViolationType,
 } from '@aiui/design-core';
+import { extractTailwindViolations, runAllAccessibilityChecks } from '@aiui/mcp-server/detectors';
+
+// Anti-pattern engine is optional: the module may not exist yet if the
+// mcp-server hasn't been rebuilt, so we load it lazily and skip gracefully.
+// TODO: once @aiui/mcp-server/anti-patterns ships reliably, make this required.
+type AntiPatternViolation = {
+  rule: string;
+  severity: 'error' | 'warning';
+  line?: number;
+  snippet: string;
+  message: string;
+  suggestion?: string;
+};
+let antiPatternFn: ((code: string) => AntiPatternViolation[]) | null = null;
+async function loadAntiPatterns(): Promise<typeof antiPatternFn> {
+  if (antiPatternFn !== null) return antiPatternFn;
+  try {
+    const mod = (await import('@aiui/mcp-server/anti-patterns')) as {
+      detectAntiPatterns?: (code: string) => AntiPatternViolation[];
+    };
+    antiPatternFn = mod.detectAntiPatterns ?? null;
+  } catch {
+    antiPatternFn = null;
+  }
+  return antiPatternFn;
+}
 
 export interface ApprovedToken {
   tokenKey: string;
@@ -473,4 +499,92 @@ export function scanFile(filePath: string, tokens: ApprovedToken[]): FileResult 
   }
 
   return { filePath, result };
+}
+
+/**
+ * Async variant that also runs Tailwind, accessibility, and anti-pattern
+ * detectors imported from @aiui/mcp-server. The anti-pattern engine is
+ * optional — if the module fails to resolve, its rules are skipped.
+ */
+export async function scanFileAsync(
+  filePath: string,
+  tokens: ApprovedToken[]
+): Promise<FileResult> {
+  // Reuse the existing sync pipeline for token-value checks
+  const result = scanFile(filePath, tokens);
+  const code = fs.readFileSync(filePath, 'utf-8');
+
+  // Approved Tailwind classes — if any token happens to look like a utility
+  // (e.g. "bg-primary") treat it as pre-approved.
+  const approvedTailwind = new Set(
+    tokens.filter((t) => t.tokenType === 'color').map((t) => t.tokenValue.toLowerCase())
+  );
+  for (const tv of extractTailwindViolations(code, approvedTailwind)) {
+    result.result.violations.push({
+      type: 'color',
+      severity: 'warning',
+      message:
+        tv.kind === 'utility'
+          ? `Tailwind utility "${tv.value}" uses a hardcoded palette color not in the approved token set`
+          : `Tailwind arbitrary value "${tv.value}" bypasses the design token system`,
+      line: tv.line,
+      value: tv.value,
+    });
+  }
+
+  // Accessibility checks (always on, warning-level).
+  for (const a of runAllAccessibilityChecks(code)) {
+    result.result.violations.push({
+      // ComplianceViolationType doesn't include 'accessibility' — map to 'general'
+      type: 'general' as ComplianceViolationType,
+      severity: a.severity,
+      message: `[a11y] ${a.message}`,
+      line: a.line,
+    });
+  }
+
+  // Anti-pattern (taste) rules — optional.
+  const detect = await loadAntiPatterns();
+  if (detect) {
+    for (const ap of detect(code)) {
+      result.result.violations.push({
+        type: 'general' as ComplianceViolationType,
+        severity: ap.severity,
+        message: `[taste/${ap.rule}] ${ap.message}`,
+        line: ap.line,
+        value: ap.snippet,
+        suggestion: ap.suggestion,
+      });
+    }
+  }
+
+  // Recompute compliance + score with the appended violations
+  result.result.compliant = result.result.violations.length === 0;
+  const errorCount = result.result.violations.filter((v) => v.severity === 'error').length;
+  const warningCount = result.result.violations.filter((v) => v.severity === 'warning').length;
+  result.result.score = Math.max(0, 100 - errorCount * 20 - warningCount * 5);
+
+  return result;
+}
+
+/**
+ * Read a source line with optional surrounding context for CLI reporting.
+ */
+export function readFileSnippet(
+  filePath: string,
+  line: number,
+  context = 1
+): { lines: Array<{ n: number; text: string; isTarget: boolean }> } | null {
+  try {
+    const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
+    const start = Math.max(1, line - context);
+    const end = Math.min(lines.length, line + context);
+    const out: Array<{ n: number; text: string; isTarget: boolean }> = [];
+    for (let i = start; i <= end; i++) {
+      out.push({ n: i, text: lines[i - 1] ?? '', isTarget: i === line });
+    }
+    return { lines: out };
+  } catch {
+    return null;
+  }
 }

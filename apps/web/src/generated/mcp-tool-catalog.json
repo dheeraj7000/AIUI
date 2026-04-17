@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-04-17T19:10:42.903Z",
-  "count": 18,
+  "generatedAt": "2026-04-17T19:32:37.471Z",
+  "count": 26,
   "tools": [
     {
       "name": "check_design_memory",
@@ -91,6 +91,54 @@
       "name": "update_tokens",
       "description": "Add, update, or delete design tokens in a style pack. Returns counts of added, modified, and deleted tokens.",
       "category": "write"
+    },
+    {
+      "name": "audit",
+      "description": "Audit this code for token and taste violations.",
+      "category": "alias",
+      "aliasOf": "validate_ui_output"
+    },
+    {
+      "name": "components",
+      "description": "List available component recipes.",
+      "category": "alias",
+      "aliasOf": "list_components"
+    },
+    {
+      "name": "context",
+      "description": "Load the project design context.",
+      "category": "alias",
+      "aliasOf": "get_project_context"
+    },
+    {
+      "name": "critique",
+      "description": "Critique this UI from multiple user personas.",
+      "category": "alias",
+      "aliasOf": "validate_ui_output"
+    },
+    {
+      "name": "polish",
+      "description": "Polish this code — find issues and suggest fixes.",
+      "category": "alias",
+      "aliasOf": "validate_ui_output+fix_compliance_issues"
+    },
+    {
+      "name": "recipe",
+      "description": "Fetch a component recipe by id.",
+      "category": "alias",
+      "aliasOf": "get_component_recipe"
+    },
+    {
+      "name": "tokens",
+      "description": "Show the active design tokens for this project.",
+      "category": "alias",
+      "aliasOf": "get_theme_tokens"
+    },
+    {
+      "name": "typeset",
+      "description": "Typeset this UI — inspect font tokens and flag type-level violations.",
+      "category": "alias",
+      "aliasOf": "get_theme_tokens+validate_ui_output"
     }
   ]
 }

@@ -85,6 +85,26 @@ export class AiuiMcpServer {
   }
 
   /**
+   * Look up a previously-registered tool handler by name. Used by alias
+   * registrations (see tools/aliases.ts) so discipline-named aliases like
+   * `audit` / `polish` / `critique` can delegate to their canonical tools
+   * without duplicating business logic. Returns the raw un-audited handler;
+   * the alias re-registration wraps it with audit + content-wrapping again,
+   * which is intentional — each alias is a distinct audit event.
+   */
+  getToolHandler(name: string): ToolHandler | undefined {
+    return this.tools.get(name)?.handler;
+  }
+
+  /**
+   * Look up the zod schema for a previously-registered tool. Aliases reuse
+   * the canonical schema so their argument validation stays in sync.
+   */
+  getToolSchema(name: string): Record<string, z.ZodType> | undefined {
+    return this.tools.get(name)?.schema;
+  }
+
+  /**
    * Start the MCP server with stdio transport.
    */
   async start() {

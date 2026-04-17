@@ -41,6 +41,7 @@ const sidebarSections = [
   { id: 'key-features', label: 'Key Features' },
   { id: 'competitive-landscape', label: 'Competitive Landscape' },
   { id: 'supported-tools', label: 'Supported Tools' },
+  { id: 'editor-support', label: 'Editor Support Matrix' },
   { id: 'getting-started', label: 'Getting Started' },
 ];
 
@@ -888,6 +889,208 @@ export default function DocsPage() {
             </section>
 
             {/* ============================================================ */}
+            {/* SECTION 8.5: EDITOR SUPPORT MATRIX */}
+            {/* ============================================================ */}
+            <section id="editor-support" className="scroll-mt-24">
+              <SectionBadge label="Editor Support" />
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
+                Every MCP-compatible editor, with setup
+              </h2>
+              <p className="text-zinc-400 text-lg leading-relaxed mb-8 max-w-3xl">
+                AIUI is a standard Streamable HTTP MCP server (with stdio fallback). It works with
+                any client that speaks the Model Context Protocol. Below is the current
+                compatibility matrix with exact setup snippets. Replace{' '}
+                <code className="rounded bg-zinc-800/60 px-1.5 py-0.5 font-mono text-xs text-indigo-300">
+                  $AIUI_KEY
+                </code>{' '}
+                with your project API key from the dashboard.
+              </p>
+
+              {/* Matrix */}
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 overflow-hidden mb-10">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm tabular-nums">
+                    <thead>
+                      <tr className="border-b border-zinc-800">
+                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Editor</th>
+                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Status</th>
+                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Transport</th>
+                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Setup</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800/50">
+                      <EditorRow
+                        name="Claude Code"
+                        status="stable"
+                        transport="HTTP + stdio"
+                        setup="claude mcp add"
+                      />
+                      <EditorRow
+                        name="Cursor"
+                        status="stable"
+                        transport="stdio"
+                        setup=".cursor/mcp.json"
+                      />
+                      <EditorRow
+                        name="Windsurf"
+                        status="stable"
+                        transport="stdio"
+                        setup="mcp_config.json"
+                      />
+                      <EditorRow
+                        name="Claude Desktop"
+                        status="stable"
+                        transport="stdio"
+                        setup="claude_desktop_config.json"
+                      />
+                      <EditorRow
+                        name="VS Code + Copilot"
+                        status="stable"
+                        transport="HTTP + stdio"
+                        setup=".vscode/mcp.json"
+                      />
+                      <EditorRow
+                        name="Zed"
+                        status="stable"
+                        transport="stdio"
+                        setup="settings.json (context_servers)"
+                      />
+                      <EditorRow
+                        name="Gemini CLI"
+                        status="stable"
+                        transport="stdio"
+                        setup="~/.gemini/settings.json"
+                      />
+                      <EditorRow
+                        name="Codex CLI"
+                        status="experimental"
+                        transport="stdio"
+                        setup="~/.codex/config.toml"
+                      />
+                      <EditorRow
+                        name="JetBrains AI Assistant"
+                        status="community"
+                        transport="stdio"
+                        setup="Plugin settings"
+                      />
+                    </tbody>
+                  </table>
+                </div>
+                <div className="border-t border-zinc-800 px-4 py-3 text-xs text-zinc-500">
+                  <span className="text-zinc-400 font-medium">stable</span> = first-party MCP
+                  support, tested with AIUI &nbsp;·&nbsp;{' '}
+                  <span className="text-zinc-400 font-medium">experimental</span> = MCP shipped
+                  recently, expect rough edges &nbsp;·&nbsp;{' '}
+                  <span className="text-zinc-400 font-medium">community</span> = works via
+                  third-party bridge
+                </div>
+              </div>
+
+              {/* Setup snippets */}
+              <h3 className="text-lg font-semibold text-white mb-4">Setup snippets</h3>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <EditorSetup
+                  name="Claude Code"
+                  path="Terminal"
+                  code={`claude mcp add aiui https://mcp.aiui.dev/mcp \\
+  --header "Authorization: Bearer $AIUI_KEY"`}
+                />
+                <EditorSetup
+                  name="Cursor"
+                  path=".cursor/mcp.json"
+                  code={`{
+  "mcpServers": {
+    "aiui": {
+      "url": "https://mcp.aiui.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer \${AIUI_KEY}"
+      }
+    }
+  }
+}`}
+                />
+                <EditorSetup
+                  name="Windsurf"
+                  path="~/.codeium/windsurf/mcp_config.json"
+                  code={`{
+  "mcpServers": {
+    "aiui": {
+      "serverUrl": "https://mcp.aiui.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer \${AIUI_KEY}"
+      }
+    }
+  }
+}`}
+                />
+                <EditorSetup
+                  name="Claude Desktop"
+                  path="~/Library/Application Support/Claude/claude_desktop_config.json"
+                  code={`{
+  "mcpServers": {
+    "aiui": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.aiui.dev/mcp",
+        "--header", "Authorization: Bearer \${AIUI_KEY}"]
+    }
+  }
+}`}
+                />
+                <EditorSetup
+                  name="VS Code + Copilot"
+                  path=".vscode/mcp.json"
+                  code={`{
+  "servers": {
+    "aiui": {
+      "type": "http",
+      "url": "https://mcp.aiui.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer \${input:aiui_key}"
+      }
+    }
+  }
+}`}
+                />
+                <EditorSetup
+                  name="Zed"
+                  path="~/.config/zed/settings.json"
+                  code={`{
+  "context_servers": {
+    "aiui": {
+      "command": {
+        "path": "npx",
+        "args": ["-y", "mcp-remote", "https://mcp.aiui.dev/mcp",
+          "--header", "Authorization: Bearer \${AIUI_KEY}"]
+      }
+    }
+  }
+}`}
+                />
+                <EditorSetup
+                  name="Gemini CLI"
+                  path="~/.gemini/settings.json"
+                  code={`{
+  "mcpServers": {
+    "aiui": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.aiui.dev/mcp",
+        "--header", "Authorization: Bearer \${AIUI_KEY}"]
+    }
+  }
+}`}
+                />
+                <EditorSetup
+                  name="Codex CLI"
+                  path="~/.codex/config.toml"
+                  code={`[mcp_servers.aiui]
+command = "npx"
+args = ["-y", "mcp-remote", "https://mcp.aiui.dev/mcp",
+  "--header", "Authorization: Bearer \${AIUI_KEY}"]`}
+                />
+              </div>
+            </section>
+
+            {/* ============================================================ */}
             {/* SECTION 9: GETTING STARTED */}
             {/* ============================================================ */}
             <section id="getting-started" className="scroll-mt-24">
@@ -1335,6 +1538,57 @@ function FundingCard({
         {raised}
       </p>
       <p className={`text-xs mt-1 ${highlight ? 'text-red-400/60' : 'text-zinc-500'}`}>{detail}</p>
+    </div>
+  );
+}
+
+function EditorRow({
+  name,
+  status,
+  transport,
+  setup,
+}: {
+  name: string;
+  status: 'stable' | 'experimental' | 'community' | 'planned';
+  transport: string;
+  setup: string;
+}) {
+  const statusStyles = {
+    stable: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
+    experimental: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+    community: 'bg-violet-500/10 text-violet-300 border-violet-500/30',
+    planned: 'bg-zinc-700/30 text-zinc-400 border-zinc-600/40',
+  };
+  return (
+    <tr>
+      <td className="px-4 py-2.5 text-zinc-200 text-sm font-medium">{name}</td>
+      <td className="px-4 py-2.5 text-left">
+        <span
+          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${statusStyles[status]}`}
+        >
+          {status}
+        </span>
+      </td>
+      <td className="px-4 py-2.5 text-zinc-400 text-sm font-mono">{transport}</td>
+      <td className="px-4 py-2.5 text-zinc-400 text-sm font-mono">{setup}</td>
+    </tr>
+  );
+}
+
+function EditorSetup({ name, path, code }: { name: string; path: string; code: string }) {
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-semibold text-white">{name}</h4>
+        <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs font-mono text-zinc-400">
+          {path}
+        </span>
+      </div>
+      <div className="rounded-lg bg-zinc-950 border border-zinc-800 px-3 py-2.5 overflow-x-auto">
+        <pre className="text-xs font-mono text-zinc-300 whitespace-pre">
+          <code>{code}</code>
+        </pre>
+      </div>
     </div>
   );
 }

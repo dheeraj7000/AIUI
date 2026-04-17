@@ -9,12 +9,18 @@ export const dynamic = 'force-dynamic';
 // Types
 // ---------------------------------------------------------------------------
 
-type ToolCategory = 'read' | 'write';
+type ToolCategory = 'read' | 'write' | 'alias';
 
 interface CatalogTool {
   name: string;
   description: string;
   category: ToolCategory;
+  /**
+   * Set on discipline-named aliases (e.g. audit/polish/critique). Points
+   * to the canonical tool name; composed aliases join multiple canonicals
+   * with "+" (e.g. "validate_ui_output+fix_compliance_issues").
+   */
+  aliasOf?: string;
 }
 
 interface CatalogResponse {
@@ -57,6 +63,15 @@ const TOOL_EXAMPLES: Record<string, string> = {
   fix_compliance_issues: `{ projectSlug: "my-app", code: "<your TSX>" }`,
   reset_project_to_starter: `{ slug: "my-app", targetDir: "/abs/path/to/repo" }`,
   undo_last_token_change: `{ projectSlug: "my-app" }`,
+  // Discipline-named aliases
+  audit: `{ projectId: "<uuid>", code: "<your TSX>" }`,
+  polish: `{ projectId: "<uuid>", projectSlug: "my-app", code: "<your TSX>" }`,
+  critique: `{ projectId: "<uuid>", code: "<your TSX>" }`,
+  typeset: `{ projectId: "<uuid>", code: "<your TSX>", format: "json" }`,
+  tokens: `{ projectId: "<uuid>", format: "json" }`,
+  context: `{ slug: "my-app" }`,
+  components: `{ stylePackId: "<uuid>" }`,
+  recipe: `{ recipeId: "abc-123" }`,
 };
 
 const GENERIC_EXAMPLE = `{ slug: "my-app" }`;
@@ -132,8 +147,13 @@ function withExample(tool: CatalogTool): McpTool {
 function ToolCard({ tool }: { tool: McpTool }) {
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-sm shadow-sm transition-colors hover:border-white/10">
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
         <code className="font-mono text-base font-semibold text-white">{tool.name}</code>
+        {tool.aliasOf && (
+          <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 font-mono text-[10px] font-medium text-violet-300">
+            alias of {tool.aliasOf}
+          </span>
+        )}
       </div>
       <p className="mb-3 text-sm leading-relaxed text-zinc-400">{tool.description}</p>
       <pre className="overflow-x-auto rounded-lg border border-white/[0.06] bg-zinc-950/60 px-3 py-2 font-mono text-xs text-zinc-300">
@@ -152,6 +172,7 @@ export default async function McpToolsPage() {
 
   const readTools = tools.filter((t) => t.category === 'read').map(withExample);
   const writeTools = tools.filter((t) => t.category === 'write').map(withExample);
+  const aliasTools = tools.filter((t) => t.category === 'alias').map(withExample);
 
   let generatedAtDisplay: string;
   try {
@@ -255,6 +276,28 @@ export default async function McpToolsPage() {
           ))}
         </div>
       </section>
+
+      {/* Discipline-named aliases */}
+      {aliasTools.length > 0 && (
+        <section className="mt-10">
+          <div className="mb-4 flex items-center gap-2">
+            <Sparkles size={18} className="text-violet-400" />
+            <h2 className="text-lg font-semibold text-white">Aliases</h2>
+            <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-300">
+              {aliasTools.length}
+            </span>
+          </div>
+          <p className="mb-4 text-sm text-zinc-400">
+            Discipline-named shortcuts (audit, polish, critique, typeset, ...) that delegate to the
+            canonical tools above. Use whichever verb fits the task.
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {aliasTools.map((tool) => (
+              <ToolCard key={tool.name} tool={tool} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Footnote */}
       <p className="mt-10 text-xs text-zinc-500">Catalog generated at {generatedAtDisplay}</p>

@@ -388,6 +388,47 @@ export async function generateDesignMemory(
   lines.push(`**Tokens:** ${tokens.length}  `);
   lines.push('');
 
+  // =========================================================================
+  // Intent — plainspoken answers from the Studio "Shape" discovery step.
+  // These flow in from projects.studioDraft.shape so Claude has product
+  // intent (audience, JTBD, emotional target, anti-refs) on every sync.
+  // =========================================================================
+  const shape = (project.studioDraft as { shape?: Record<string, unknown> } | null)?.shape;
+  if (shape && typeof shape === 'object') {
+    const audience = typeof shape.audience === 'string' ? shape.audience.trim() : '';
+    const jobToBeDone = typeof shape.jobToBeDone === 'string' ? shape.jobToBeDone.trim() : '';
+    const emotionAfterUse = Array.isArray(shape.emotionAfterUse)
+      ? (shape.emotionAfterUse as unknown[]).filter((x): x is string => typeof x === 'string')
+      : [];
+    const brandPersonality = Array.isArray(shape.brandPersonality)
+      ? (shape.brandPersonality as unknown[]).filter((x): x is string => typeof x === 'string')
+      : [];
+    const antiReferences = Array.isArray(shape.antiReferences)
+      ? (shape.antiReferences as unknown[]).filter((x): x is string => typeof x === 'string')
+      : [];
+
+    const hasAny =
+      audience ||
+      jobToBeDone ||
+      emotionAfterUse.length > 0 ||
+      brandPersonality.length > 0 ||
+      antiReferences.length > 0;
+
+    if (hasAny) {
+      lines.push('## Intent');
+      lines.push('');
+      if (audience) lines.push(`**Audience:** ${audience}`);
+      if (jobToBeDone) lines.push(`**Job to be done:** ${jobToBeDone}`);
+      if (emotionAfterUse.length > 0)
+        lines.push(`**Emotion after first use:** ${emotionAfterUse.join(', ')}`);
+      if (brandPersonality.length > 0)
+        lines.push(`**Brand personality:** ${brandPersonality.join(', ')}`);
+      if (antiReferences.length > 0)
+        lines.push(`**Anti-references (do NOT look like):** ${antiReferences.join(', ')}`);
+      lines.push('');
+    }
+  }
+
   // Design rules
   lines.push('## Design Rules');
   lines.push('');

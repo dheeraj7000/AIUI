@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/index.ts', 'src/tools/detectors.ts', 'src/tools/anti-patterns.ts'],
   format: ['esm'],
   target: 'node18',
   outDir: 'dist',
@@ -9,7 +9,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   treeshake: true,
-  dts: false,
+  dts: true,
   banner: {
     js: '#!/usr/bin/env node',
   },

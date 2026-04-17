@@ -33,6 +33,21 @@ const WRITE_TOOLS = new Set([
   'undo_last_token_change',
 ]);
 
+// Discipline-named aliases -> canonical tool(s). Must stay in sync with
+// ALIAS_MAP in apps/mcp-server/src/tools/aliases.ts. Composed aliases use
+// a "+"-joined form so a reader can tell at a glance which canonicals feed
+// the alias (catalog consumers should split on "+").
+const ALIAS_MAP = {
+  audit: 'validate_ui_output',
+  polish: 'validate_ui_output+fix_compliance_issues',
+  critique: 'validate_ui_output',
+  typeset: 'get_theme_tokens+validate_ui_output',
+  tokens: 'get_theme_tokens',
+  context: 'get_project_context',
+  components: 'list_components',
+  recipe: 'get_component_recipe',
+};
+
 // Match server.registerTool('name', 'description' | "description" | `description`, ...)
 // Captures name (group 1) and description string literal body (group 2).
 // Descriptions can be string-concatenated across multiple lines, which we
@@ -122,17 +137,25 @@ for (const file of files) {
       console.warn(`[gen-tool-catalog] Could not parse description for ${name} in ${file}`);
       continue;
     }
-    tools.push({
+    const entry = {
       name,
       description: parsed.value.trim(),
       category: WRITE_TOOLS.has(name) ? 'write' : 'read',
-    });
+    };
+    if (Object.prototype.hasOwnProperty.call(ALIAS_MAP, name)) {
+      entry.aliasOf = ALIAS_MAP[name];
+      entry.category = 'alias';
+    }
+    tools.push(entry);
   }
 }
 
-// Sort: reads first, then writes; alphabetical within group.
+// Sort: reads, then writes, then aliases; alphabetical within group.
+const CATEGORY_ORDER = { read: 0, write: 1, alias: 2 };
 tools.sort((a, b) => {
-  if (a.category !== b.category) return a.category === 'read' ? -1 : 1;
+  const ca = CATEGORY_ORDER[a.category] ?? 99;
+  const cb = CATEGORY_ORDER[b.category] ?? 99;
+  if (ca !== cb) return ca - cb;
   return a.name.localeCompare(b.name);
 });
 

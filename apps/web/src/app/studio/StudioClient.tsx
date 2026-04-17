@@ -44,7 +44,66 @@ interface StudioClientProps {
 // Steps
 // ---------------------------------------------------------------------------
 
-type Step = 'auth' | 'project' | 'style-pack' | 'components' | 'done';
+type Step = 'auth' | 'project' | 'shape' | 'style-pack' | 'components' | 'done';
+
+// Palettes for the "shape" discovery step. Kept local — these are copy,
+// not design tokens, so they don't belong in the design system.
+const EMOTION_CHIPS = [
+  'control',
+  'delight',
+  'trust',
+  'calm',
+  'speed',
+  'power',
+  'clarity',
+  'warmth',
+  'focus',
+  'fun',
+  'confidence',
+  'surprise',
+] as const;
+
+const PERSONALITY_SUGGESTIONS = [
+  'calm',
+  'exacting',
+  'playful',
+  'bold',
+  'warm',
+  'precise',
+  'raw',
+  'refined',
+  'mature',
+  'energetic',
+  'serious',
+  'inviting',
+] as const;
+
+const ANTI_REFERENCE_OPTIONS = [
+  'generic AI SaaS',
+  'dark mode with purple glow',
+  'dashboard template',
+  'Linear clone',
+  'Vercel clone',
+  'shadcn default',
+  'cyan-on-dark',
+  'neon',
+] as const;
+
+interface ShapeState {
+  audience: string;
+  jobToBeDone: string;
+  emotionAfterUse: string[];
+  brandPersonality: string[];
+  antiReferences: string[];
+}
+
+const EMPTY_SHAPE: ShapeState = {
+  audience: '',
+  jobToBeDone: '',
+  emotionAfterUse: [],
+  brandPersonality: [],
+  antiReferences: [],
+};
 
 const categoryColors: Record<string, string> = {
   saas: 'border-blue-300 bg-blue-50',
@@ -89,6 +148,9 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string>('All');
   const [hasDraft, setHasDraft] = useState(false);
+  const [shape, setShape] = useState<ShapeState>(EMPTY_SHAPE);
+  const [personalityInput, setPersonalityInput] = useState('');
+  const [customAntiRef, setCustomAntiRef] = useState('');
 
   // Debounced autosave for Design Studio drafts. Stored server-side so a
   // user who closes the tab can resume on next open. Fire-and-forget — a
@@ -131,7 +193,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
           const match = data.projects.find((p: Project) => p.slug === projectSlug);
           if (match) {
             setSelectedProject(match);
-            setStep('style-pack');
+            setStep('shape');
             await loadProjectState(match.id);
             return;
           }
@@ -162,10 +224,27 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
 
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      const body = {
+      // Only send shape if user has touched it — avoids wiping a saved
+      // shape with an empty object on unrelated autosaves.
+      const shapeTouched =
+        shape.audience.trim() !== '' ||
+        shape.jobToBeDone.trim() !== '' ||
+        shape.emotionAfterUse.length > 0 ||
+        shape.brandPersonality.length > 0 ||
+        shape.antiReferences.length > 0;
+      const body: Record<string, unknown> = {
         packId: selectedPackId,
         selectedComponentIds: [...selectedRecipeIds],
       };
+      if (shapeTouched) {
+        body.shape = {
+          audience: shape.audience.trim() || undefined,
+          jobToBeDone: shape.jobToBeDone.trim() || undefined,
+          emotionAfterUse: shape.emotionAfterUse.length > 0 ? shape.emotionAfterUse : undefined,
+          brandPersonality: shape.brandPersonality.length > 0 ? shape.brandPersonality : undefined,
+          antiReferences: shape.antiReferences.length > 0 ? shape.antiReferences : undefined,
+        };
+      }
       fetch(`/api/projects/${selectedProject.id}/studio-draft`, {
         method: 'PUT',
         credentials: 'same-origin',
@@ -183,7 +262,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [selectedPackId, selectedRecipeIds, selectedProject, session, step]);
+  }, [selectedPackId, selectedRecipeIds, selectedProject, session, step, shape]);
 
   // Clear the server-side draft. Resets the in-memory edits too so the
   // user sees the wizard in its persisted state.
@@ -198,6 +277,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
     skipNextSaveRef.current = true;
     setSelectedPackId(null);
     setSelectedRecipeIds(new Set());
+    setShape(EMPTY_SHAPE);
     setHasDraft(false);
     try {
       await fetch(`/api/projects/${selectedProject.id}/studio-draft`, {
@@ -242,10 +322,26 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
         const draft = (await draftRes.json()) as {
           packId?: string;
           selectedComponentIds?: string[];
+          shape?: Partial<ShapeState>;
         };
         if (draft.packId) setSelectedPackId(draft.packId);
         if (Array.isArray(draft.selectedComponentIds)) {
           setSelectedRecipeIds(new Set(draft.selectedComponentIds));
+        }
+        if (draft.shape) {
+          setShape({
+            audience: draft.shape.audience ?? '',
+            jobToBeDone: draft.shape.jobToBeDone ?? '',
+            emotionAfterUse: Array.isArray(draft.shape.emotionAfterUse)
+              ? draft.shape.emotionAfterUse
+              : [],
+            brandPersonality: Array.isArray(draft.shape.brandPersonality)
+              ? draft.shape.brandPersonality
+              : [],
+            antiReferences: Array.isArray(draft.shape.antiReferences)
+              ? draft.shape.antiReferences
+              : [],
+          });
         }
         setHasDraft(true);
         // Skip the next autosave — state just came from the server and
@@ -294,7 +390,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
       }
       const project = await res.json();
       setSelectedProject(project);
-      setStep('style-pack');
+      setStep('shape');
     } catch {
       setError('Failed to create project');
     }
@@ -304,7 +400,54 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
   const selectProject = async (p: Project) => {
     setSelectedProject(p);
     await loadProjectState(p.id);
-    setStep('style-pack');
+    setStep('shape');
+  };
+
+  // Shape step helpers — toggle chips in bounded multi-selects.
+  const toggleEmotion = (emotion: string) => {
+    setShape((prev) => {
+      const has = prev.emotionAfterUse.includes(emotion);
+      if (has) {
+        return { ...prev, emotionAfterUse: prev.emotionAfterUse.filter((e) => e !== emotion) };
+      }
+      // Cap at 3 per the brief — silently drop overflow.
+      if (prev.emotionAfterUse.length >= 3) return prev;
+      return { ...prev, emotionAfterUse: [...prev.emotionAfterUse, emotion] };
+    });
+  };
+
+  const togglePersonality = (word: string) => {
+    const w = word.trim().toLowerCase();
+    if (!w) return;
+    setShape((prev) => {
+      const has = prev.brandPersonality.includes(w);
+      if (has) {
+        return { ...prev, brandPersonality: prev.brandPersonality.filter((p) => p !== w) };
+      }
+      if (prev.brandPersonality.length >= 3) return prev;
+      return { ...prev, brandPersonality: [...prev.brandPersonality, w] };
+    });
+  };
+
+  const toggleAntiRef = (ref: string) => {
+    setShape((prev) => {
+      const has = prev.antiReferences.includes(ref);
+      if (has) {
+        return { ...prev, antiReferences: prev.antiReferences.filter((r) => r !== ref) };
+      }
+      return { ...prev, antiReferences: [...prev.antiReferences, ref] };
+    });
+  };
+
+  const addCustomAntiRef = () => {
+    const v = customAntiRef.trim();
+    if (!v) return;
+    setShape((prev) =>
+      prev.antiReferences.includes(v)
+        ? prev
+        : { ...prev, antiReferences: [...prev.antiReferences, v] }
+    );
+    setCustomAntiRef('');
   };
 
   // Toggle recipe selection
@@ -411,11 +554,12 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
         {/* Progress */}
         <div className="mx-auto max-w-6xl px-6 pb-4">
           <div className="flex gap-1">
-            {['auth', 'project', 'style-pack', 'components', 'done'].map((s, i) => (
+            {['auth', 'project', 'shape', 'style-pack', 'components', 'done'].map((s, i) => (
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full transition-colors ${
-                  i <= ['auth', 'project', 'style-pack', 'components', 'done'].indexOf(step)
+                  i <=
+                  ['auth', 'project', 'shape', 'style-pack', 'components', 'done'].indexOf(step)
                     ? 'bg-blue-600'
                     : 'bg-gray-200'
                 }`}
@@ -524,6 +668,251 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
           </div>
         )}
 
+        {/* STEP: Shape — pre-pack discovery interview.
+            Captures product intent (audience, JTBD, emotional target,
+            brand personality, anti-references) and persists to
+            studio_draft.shape. On sync_design_memory, these flow into
+            design-memory.md under `## Intent` so Claude reads them on
+            every MCP call. Skippable, but "Continue" is the default CTA. */}
+        {step === 'shape' && (
+          <div className="mx-auto max-w-2xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Shape the intent</h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  Answer a few questions so Claude knows what you&apos;re building — not just how it
+                  should look. This writes into your design memory.
+                </p>
+              </div>
+              <button
+                onClick={() => setStep('style-pack')}
+                className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-gray-600"
+              >
+                Skip this
+              </button>
+            </div>
+
+            <div className="mt-8 space-y-8">
+              {/* Audience */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">
+                  Who is this for?
+                </label>
+                <p className="text-xs text-gray-500">One sentence. Your audience.</p>
+                <input
+                  type="text"
+                  value={shape.audience}
+                  onChange={(e) => setShape((p) => ({ ...p, audience: e.target.value }))}
+                  placeholder="e.g. Senior engineers evaluating AI coding tools"
+                  maxLength={500}
+                  className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Job to be done */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">
+                  What does your user want to accomplish?
+                </label>
+                <p className="text-xs text-gray-500">
+                  One sentence. The job they&apos;re hiring this for.
+                </p>
+                <input
+                  type="text"
+                  value={shape.jobToBeDone}
+                  onChange={(e) => setShape((p) => ({ ...p, jobToBeDone: e.target.value }))}
+                  placeholder="e.g. Ship a design system their AI agent actually respects"
+                  maxLength={500}
+                  className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Emotion after first use */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">
+                  How should they feel after first use?
+                </label>
+                <p className="text-xs text-gray-500">Pick 3 ({shape.emotionAfterUse.length}/3)</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {EMOTION_CHIPS.map((emotion) => {
+                    const selected = shape.emotionAfterUse.includes(emotion);
+                    const disabled = !selected && shape.emotionAfterUse.length >= 3;
+                    return (
+                      <button
+                        key={emotion}
+                        type="button"
+                        onClick={() => toggleEmotion(emotion)}
+                        disabled={disabled}
+                        className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                          selected
+                            ? 'border-blue-600 bg-blue-600 text-white'
+                            : disabled
+                              ? 'border-gray-200 bg-gray-50 text-gray-300'
+                              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                        }`}
+                      >
+                        {emotion}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Brand personality */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">
+                  Brand personality — pick 3 words
+                </label>
+                <p className="text-xs text-gray-500">
+                  Tap suggestions or type your own ({shape.brandPersonality.length}/3)
+                </p>
+                {shape.brandPersonality.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {shape.brandPersonality.map((word) => (
+                      <button
+                        key={word}
+                        type="button"
+                        onClick={() => togglePersonality(word)}
+                        className="rounded-full border border-blue-600 bg-blue-600 px-3 py-1 text-xs font-medium text-white"
+                      >
+                        {word} \u00d7
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={personalityInput}
+                    onChange={(e) => setPersonalityInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        togglePersonality(personalityInput);
+                        setPersonalityInput('');
+                      }
+                    }}
+                    placeholder="Type a word, hit Enter"
+                    maxLength={40}
+                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      togglePersonality(personalityInput);
+                      setPersonalityInput('');
+                    }}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {PERSONALITY_SUGGESTIONS.filter((s) => !shape.brandPersonality.includes(s)).map(
+                    (word) => {
+                      const disabled = shape.brandPersonality.length >= 3;
+                      return (
+                        <button
+                          key={word}
+                          type="button"
+                          onClick={() => togglePersonality(word)}
+                          disabled={disabled}
+                          className={`rounded-full border border-dashed px-3 py-1 text-xs ${
+                            disabled
+                              ? 'border-gray-200 text-gray-300'
+                              : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
+                          }`}
+                        >
+                          + {word}
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+
+              {/* Anti-references */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">
+                  What do you NOT want this to look like?
+                </label>
+                <p className="text-xs text-gray-500">Multi-select. Add your own too.</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {ANTI_REFERENCE_OPTIONS.map((opt) => {
+                    const selected = shape.antiReferences.includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleAntiRef(opt)}
+                        className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                          selected
+                            ? 'border-red-600 bg-red-50 text-red-700'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                        }`}
+                      >
+                        {selected ? '\u2713 ' : ''}
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Custom anti-refs already in state but not in preset list */}
+                {shape.antiReferences.filter(
+                  (r) => !(ANTI_REFERENCE_OPTIONS as readonly string[]).includes(r)
+                ).length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {shape.antiReferences
+                      .filter((r) => !(ANTI_REFERENCE_OPTIONS as readonly string[]).includes(r))
+                      .map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => toggleAntiRef(r)}
+                          className="rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs font-medium text-red-700"
+                        >
+                          {r} \u00d7
+                        </button>
+                      ))}
+                  </div>
+                )}
+                <div className="mt-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={customAntiRef}
+                    onChange={(e) => setCustomAntiRef(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCustomAntiRef();
+                      }
+                    }}
+                    placeholder="Custom anti-reference"
+                    maxLength={80}
+                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomAntiRef}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 flex justify-end gap-3">
+              <button
+                onClick={() => setStep('style-pack')}
+                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* STEP: Style Pack */}
         {step === 'style-pack' && (
           <div>
@@ -534,12 +923,20 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
                   This defines your color palette, typography, spacing, and shadows.
                 </p>
               </div>
-              <button
-                onClick={() => setStep('components')}
-                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                {selectedPackId ? 'Next: Components' : 'Skip'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setStep('shape')}
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => setStep('components')}
+                  className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  {selectedPackId ? 'Next: Components' : 'Skip'}
+                </button>
+              </div>
             </div>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -707,7 +1104,7 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
               </a>
               <button
                 onClick={() => {
-                  setStep('style-pack');
+                  setStep('shape');
                   setError(null);
                 }}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"

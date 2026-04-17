@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { loadLocalTokens, loadRemoteTokens, findFiles, scanFile } from '../lib/scanner.js';
+import { loadLocalTokens, loadRemoteTokens, findFiles, scanFileAsync } from '../lib/scanner.js';
 import type { ApprovedToken, FileResult } from '../lib/scanner.js';
 import { buildReport, formatReport } from '../lib/reporter.js';
 
@@ -11,6 +11,8 @@ export interface ValidateOptions {
   project?: string;
   format: 'text' | 'json' | 'github';
   strict: boolean;
+  /** When true, exit non-zero only when at least one error-severity violation is found. */
+  ci?: boolean;
   maxViolations: number;
   ignore: string[];
 }
@@ -73,7 +75,7 @@ export async function validate(options: ValidateOptions): Promise<number> {
 
   for (const filePath of filePaths) {
     try {
-      const result = scanFile(filePath, tokens);
+      const result = await scanFileAsync(filePath, tokens);
       results.push(result);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -82,7 +84,13 @@ export async function validate(options: ValidateOptions): Promise<number> {
   }
 
   // --- Report ---
-  const report = buildReport(results, cwd, options.strict, options.maxViolations);
+  const report = buildReport(
+    results,
+    cwd,
+    options.strict,
+    options.maxViolations,
+    options.ci ?? false
+  );
   const output = formatReport(report, options.format);
 
   if (output) {

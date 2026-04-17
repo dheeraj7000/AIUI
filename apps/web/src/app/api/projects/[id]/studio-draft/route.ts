@@ -13,10 +13,19 @@ import { requireProjectAccess } from '@/lib/project-access';
  * reopen here. Never return or accept the raw row — only the draft payload.
  */
 
+const shapeSchema = z.object({
+  audience: z.string().max(500).optional(),
+  jobToBeDone: z.string().max(500).optional(),
+  emotionAfterUse: z.array(z.string().max(40)).max(12).optional(),
+  brandPersonality: z.array(z.string().max(40)).max(12).optional(),
+  antiReferences: z.array(z.string().max(80)).max(20).optional(),
+});
+
 const draftSchema = z.object({
   packId: z.string().uuid().optional().nullable(),
   selectedComponentIds: z.array(z.string().uuid()).max(500).optional(),
   tokenOverrides: z.record(z.string(), z.string()).optional(),
+  shape: shapeSchema.optional(),
 });
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -80,6 +89,14 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       ? { selectedComponentIds: parsed.data.selectedComponentIds }
       : {}),
     ...(parsed.data.tokenOverrides ? { tokenOverrides: parsed.data.tokenOverrides } : {}),
+    ...(parsed.data.shape
+      ? {
+          shape: {
+            ...parsed.data.shape,
+            updatedAt: new Date().toISOString(),
+          },
+        }
+      : {}),
     updatedAt: new Date().toISOString(),
   };
 

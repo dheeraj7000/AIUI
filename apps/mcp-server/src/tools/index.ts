@@ -14,6 +14,7 @@ import { registerInitProject } from './init-project';
 import { registerFixCompliance } from './fix-compliance';
 import { registerResetProject } from './reset-project';
 import { registerUndoTokens } from './undo-tokens';
+import { registerAliases } from './aliases';
 
 /**
  * Register all AIUI tools with the MCP server.
@@ -37,4 +38,8 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerFixCompliance(server);
   registerResetProject(server);
   registerUndoTokens(server);
+
+  // Discipline-named aliases (audit/polish/critique/typeset/...).
+  // MUST run last so alias handlers can look up canonical tools by name.
+  registerAliases(server);
 }

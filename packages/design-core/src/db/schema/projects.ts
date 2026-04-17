@@ -17,10 +17,22 @@ import { organizations } from './organizations';
  * /api/projects/[id]/studio-draft so a closed-tab session can be restored
  * on next open. All fields optional — only `updatedAt` is always written.
  */
+export type StudioDraftShape = {
+  audience?: string;
+  jobToBeDone?: string;
+  emotionAfterUse?: string[];
+  brandPersonality?: string[];
+  antiReferences?: string[];
+  updatedAt: string;
+};
+
 export type StudioDraft = {
   packId?: string;
   selectedComponentIds?: string[];
   tokenOverrides?: Record<string, string>;
+  // Pre-pack discovery interview — see StudioClient.tsx "shape" step.
+  // Flows into design-memory.md under `## Intent` via generateDesignMemory.
+  shape?: StudioDraftShape;
   updatedAt: string;
 };
 

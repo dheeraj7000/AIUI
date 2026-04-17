@@ -6,6 +6,7 @@ import { projects, styleTokens } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
 import { requireScope } from '../lib/auth';
+import { detectAntiPatterns } from './anti-patterns';
 
 export function registerFixCompliance(server: AiuiMcpServer) {
   server.registerTool(
@@ -116,11 +117,23 @@ export function registerFixCompliance(server: AiuiMcpServer) {
         }
       }
 
+      // Surface anti-pattern (taste) violations so Claude can hand-fix them.
+      // These are intentionally NOT auto-rewritten — they require judgment.
+      const antiPatterns = detectAntiPatterns(fixedCode).map((v) => ({
+        rule: v.rule,
+        severity: v.severity,
+        line: v.line,
+        snippet: v.snippet,
+        message: v.message,
+        suggestion: v.suggestion,
+      }));
+
       return {
         fixedCode,
         fixesApplied: fixesApplied.length,
         fixes: fixesApplied,
         remainingIssues,
+        antiPatterns,
       };
     }
   );

@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@aiui/design-core": "workspace:*",
+    "@aiui/mcp-server": "workspace:*",
     "zod": "^4.3.6",
     "commander": "^13.1.0",
     "ora": "^8.2.0",

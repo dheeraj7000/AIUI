@@ -7,6 +7,17 @@
     "aiui-mcp-server": "./dist/index.js"
   },
   "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./detectors": {
+      "types": "./dist/tools/detectors.d.ts",
+      "default": "./dist/tools/detectors.js"
+    },
+    "./anti-patterns": {
+      "types": "./dist/tools/anti-patterns.d.ts",
+      "default": "./dist/tools/anti-patterns.js"
+    }
+  },
   "files": [
     "dist",
     "README.md"
