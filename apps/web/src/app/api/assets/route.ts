@@ -59,7 +59,6 @@ const createAssetBodySchema = z.object({
 const listAssetsQuerySchema = z.object({
   projectId: z.string().uuid(),
   type: z.enum(ASSET_TYPES).optional(),
-  tagIds: z.string().optional(), // comma-separated UUIDs
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -99,7 +98,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * GET /api/assets — List assets filtered by project, type, and tags.
+ * GET /api/assets — List assets filtered by project and type.
  */
 export async function GET(req: NextRequest) {
   const userId = req.headers.get('x-user-id');
@@ -111,7 +110,6 @@ export async function GET(req: NextRequest) {
     const params = {
       projectId: req.nextUrl.searchParams.get('projectId') ?? '',
       type: req.nextUrl.searchParams.get('type') ?? undefined,
-      tagIds: req.nextUrl.searchParams.get('tagIds') ?? undefined,
       limit: req.nextUrl.searchParams.get('limit') ?? undefined,
       offset: req.nextUrl.searchParams.get('offset') ?? undefined,
     };
@@ -124,8 +122,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const tagIds = parsed.data.tagIds ? parsed.data.tagIds.split(',').filter(Boolean) : undefined;
-
     const db = getDb();
 
     // Authorize: caller must belong to the target project's organization
@@ -136,7 +132,6 @@ export async function GET(req: NextRequest) {
     const result = await listAssets(db, {
       projectId: parsed.data.projectId,
       type: parsed.data.type,
-      tagIds,
       limit: parsed.data.limit,
       offset: parsed.data.offset,
     });

@@ -10,7 +10,7 @@ const steps: Step[] = [
   {
     id: '01',
     title: 'Write down your design decisions.',
-    body: 'Pick a style pack in the studio, import tokens you already have, or bring a Figma file. AIUI turns those decisions into a small set of files inside your project — .aiui/ — that become the source of truth.',
+    body: 'Pick a style pack in the studio or paste CSS variables, a Tailwind config, or Tokens Studio JSON. AIUI turns those decisions into a small set of files inside your project — .aiui/ — that become the source of truth.',
     specimen: (
       <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
         <code>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { createDb, projects, stylePacks } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import { getUserOrg } from '@/lib/get-user-org';
+import { CreateProjectButton } from '@/components/ui/create-project-button';
 
 export const metadata = { title: 'Projects - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,7 @@ async function getProjects() {
 }
 
 export default async function ProjectsPage() {
-  const allProjects = await getProjects();
+  const [allProjects, userOrg] = await Promise.all([getProjects(), getUserOrg()]);
 
   return (
     <div>
@@ -49,6 +50,7 @@ export default async function ProjectsPage() {
             {allProjects.length} project{allProjects.length !== 1 ? 's' : ''}
           </p>
         </div>
+        {userOrg && <CreateProjectButton orgId={userOrg.organizationId} />}
       </div>
 
       {allProjects.length > 0 ? (
@@ -81,18 +83,15 @@ export default async function ProjectsPage() {
         </div>
       ) : (
         <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
-          <p className="text-sm text-zinc-400">No projects yet.</p>
+          <p className="text-sm font-medium text-zinc-300">No projects yet</p>
           <p className="mt-2 text-xs text-zinc-500">
-            Go to a{' '}
-            <Link href="/style-packs" className="text-indigo-400 hover:underline">
-              Style Pack
-            </Link>{' '}
-            or{' '}
-            <Link href="/components" className="text-indigo-400 hover:underline">
-              Component
-            </Link>{' '}
-            and click &quot;Add to Project&quot; to create one.
+            Create a project to get a starter pack, tokens, and your MCP integration guide.
           </p>
+          {userOrg && (
+            <div className="mt-6 flex justify-center">
+              <CreateProjectButton orgId={userOrg.organizationId} />
+            </div>
+          )}
         </div>
       )}
     </div>

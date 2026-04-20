@@ -5,6 +5,7 @@ import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Key, Download } fro
 import { getUserOrg } from '@/lib/get-user-org';
 import { OnboardingChecklist } from '@/components/ui/onboarding-checklist';
 import { McpWalkthrough } from '@/components/ui/mcp-walkthrough';
+import { CreateProjectButton } from '@/components/ui/create-project-button';
 
 export const metadata = { title: 'Dashboard - AIUI' };
 export const dynamic = 'force-dynamic';
@@ -106,7 +107,7 @@ const statCards = [
 ];
 
 export default async function DashboardPage() {
-  const stats = await getStats();
+  const [stats, userOrg] = await Promise.all([getStats(), getUserOrg()]);
 
   return (
     <div>
@@ -116,6 +117,7 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="mt-1 text-sm text-zinc-500">Manage your design system and projects</p>
         </div>
+        {userOrg && <CreateProjectButton orgId={userOrg.organizationId} />}
       </div>
 
       {/* Onboarding */}
@@ -192,7 +194,7 @@ export default async function DashboardPage() {
                   Import Tokens
                 </h3>
                 <p className="text-xs text-zinc-500">
-                  Import design tokens from Figma, CSS, or Tailwind
+                  Import design tokens from CSS, Tokens Studio, or Tailwind
                 </p>
               </div>
             </div>
@@ -204,15 +206,23 @@ export default async function DashboardPage() {
       <div className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Projects</h2>
-          {stats.recentProjects.length > 0 && (
-            <Link
-              href="/projects"
-              className="group flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
-            >
-              View all
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          )}
+          <div className="flex items-center gap-3">
+            {userOrg && (
+              <CreateProjectButton orgId={userOrg.organizationId} variant="outline" label="New" />
+            )}
+            {stats.recentProjects.length > 0 && (
+              <Link
+                href="/projects"
+                className="group flex items-center gap-1 text-sm font-medium text-indigo-400 transition-colors hover:text-indigo-300"
+              >
+                View all
+                <ArrowRight
+                  size={14}
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              </Link>
+            )}
+          </div>
         </div>
 
         {stats.recentProjects.length > 0 ? (
@@ -245,16 +255,13 @@ export default async function DashboardPage() {
             </div>
             <p className="text-sm font-medium text-zinc-400">No projects yet</p>
             <p className="mt-1 text-xs text-zinc-500">
-              Projects are created via the API. Browse{' '}
-              <Link href="/style-packs" className="text-indigo-400 hover:underline">
-                Style Packs
-              </Link>{' '}
-              and{' '}
-              <Link href="/components" className="text-indigo-400 hover:underline">
-                Components
-              </Link>{' '}
-              to explore your design library.
+              Create your first project — a starter pack and tokens are seeded for you.
             </p>
+            {userOrg && (
+              <div className="mt-5 flex justify-center">
+                <CreateProjectButton orgId={userOrg.organizationId} />
+              </div>
+            )}
           </div>
         )}
       </div>

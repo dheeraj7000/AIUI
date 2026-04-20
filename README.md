@@ -10,7 +10,7 @@ AIUI lets you choose styles, components, and design tokens from a visual console
 - **Component Recipes** — code templates with props schemas and AI usage rules
 - **Design Memory** — syncs your design context into any project so Claude follows it automatically
 - **Token Compliance** — validates generated code against your approved tokens
-- **MCP Integration** — Claude Code reads your design system via 12 MCP tools
+- **MCP Integration** — Claude Code reads your design system via 18 MCP tools
 
 ## Prerequisites
 
@@ -50,7 +50,7 @@ DATABASE_URL="postgresql://aiui:aiui@127.0.0.1:5432/aiui" pnpm seed
 cd ../..
 ```
 
-This creates 6 style packs and 57 component recipes from shadcn/ui, MagicUI, and community sources.
+This creates 14 style packs and ~161 component recipes from shadcn/ui, MagicUI, and community sources.
 
 ### 4. Configure environment
 
@@ -99,7 +99,7 @@ packages/
 | `/dashboard`        | Overview — style pack count, component count, projects            |
 | `/style-packs`      | Browse all 6 design packs with token/component counts             |
 | `/style-packs/[id]` | View tokens (color swatches, radii, fonts) + apply to project     |
-| `/components`       | Browse all 57 component recipes with type filters                 |
+| `/components`       | Browse all ~161 component recipes with type filters               |
 | `/components/[id]`  | View code template, props schema, AI usage rules + add to project |
 | `/projects`         | List your projects with assigned style packs                      |
 | `/projects/[slug]`  | Project detail — tokens, components, MCP integration guide        |
@@ -109,7 +109,7 @@ packages/
 
 AIUI exposes 18 tools via the Model Context Protocol. The live, authoritative
 list is published at `GET /mcp/catalog` on the MCP server and surfaced in the
-dashboard at `/mcp-tools`. Highlights:
+dashboard at `/mcp-tools`. Full catalog:
 
 | Tool                       | Description                                       |
 | -------------------------- | ------------------------------------------------- |
@@ -237,16 +237,24 @@ Now Claude automatically follows your design system when building UI.
 
 ## Design Library
 
-The seed data includes 6 style packs:
+The seed data includes 14 style packs:
 
-| Pack                 | Category   | Tokens | Components |
-| -------------------- | ---------- | ------ | ---------- |
-| SaaS Clean           | saas       | 31     | 8          |
-| Fintech Light        | fintech    | 31     | 6          |
-| Startup Bold         | startup    | 31     | 6          |
-| shadcn/ui Essentials | ui-library | 33     | 14         |
-| MagicUI Effects      | animations | 32     | 13         |
-| Community Creative   | creative   | 32     | 10         |
+| Pack                 | Category   | Components |
+| -------------------- | ---------- | ---------- |
+| SaaS Clean           | saas       | 9          |
+| Fintech Light        | fintech    | 7          |
+| Startup Bold         | startup    | 7          |
+| shadcn/ui Essentials | ui-library | 15         |
+| MagicUI Effects      | animations | 14         |
+| Community Creative   | creative   | 11         |
+| Dashboard Dark       | saas       | 13         |
+| Ecommerce Pro        | ecommerce  | 13         |
+| Healthcare Clean     | healthcare | 11         |
+| AI Studio            | ai         | 13         |
+| Mobile First         | mobile     | 11         |
+| Minimal Mono         | minimal    | 11         |
+| UIverse Primitives   | ui-library | 13         |
+| UIverse Effects      | animations | 13         |
 
 ## Scripts
 

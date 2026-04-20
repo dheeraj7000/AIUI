@@ -400,7 +400,7 @@ export default function DocsPage() {
                     color="amber"
                     items={[
                       'Colors, typography, spacing, shadows, border radii, elevation',
-                      'Import from Figma, Tailwind configs, or CSS variables',
+                      'Import from Tailwind configs, CSS variables, or Tokens Studio',
                       'Export as Tailwind, CSS custom properties, or JSON',
                       'Instant propagation — change once, applies everywhere',
                     ]}

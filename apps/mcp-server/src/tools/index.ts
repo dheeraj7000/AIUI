@@ -1,6 +1,5 @@
 import type { AiuiMcpServer } from '../server';
 import { registerGetProjectContext } from './get-project-context';
-import { registerResolveTag } from './resolve-tag';
 import { registerComponentTools } from './components';
 import { registerThemeTokens } from './theme-tokens';
 import { registerAssetManifest } from './asset-manifest';
@@ -14,7 +13,6 @@ import { registerInitProject } from './init-project';
 import { registerFixCompliance } from './fix-compliance';
 import { registerResetProject } from './reset-project';
 import { registerUndoTokens } from './undo-tokens';
-import { registerAliases } from './aliases';
 
 /**
  * Register all AIUI tools with the MCP server.
@@ -22,7 +20,6 @@ import { registerAliases } from './aliases';
 export function registerAllTools(server: AiuiMcpServer) {
   // Read tools
   registerGetProjectContext(server);
-  registerResolveTag(server);
   registerComponentTools(server);
   registerThemeTokens(server);
   registerAssetManifest(server);
@@ -38,8 +35,4 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerFixCompliance(server);
   registerResetProject(server);
   registerUndoTokens(server);
-
-  // Discipline-named aliases (audit/polish/critique/typeset/...).
-  // MUST run last so alias handlers can look up canonical tools by name.
-  registerAliases(server);
 }

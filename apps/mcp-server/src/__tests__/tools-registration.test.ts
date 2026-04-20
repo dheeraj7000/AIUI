@@ -7,7 +7,6 @@ import { registerFixCompliance } from '../tools/fix-compliance';
 import { registerResetProject } from '../tools/reset-project';
 import { registerUndoTokens } from '../tools/undo-tokens';
 import { registerGetProjectContext } from '../tools/get-project-context';
-import { registerResolveTag } from '../tools/resolve-tag';
 import { registerComponentTools } from '../tools/components';
 import { registerThemeTokens } from '../tools/theme-tokens';
 import { registerAssetManifest } from '../tools/asset-manifest';
@@ -49,10 +48,6 @@ describe('Tools registration exports', () => {
     expect(typeof registerGetProjectContext).toBe('function');
   });
 
-  it('registerResolveTag is a function', () => {
-    expect(typeof registerResolveTag).toBe('function');
-  });
-
   it('registerComponentTools is a function', () => {
     expect(typeof registerComponentTools).toBe('function');
   });
@@ -91,7 +86,6 @@ describe('Tools registration exports', () => {
       registerResetProject,
       registerUndoTokens,
       registerGetProjectContext,
-      registerResolveTag,
       registerComponentTools,
       registerThemeTokens,
       registerAssetManifest,

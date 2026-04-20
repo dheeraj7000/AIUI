@@ -6,7 +6,6 @@ import { log } from './lib/errors';
 import { authenticateRequest } from './lib/auth';
 import { runWithContext } from './lib/context';
 import { registerAllTools } from './tools';
-import { trackUsageAsync } from './lib/usage';
 import { AiuiMcpServer } from './server';
 
 // ---------------------------------------------------------------------------
@@ -319,27 +318,6 @@ export async function startHttpServer(port: number) {
         res.status(429).json({ error: 'Rate limit exceeded' });
         return;
       }
-
-      // Track tool calls to the audit log / usage_events table (fire-and-forget).
-      // Handles both single JSON-RPC requests and batch arrays. Non-tool_call
-      // methods (initialize, tools/list, ...) are ignored.
-      const trackFromBody = (body: unknown): void => {
-        if (!body || typeof body !== 'object') return;
-        if (Array.isArray(body)) {
-          body.forEach(trackFromBody);
-          return;
-        }
-        const rec = body as { method?: string; params?: { name?: string } };
-        if (rec.method === 'tools/call' && rec.params?.name) {
-          trackUsageAsync({
-            apiKeyId: authContext.keyId,
-            organizationId: authContext.organizationId,
-            toolName: rec.params.name,
-            eventType: 'tool_call',
-          });
-        }
-      };
-      trackFromBody(req.body);
 
       // Check for existing session
       const sessionId = req.headers['mcp-session-id'] as string | undefined;

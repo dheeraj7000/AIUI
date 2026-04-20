@@ -5,8 +5,6 @@ import { getDb } from '../lib/db';
 import { projects, styleTokens, designProfiles, computeTokensHash } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
-import { detectAntiPatterns } from './anti-patterns';
-import { critiqueByPersonas, type PersonaFinding } from './personas';
 import {
   extractColors,
   extractTailwindViolations,
@@ -56,19 +54,11 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
     {
       projectId: z.string().uuid().describe('The project ID to validate against'),
       code: z.string().describe('The generated UI code to validate'),
-      mode: z
-        .enum(['deterministic', 'personas', 'both'])
-        .optional()
-        .describe(
-          "Validation mode. 'deterministic' (default) runs rule-based checks only; 'personas' adds qualitative persona critique; 'both' returns both layers."
-        ),
     },
     async (args) => {
       const db = getDb();
       const projectId = args.projectId as string;
       const code = args.code as string;
-      const mode =
-        (args.mode as 'deterministic' | 'personas' | 'both' | undefined) ?? 'deterministic';
 
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
 
@@ -275,13 +265,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
       violations.push(...a11yViolations);
 
       // -----------------------------------------------------------------------
-      // Anti-pattern (taste) checks — additive, does not mutate `violations`
-      // -----------------------------------------------------------------------
-      const antiPatterns = detectAntiPatterns(code);
-      const antiPatternErrorCount = antiPatterns.filter((v) => v.severity === 'error').length;
-      const antiPatternWarningCount = antiPatterns.filter((v) => v.severity === 'warning').length;
-
-      // -----------------------------------------------------------------------
       // Scoring
       // -----------------------------------------------------------------------
       const errorCount = violations.filter((v) => v.severity === 'error').length;
@@ -290,15 +273,7 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
       ).length;
       const a11yCount = a11yViolations.length;
 
-      const score = Math.max(
-        0,
-        100 -
-          errorCount * 20 -
-          warningCount * 5 -
-          a11yCount * 3 -
-          antiPatternErrorCount * 8 -
-          antiPatternWarningCount * 2
-      );
+      const score = Math.max(0, 100 - errorCount * 20 - warningCount * 5 - a11yCount * 3);
 
       // Check if the project's design profile is stale
       let memoryFresh = true;
@@ -326,17 +301,10 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         ? undefined
         : 'Design memory may be outdated. Consider re-syncing.';
 
-      let personas: PersonaFinding[] | undefined;
-      if (mode !== 'deterministic') {
-        personas = critiqueByPersonas(code, violations);
-      }
-
       return {
-        compliant: violations.length === 0 && antiPatternErrorCount === 0,
+        compliant: violations.length === 0,
         score,
         violations,
-        antiPatterns,
-        ...(personas ? { personas } : {}),
         memoryFresh,
         ...(stalenessWarning ? { stalenessWarning } : {}),
         summary: {
@@ -351,8 +319,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
           checkedZIndex: usedZIndex.length,
           checkedOpacity: usedOpacity.length,
           checkedBorderWidths: usedBorderWidth.length,
-          antiPatternErrors: antiPatternErrorCount,
-          antiPatternWarnings: antiPatternWarningCount,
         },
       };
     }

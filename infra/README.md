@@ -10,9 +10,32 @@ Internet → ALB (HTTP:80) → EC2 t3.micro (Docker Compose)
                               └── aiui-mcp    (:8080)
 
 Neon (external) → PostgreSQL
-SSM Parameter Store → Secrets
+SSM Parameter Store → Secrets (DATABASE_URL, JWT_SECRET)
 ECR → Container images
 ```
+
+## 2026-04 scope-reduction notes
+
+The application surface shrank substantially in the 2026-04 cleanup (see
+repo `CLAUDE.md` → "Scope"). The infrastructure does **not** need structural
+changes as a result, but a few implications are worth knowing:
+
+- No new secrets were added. The only SSM params used are `DATABASE_URL`
+  and `JWT_SECRET` — the usage-metering / credit-ledger machinery was
+  removed, so there is nothing like `STRIPE_KEY` or tier limits to wire in.
+- Database migrations: after pulling the new code, run
+  `drizzle-kit generate && drizzle-kit push` (or `db:push`) so the removed
+  tables (`tags`, `resource_tags`, `invitations`, `usage_events`,
+  `credit_ledger`, `pack_registry`, `pack_ratings`) are dropped. A no-op
+  against a fresh database.
+- The `mcp-server` container still listens on `:8080` with the same HTTP
+  transport. Client configuration (Bearer auth, `/mcp`, `/mcp/catalog`,
+  `/mcp/setup`) is unchanged.
+- CORS, rate limits, session TTLs — all unchanged.
+
+If you are redeploying a stack that previously had the enterprise surface
+enabled, nothing in Terraform needs to roll back — the app simply stops
+reading or writing the removed tables.
 
 ## Prerequisites
 

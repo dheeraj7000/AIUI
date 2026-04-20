@@ -70,7 +70,10 @@ export default function SignUpPage() {
     setIsSubmitting(true);
     try {
       await signUp(email, password);
-      router.push('/dashboard');
+      // The signup route auto-creates a starter project, so the projects
+      // list already has something to show. Sending the user straight to
+      // /projects avoids the "empty dashboard" first impression.
+      router.push('/projects');
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'Sign up failed. Please try again.');
     } finally {

@@ -48,18 +48,10 @@ export { createDb } from './db';
 export type { Database } from './db';
 export * from './db/schema';
 
-// Organization validation
-export { createOrgSchema, updateOrgSchema } from './validation/organization';
-export type { CreateOrgInput, UpdateOrgInput } from './validation/organization';
-
-// Organization operations
-export {
-  createOrganization,
-  getOrganization,
-  listUserOrganizations,
-  updateOrganization,
-  deleteOrganization,
-} from './operations/organizations';
+// Workspace (personal organization) operations — retained after scope cut
+// Multi-tenant CRUD (create/update/delete, member invites, roles) is gone;
+// each user gets one workspace, auto-provisioned on signup.
+export { getOrganization, getUserWorkspace, ensureUserWorkspace } from './operations/organizations';
 
 // Style pack validation
 export {
@@ -81,23 +73,6 @@ export {
   updateStylePack,
   deleteStylePack,
 } from './operations/style-packs';
-
-// Tag validation
-export { createTagSchema, assignTagSchema, listTagsSchema } from './validation/tag';
-export type { CreateTagInput, AssignTagInput, ListTagsInput } from './validation/tag';
-
-// Tag operations
-export {
-  createTag,
-  getTag,
-  listTags,
-  deleteTag,
-  assignTag,
-  removeTagAssignment,
-  getTagsForResource,
-  getResourcesByTag,
-  TagConflictError,
-} from './operations/tags';
 
 // Component recipe validation
 export {
@@ -154,32 +129,6 @@ export {
   updateAssetMetadata,
 } from './operations/assets';
 export type { CreateAssetInput, ListAssetsParams } from './operations/assets';
-
-// Member validation
-export { createInvitationSchema, updateRoleSchema } from './validation/member';
-export type { CreateInvitationInput, UpdateRoleInput } from './validation/member';
-
-// Invitation operations
-export {
-  createInvitation,
-  acceptInvitation,
-  listPendingInvitations,
-  revokeInvitation,
-} from './operations/invitations';
-
-// Member operations
-export { updateMemberRole, removeMember } from './operations/members';
-
-// Permissions
-export {
-  canManageMembers,
-  canDeleteOrg,
-  canUpdateOrg,
-  canChangeRole,
-  canRemoveMember,
-  ROLE_HIERARCHY,
-} from './lib/permissions';
-export type { OrgRole } from './lib/permissions';
 
 // Metadata extraction
 export {
@@ -290,14 +239,8 @@ export {
   type StylePackListFilters,
 } from './db/queries';
 
-// API key operations
-export {
-  createApiKey,
-  listApiKeys,
-  revokeApiKey,
-  rotateApiKey,
-  verifyApiKey,
-} from './operations/api-keys';
+// API key operations (simplified after cleanup — no rotation / prefix masking)
+export { createApiKey, listApiKeys, revokeApiKey, verifyApiKey } from './operations/api-keys';
 export type { CreateApiKeyInput, ApiKeyWithRaw, ApiKeyContext } from './operations/api-keys';
 
 // Project initialization with starter pack seeding
@@ -316,28 +259,11 @@ export type {
 export {
   detectFormat,
   parseTokens,
-  parseFigmaUrl,
-  extractFigmaTokens,
   parseCssVariables,
   parseTokensStudio,
   parseTailwindConfig,
 } from './importers';
-export type { ImportFormat, ImportResult, FigmaExtractionResult } from './importers';
-
-// Usage tracking
-export {
-  trackUsage,
-  checkLimit,
-  getUsage,
-  getUsageHistory,
-  ensureLedger,
-  TIER_LIMITS,
-} from './operations/usage';
-
-// Marketplace
-export { publishPack, searchPacks, getMarketplacePack, ratePack } from './operations/marketplace';
-export { publishPackSchema, searchPacksSchema, ratePackSchema } from './validation/marketplace';
-export type { PublishPackInput, SearchPacksInput, RatePackInput } from './validation/marketplace';
+export type { ImportFormat, ImportResult } from './importers';
 
 // Graph operations
 export {
@@ -349,14 +275,5 @@ export {
   autoGenerateGraph,
 } from './operations/graph';
 
-// Registry
-export { serializePackForRegistry, getRegistryIndex } from './operations/registry';
-export {
-  registryItemSchema,
-  registryIndexItemSchema,
-  registryTokenSchema,
-} from './validation/registry';
-export type { RegistryItem, RegistryIndexItem, RegistryToken } from './validation/registry';
-
-// Auth guards
+// Auth guards (retained — every authenticated route uses these)
 export { verifyOrgMembership, verifyResourceOwnership } from './lib/auth-guards';

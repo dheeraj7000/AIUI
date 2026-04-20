@@ -12,10 +12,6 @@
     "./detectors": {
       "types": "./dist/tools/detectors.d.ts",
       "default": "./dist/tools/detectors.js"
-    },
-    "./anti-patterns": {
-      "types": "./dist/tools/anti-patterns.d.ts",
-      "default": "./dist/tools/anti-patterns.js"
     }
   },
   "files": [
@@ -42,7 +38,6 @@
     "@aiui/component-engine": "workspace:*",
     "@aiui/design-core": "workspace:*",
     "@aiui/prompt-compiler": "workspace:*",
-    "@aiui/types": "workspace:*",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "tsup": "^8.4.0",

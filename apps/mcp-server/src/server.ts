@@ -40,11 +40,9 @@ export class AiuiMcpServer {
   ) {
     this.tools.set(name, { description, schema, handler });
 
-    // Every tool dispatch is wrapped with server-side audit logging. The
-    // wrapper records {userId, orgId, projectId, toolName, args_summary,
-    // status, duration_ms} into usage_events (see lib/audit-wrapper.ts). It
-    // is applied once, here, so both stdio and HTTP registration paths
-    // inherit the behavior — no changes needed at call sites.
+    // `wrapWithAudit` is a no-op after the scope cut (usage_events table is
+    // gone). It is kept only so the server code path stays stable if auditing
+    // is ever re-introduced — today, handler runs directly.
     const auditedHandler = wrapWithAudit(name, handler);
 
     this.server.tool(name, description, schema, async (args) => {
@@ -85,12 +83,9 @@ export class AiuiMcpServer {
   }
 
   /**
-   * Look up a previously-registered tool handler by name. Used by alias
-   * registrations (see tools/aliases.ts) so discipline-named aliases like
-   * `audit` / `polish` / `critique` can delegate to their canonical tools
-   * without duplicating business logic. Returns the raw un-audited handler;
-   * the alias re-registration wraps it with audit + content-wrapping again,
-   * which is intentional — each alias is a distinct audit event.
+   * Look up a previously-registered tool handler by name. Still exported in
+   * case tests want to dispatch a handler directly; no production consumer
+   * now that the alias layer (which used this) has been removed.
    */
   getToolHandler(name: string): ToolHandler | undefined {
     return this.tools.get(name)?.handler;

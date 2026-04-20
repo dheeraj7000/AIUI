@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/tools/detectors.ts', 'src/tools/anti-patterns.ts'],
+  entry: ['src/index.ts', 'src/tools/detectors.ts'],
   format: ['esm'],
   target: 'node18',
   outDir: 'dist',
@@ -14,12 +14,7 @@ export default defineConfig({
     js: '#!/usr/bin/env node',
   },
   // Bundle workspace packages (they don't exist on npm)
-  noExternal: [
-    '@aiui/design-core',
-    '@aiui/prompt-compiler',
-    '@aiui/component-engine',
-    '@aiui/types',
-  ],
+  noExternal: ['@aiui/design-core', '@aiui/prompt-compiler', '@aiui/component-engine'],
   // Keep npm-installable packages as external
   external: [
     '@modelcontextprotocol/sdk',

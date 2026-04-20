@@ -6,69 +6,31 @@ This project uses AIUI for design management.
 See `.aiui/design-memory.md` for the active design system — tokens, components, and rules.
 Always follow the design rules defined there before building any UI.
 
-## SPOQ Integration
+## Scope (post-2026-04 cleanup)
 
-This project uses [SPOQ](https://spoqpaper.com) for multi-agent AI orchestration.
+AIUI is a solo-dev tool. The following have been intentionally **removed** from
+the main branch — if you need to reference them, see the `v2/full-features`
+branch:
 
-### Common Commands
+- Multi-tenant organizations, invitations, and member roles
+- Tags + resource tagging system
+- Pack registry / marketplace
+- Audit logs + per-tier usage metering (`usage_events`, `credit_ledger`)
+- API key rotation
+- Tool aliases (`audit` / `polish` / `critique` / `typeset` / ...)
+- Anti-pattern heuristics + persona critique
+- Figma import pipeline
 
-```bash
-# Plan an epic
-/epic-planning "Implement feature X"
+When adding features, default to the solo-dev scope. Do not re-introduce
+multi-tenant, RBAC, or metering machinery without an explicit product decision.
 
-# Validate epic quality
-/epic-validation @spoq/epics/active/feature-x
+## Local MCP Config
 
-# Execute with agent swarm
-/agent-execution @spoq/epics/active/feature-x
+The shipped `.mcp.json` only registers the `aiui` server. If you want extra
+local servers (e.g. `spoq`), copy `.mcp.local.json.example` to
+`.mcp.local.json` — it is gitignored.
 
-# Execute with agent teams
-/team-execution @spoq/epics/active/feature-x
+## Git Operations
 
-# Validate delivered code
-/agent-validation
-
-# Plan a multi-epic program
-/epic-planning --map "Program name"
-```
-
-### Validation Thresholds
-
-**Epic Validation (10 Metrics):** >= 95 average, >= 90 per metric
-**Agent Validation (10 Metrics):** >= 95 average, >= 80 per metric
-
-### Directory Structure
-
-- `spoq/epics/active/` — Epics in progress
-- `spoq/epics/complete/` — Archived completed epics
-- `spoq/maps/active/` — Maps (multi-epic programs) in progress
-- `spoq/maps/complete/` — Archived completed maps
-- `.claude/skills/` — SPOQ skill definitions
-
-### MCP Server
-
-The SPOQ MCP server provides 23 tools for epic, map, and task management.
-Configure in `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "spoq": {
-      "command": "spoq",
-      "args": ["mcp"]
-    }
-  }
-}
-```
-
-### Workflow
-
-1. **Plan** — `/epic-planning` decomposes goals into atomic tasks
-2. **Validate** — `/epic-validation` scores against 10 quality metrics
-3. **Execute** — `/agent-execution` dispatches parallel agent swarms
-4. **Verify** — `/agent-validation` scores delivered code
-
-### Git Operations
-
-- Repository maintainer handles all git operations
-- SPOQ agents never create commits
+- Repository maintainer handles all git operations.
+- Agents should not create commits.

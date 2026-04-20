@@ -35,18 +35,6 @@ export type {
 export { createRecipeSchema, updateRecipeSchema, listRecipesSchema } from './component-recipe';
 export type { CreateRecipeInput, UpdateRecipeInput, ListRecipesInput } from './component-recipe';
 
-// Tags
-export { createTagSchema, assignTagSchema, listTagsSchema } from './tag';
-export type { CreateTagInput, AssignTagInput, ListTagsInput } from './tag';
-
-// Organizations
-export { createOrgSchema, updateOrgSchema } from './organization';
-export type { CreateOrgInput, UpdateOrgInput } from './organization';
-
-// Members & invitations
-export { createInvitationSchema, updateRoleSchema } from './member';
-export type { CreateInvitationInput, UpdateRoleInput } from './member';
-
 // Asset validation
 export {
   ASSET_TYPE_CONFIG,

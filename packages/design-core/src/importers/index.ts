@@ -1,7 +1,7 @@
 /**
  * Unified design token import interface.
  *
- * Supports importing tokens from Figma, CSS custom properties,
+ * Supports importing tokens from CSS custom properties,
  * Tokens Studio JSON, and Tailwind CSS configurations.
  */
 
@@ -16,7 +16,7 @@ interface CreateTokenInput {
   description?: string;
 }
 
-export type ImportFormat = 'figma' | 'css' | 'tokens-studio' | 'tailwind' | 'auto';
+export type ImportFormat = 'css' | 'tokens-studio' | 'tailwind' | 'auto';
 
 export interface ImportResult {
   tokens: CreateTokenInput[];
@@ -28,9 +28,6 @@ export interface ImportResult {
 // ---------------------------------------------------------------------------
 // Re-exports
 // ---------------------------------------------------------------------------
-
-export { parseFigmaUrl, extractFigmaTokens } from './figma';
-export type { FigmaExtractionResult } from './figma';
 
 import { parseCssVariables as _parseCssVariables } from './css-vars';
 import { parseTokensStudio as _parseTokensStudio } from './tokens-studio';
@@ -151,11 +148,8 @@ function looksLikeTailwindJs(content: string): boolean {
 /**
  * Parse design tokens from a string in the specified (or auto-detected) format.
  *
- * When format is 'auto', all non-Figma parsers are tried and the result
- * with the most extracted tokens is returned.
- *
- * Note: Figma import is not attempted via parseTokens because it requires
- * an async API call with authentication. Use `extractFigmaTokens` directly.
+ * When format is 'auto', all parsers are tried and the result with the most
+ * extracted tokens is returned.
  */
 export function parseTokens(content: string, format?: ImportFormat): ImportResult {
   const resolvedFormat = format && format !== 'auto' ? format : detectFormat(content);
@@ -171,16 +165,6 @@ export function parseTokens(content: string, format?: ImportFormat): ImportResul
 
   if (resolvedFormat === 'tailwind') {
     return _parseTailwindConfig(content);
-  }
-
-  if (resolvedFormat === 'figma') {
-    return {
-      tokens: [],
-      stats: { total: 0 },
-      warnings: [
-        'Figma import requires API authentication. Use extractFigmaTokens(fileKey, accessToken) directly.',
-      ],
-    };
   }
 
   // Auto mode: try all parsers and pick the best result

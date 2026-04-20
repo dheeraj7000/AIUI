@@ -7,8 +7,6 @@ import { stylePacks } from './style-packs';
 import { styleTokens } from './style-tokens';
 import { componentRecipes } from './component-recipes';
 import { assets } from './assets';
-import { tags } from './tags';
-import { resourceTags } from './resource-tags';
 import { designProfiles } from './design-profiles';
 import { promptBundles } from './prompt-bundles';
 
@@ -89,19 +87,6 @@ export const assetsRelations = relations(assets, ({ one }) => ({
   organization: one(organizations, {
     fields: [assets.organizationId],
     references: [organizations.id],
-  }),
-}));
-
-// ── Tags ───────────────────────────────────────────────────────────────────
-export const tagsRelations = relations(tags, ({ many }) => ({
-  resourceTags: many(resourceTags),
-}));
-
-// ── Resource Tags ──────────────────────────────────────────────────────────
-export const resourceTagsRelations = relations(resourceTags, ({ one }) => ({
-  tag: one(tags, {
-    fields: [resourceTags.tagId],
-    references: [tags.id],
   }),
 }));
 

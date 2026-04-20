@@ -17,8 +17,8 @@ coverage/
 # AIUI design memory (generated per-project, not committed)
 .aiui/
 
-# Dev planning (spoq epics)
-spoq/
+# Local-only MCP config (keeps dev tools like spoq out of shipped .mcp.json)
+.mcp.local.json
 
 # IDE
 .vscode/

@@ -4,14 +4,12 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Download,
-  PenTool,
   FileCode2,
   Braces,
   Wind,
   Loader2,
   AlertTriangle,
   CheckCircle2,
-  ExternalLink,
   Palette,
   Type,
   BoxSelect,
@@ -49,7 +47,6 @@ type ImportState = 'idle' | 'loading' | 'preview' | 'importing' | 'success' | 'e
 // ---------------------------------------------------------------------------
 
 const TABS = [
-  { id: 'figma' as const, label: 'Figma', icon: PenTool },
   { id: 'css' as const, label: 'CSS Variables', icon: FileCode2 },
   { id: 'tokens-studio' as const, label: 'Tokens Studio', icon: Braces },
   { id: 'tailwind' as const, label: 'Tailwind Config', icon: Wind },
@@ -178,171 +175,6 @@ function TokenPreviewSection({ data }: { data: PreviewData }) {
           </ul>
         </div>
       )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Figma Tab Content
-// ---------------------------------------------------------------------------
-
-function FigmaTab() {
-  const router = useRouter();
-  const [fileUrl, setFileUrl] = useState('');
-  const [figmaToken, setFigmaToken] = useState('');
-  const [state, setState] = useState<ImportState>('idle');
-  const [preview, setPreview] = useState<PreviewData | null>(null);
-  const [error, setError] = useState('');
-
-  const handlePreview = useCallback(async () => {
-    if (!fileUrl || !figmaToken) return;
-    setState('loading');
-    setError('');
-    setPreview(null);
-
-    try {
-      const res = await authedFetch('/api/imports/figma/preview', {
-        fileUrl,
-        accessToken: figmaToken,
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to preview Figma file');
-      }
-
-      const data: PreviewData = await res.json();
-      setPreview(data);
-      setState('preview');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-      setState('error');
-    }
-  }, [fileUrl, figmaToken]);
-
-  const handleImport = useCallback(async () => {
-    if (!fileUrl || !figmaToken) return;
-    setState('importing');
-    setError('');
-
-    const orgId = getActiveOrgId();
-
-    try {
-      const res = await authedFetch('/api/imports/figma', {
-        fileUrl,
-        accessToken: figmaToken,
-        organizationId: orgId,
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to import from Figma');
-      }
-
-      const data = await res.json();
-      setState('success');
-      setTimeout(() => {
-        router.push(`/style-packs/${data.stylePack.id}`);
-      }, 1000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-      setState('error');
-    }
-  }, [fileUrl, figmaToken, router]);
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <label htmlFor="figma-url" className="block text-sm font-medium text-zinc-400">
-          Figma File URL
-        </label>
-        <input
-          id="figma-url"
-          type="text"
-          placeholder="https://www.figma.com/file/..."
-          value={fileUrl}
-          onChange={(e) => setFileUrl(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="figma-token" className="block text-sm font-medium text-zinc-400">
-          Personal Access Token
-        </label>
-        <input
-          id="figma-token"
-          type="password"
-          placeholder="figd_..."
-          value={figmaToken}
-          onChange={(e) => setFigmaToken(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-        />
-        <a
-          href="https://www.figma.com/developers/api#access-tokens"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1.5 inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"
-        >
-          Get your token
-          <ExternalLink size={10} />
-        </a>
-      </div>
-
-      {error && (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
-          {error}
-        </div>
-      )}
-
-      {state === 'success' && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-400">
-          <CheckCircle2 size={16} />
-          Import successful! Redirecting...
-        </div>
-      )}
-
-      <div className="flex items-center gap-3">
-        {state !== 'preview' && state !== 'importing' && state !== 'success' && (
-          <button
-            onClick={handlePreview}
-            disabled={!fileUrl || !figmaToken || state === 'loading'}
-            className="inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {state === 'loading' && <Loader2 size={16} className="animate-spin" />}
-            Preview
-          </button>
-        )}
-
-        {state === 'preview' && (
-          <>
-            <button
-              onClick={handleImport}
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-400"
-            >
-              Import Tokens
-            </button>
-            <button
-              onClick={() => {
-                setState('idle');
-                setPreview(null);
-              }}
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 shadow-sm transition-colors hover:bg-zinc-700"
-            >
-              Cancel
-            </button>
-          </>
-        )}
-
-        {state === 'importing' && (
-          <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <Loader2 size={16} className="animate-spin" />
-            Importing tokens...
-          </div>
-        )}
-      </div>
-
-      {preview && <TokenPreviewSection data={preview} />}
     </div>
   );
 }
@@ -522,7 +354,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
 // ---------------------------------------------------------------------------
 
 export default function ImportPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('figma');
+  const [activeTab, setActiveTab] = useState<TabId>('css');
 
   return (
     <div>
@@ -531,7 +363,7 @@ export default function ImportPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Import Design Tokens</h1>
           <p className="mt-1 text-sm text-zinc-400">
-            Import from Figma, CSS variables, Tokens Studio, or Tailwind config
+            Paste CSS variables, Tokens Studio JSON, or a Tailwind config
           </p>
         </div>
       </div>
@@ -562,7 +394,6 @@ export default function ImportPage() {
 
       {/* Tab content */}
       <div className="mt-6">
-        {activeTab === 'figma' && <FigmaTab />}
         {activeTab === 'css' && <ManualFormatTab format="css" />}
         {activeTab === 'tokens-studio' && <ManualFormatTab format="tokens-studio" />}
         {activeTab === 'tailwind' && <ManualFormatTab format="tailwind" />}

@@ -114,6 +114,78 @@ const categoryColors: Record<string, string> = {
   creative: 'border-cyan-300 bg-cyan-50',
 };
 
+// ---------------------------------------------------------------------------
+// Shape-driven pack recommendation
+//
+// Takes the user's emotion + personality picks and produces a score per pack
+// category. A pack earns points when its category or description contains a
+// keyword that maps to the user's selections. Ties are broken by pack name
+// so the order stays deterministic for a given shape.
+//
+// This is intentionally simple: it's a ranking hint, not a classifier. The
+// user can still pick any pack — we just surface the best matches first and
+// mark them with a "Recommended" chip so the shape questionnaire feels like
+// it *does* something instead of being decorative.
+// ---------------------------------------------------------------------------
+
+const EMOTION_CATEGORY_BIAS: Record<string, string[]> = {
+  control: ['saas', 'fintech', 'ui-library', 'minimal'],
+  delight: ['animations', 'creative', 'startup'],
+  trust: ['fintech', 'healthcare', 'saas'],
+  calm: ['healthcare', 'minimal', 'saas'],
+  speed: ['saas', 'startup', 'ai'],
+  power: ['fintech', 'saas', 'startup'],
+  clarity: ['saas', 'minimal', 'ui-library'],
+  warmth: ['healthcare', 'creative', 'ecommerce'],
+  focus: ['minimal', 'ui-library', 'saas'],
+  fun: ['creative', 'animations', 'startup'],
+  confidence: ['fintech', 'saas', 'startup'],
+  surprise: ['animations', 'creative'],
+};
+
+const PERSONALITY_CATEGORY_BIAS: Record<string, string[]> = {
+  calm: ['healthcare', 'minimal', 'saas'],
+  exacting: ['fintech', 'minimal', 'ui-library'],
+  playful: ['creative', 'animations', 'startup'],
+  bold: ['startup', 'creative', 'ai'],
+  warm: ['healthcare', 'ecommerce', 'creative'],
+  precise: ['fintech', 'minimal', 'saas'],
+  raw: ['startup', 'creative'],
+  refined: ['minimal', 'fintech', 'saas'],
+  mature: ['fintech', 'saas', 'healthcare'],
+  energetic: ['startup', 'animations', 'creative'],
+  serious: ['fintech', 'minimal', 'healthcare'],
+  inviting: ['ecommerce', 'healthcare', 'creative'],
+};
+
+function scorePack(
+  pack: { category: string; description: string | null; name: string },
+  shape: ShapeState
+): number {
+  let score = 0;
+  const haystack = `${pack.category} ${pack.name} ${pack.description ?? ''}`.toLowerCase();
+  for (const emo of shape.emotionAfterUse) {
+    const prefs = EMOTION_CATEGORY_BIAS[emo] ?? [];
+    for (const p of prefs) if (haystack.includes(p)) score += 2;
+  }
+  for (const pers of shape.brandPersonality) {
+    const prefs = PERSONALITY_CATEGORY_BIAS[pers.toLowerCase()] ?? [];
+    for (const p of prefs) if (haystack.includes(p)) score += 2;
+  }
+  // Audience + JTBD free-text hints: match raw substrings (light heuristic).
+  const free = `${shape.audience} ${shape.jobToBeDone}`.toLowerCase();
+  if (free.includes('finance') || free.includes('bank') || free.includes('fintech')) {
+    if (haystack.includes('fintech')) score += 3;
+  }
+  if (free.includes('health') || free.includes('clinic') || free.includes('medical')) {
+    if (haystack.includes('health')) score += 3;
+  }
+  if (free.includes('shop') || free.includes('commerce') || free.includes('retail')) {
+    if (haystack.includes('ecommerce')) score += 3;
+  }
+  return score;
+}
+
 const typeColors: Record<string, string> = {
   hero: 'bg-violet-100 text-violet-800',
   cta: 'bg-rose-100 text-rose-800',
@@ -939,34 +1011,56 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {packs.map((pack) => (
-                <button
-                  key={pack.id}
-                  onClick={() => setSelectedPackId(pack.id === selectedPackId ? null : pack.id)}
-                  className={`rounded-xl border-2 p-5 text-left transition-all ${
-                    selectedPackId === pack.id
-                      ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200'
-                      : `border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm`
-                  }`}
-                >
-                  <div
-                    className={`mb-3 flex h-20 items-center justify-center rounded-lg ${categoryColors[pack.category] ?? 'bg-gray-50 border border-gray-200'}`}
-                  >
-                    <span className="text-xs font-medium text-gray-500">{pack.category}</span>
-                  </div>
-                  <h3 className="font-semibold text-gray-900">{pack.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-xs text-gray-500">{pack.description}</p>
-                  <div className="mt-2 flex gap-2 text-xs text-gray-400">
-                    <span>{pack.tokenCount} tokens</span>
-                    <span>{pack.recipeCount} components</span>
-                  </div>
-                  {selectedPackId === pack.id && (
-                    <div className="mt-2 text-xs font-medium text-blue-600">Selected</div>
-                  )}
-                </button>
-              ))}
-            </div>
+            {(() => {
+              // Re-rank packs with the shape-discovery heuristic. The top
+              // match (if any) gets a "Recommended" chip; everything else
+              // falls back to alphabetical order under the recommendation.
+              const scored = packs.map((p) => ({ pack: p, score: scorePack(p, shape) }));
+              const maxScore = scored.reduce((m, s) => Math.max(m, s.score), 0);
+              scored.sort((a, b) => b.score - a.score || a.pack.name.localeCompare(b.pack.name));
+              return (
+                <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {scored.map(({ pack, score }) => {
+                    const isRecommended = maxScore > 0 && score === maxScore;
+                    return (
+                      <button
+                        key={pack.id}
+                        onClick={() =>
+                          setSelectedPackId(pack.id === selectedPackId ? null : pack.id)
+                        }
+                        className={`relative rounded-xl border-2 p-5 text-left transition-all ${
+                          selectedPackId === pack.id
+                            ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200'
+                            : `border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm`
+                        }`}
+                      >
+                        {isRecommended && (
+                          <span className="absolute right-3 top-3 rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                            Recommended
+                          </span>
+                        )}
+                        <div
+                          className={`mb-3 flex h-20 items-center justify-center rounded-lg ${categoryColors[pack.category] ?? 'bg-gray-50 border border-gray-200'}`}
+                        >
+                          <span className="text-xs font-medium text-gray-500">{pack.category}</span>
+                        </div>
+                        <h3 className="font-semibold text-gray-900">{pack.name}</h3>
+                        <p className="mt-1 line-clamp-2 text-xs text-gray-500">
+                          {pack.description}
+                        </p>
+                        <div className="mt-2 flex gap-2 text-xs text-gray-400">
+                          <span>{pack.tokenCount} tokens</span>
+                          <span>{pack.recipeCount} components</span>
+                        </div>
+                        {selectedPackId === pack.id && (
+                          <div className="mt-2 text-xs font-medium text-blue-600">Selected</div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         )}
 

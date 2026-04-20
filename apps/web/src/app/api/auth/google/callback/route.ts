@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDb, users, organizations, organizationMembers } from '@aiui/design-core';
+import { createDb, users } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import { createToken } from '@/lib/jwt';
 import { setAuthCookies } from '@/lib/auth-cookies';
+import { ensureBootstrap } from '@/lib/bootstrap-new-user';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -172,35 +173,22 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Ensure the user has at least one organisation. Without this, the
-    // dashboard pages would let them in but every org-scoped action (create
-    // API key, create project, etc.) would 403 because the membership check
-    // would fail.
-    const [existingMembership] = await db
-      .select({ id: organizationMembers.id })
-      .from(organizationMembers)
-      .where(eq(organizationMembers.userId, user.id))
-      .limit(1);
-
-    if (!existingMembership) {
-      const workspaceName = `${profile.email.split('@')[0]}'s Workspace`;
-      const slug = `workspace-${user.id.slice(0, 8)}`;
-      const [org] = await db
-        .insert(organizations)
-        .values({ name: workspaceName, slug })
-        .returning({ id: organizations.id });
-      await db.insert(organizationMembers).values({
-        organizationId: org.id,
-        userId: user.id,
-        role: 'owner',
-      });
-    }
+    // Make sure the user has a workspace and at least one project. Idempotent.
+    const bootstrap = await ensureBootstrap(db, {
+      userId: user.id,
+      displayName: user.name ?? profile.email.split('@')[0],
+    });
 
     // Issue our own JWTs
     const { accessToken, idToken } = await createToken(user.id, user.email);
 
-    // Determine post-signin redirect
-    const redirectTo = req.cookies.get('aiui-oauth-redirect')?.value ?? '/dashboard';
+    // Determine post-signin redirect. First-time sign-ins land on the starter
+    // project page so the user sees value immediately instead of an empty list.
+    const requestedRedirect = req.cookies.get('aiui-oauth-redirect')?.value;
+    const defaultRedirect = bootstrap.projectSlug
+      ? `/projects/${bootstrap.projectSlug}`
+      : '/dashboard';
+    const redirectTo = requestedRedirect ?? defaultRedirect;
     const safeRedirect = decodeURIComponent(redirectTo).startsWith('/')
       ? decodeURIComponent(redirectTo)
       : '/dashboard';

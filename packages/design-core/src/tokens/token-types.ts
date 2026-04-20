@@ -1,5 +1,5 @@
 /**
- * Token categories matching the StyleToken tokenType from @aiui/types.
+ * Token categories matching the StyleToken tokenType enum.
  */
 export enum TokenCategory {
   Color = 'color',

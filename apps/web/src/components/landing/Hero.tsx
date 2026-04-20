@@ -71,7 +71,7 @@ export function Hero() {
                 letterSpacing: '0.04em',
               }}
             >
-              Free in open beta · No credit card · Ninety-second install
+              Free in open beta · No credit card · Works with Claude, Cursor, Windsurf
             </p>
 
             {/* Install, first. Morgan copies in one click. */}

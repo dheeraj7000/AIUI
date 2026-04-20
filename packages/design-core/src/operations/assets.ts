@@ -1,5 +1,5 @@
-import { eq, and, count, inArray, asc } from 'drizzle-orm';
-import { assets, resourceTags } from '../db/schema';
+import { eq, and, count, asc } from 'drizzle-orm';
+import { assets } from '../db/schema';
 import type { Database } from '../db';
 
 export interface CreateAssetInput {
@@ -18,7 +18,6 @@ export interface CreateAssetInput {
 export interface ListAssetsParams {
   projectId: string;
   type?: string;
-  tagIds?: string[];
   limit: number;
   offset: number;
 }
@@ -56,29 +55,15 @@ export async function getAssetById(db: Database, id: string) {
 }
 
 /**
- * List assets for a project with optional type and tag filters, plus pagination.
+ * List assets for a project, with optional type filter and pagination.
  */
 export async function listAssets(db: Database, params: ListAssetsParams) {
-  const { projectId, type, tagIds, limit = 50, offset = 0 } = params;
+  const { projectId, type, limit = 50, offset = 0 } = params;
 
   const conditions = [eq(assets.projectId, projectId)];
 
   if (type) {
     conditions.push(eq(assets.type, type as (typeof assets.type.enumValues)[number]));
-  }
-
-  // If filtering by tags, find matching resource IDs first
-  if (tagIds && tagIds.length > 0) {
-    const taggedResources = await db
-      .select({ resourceId: resourceTags.resourceId })
-      .from(resourceTags)
-      .where(and(inArray(resourceTags.tagId, tagIds), eq(resourceTags.resourceType, 'asset')));
-
-    const resourceIds = taggedResources.map((r) => r.resourceId);
-    if (resourceIds.length === 0) {
-      return { data: [], total: 0, limit, offset };
-    }
-    conditions.push(inArray(assets.id, resourceIds));
   }
 
   const whereClause = and(...conditions);

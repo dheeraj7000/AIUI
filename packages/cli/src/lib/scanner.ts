@@ -8,31 +8,6 @@ import type {
 } from '@aiui/design-core';
 import { extractTailwindViolations, runAllAccessibilityChecks } from '@aiui/mcp-server/detectors';
 
-// Anti-pattern engine is optional: the module may not exist yet if the
-// mcp-server hasn't been rebuilt, so we load it lazily and skip gracefully.
-// TODO: once @aiui/mcp-server/anti-patterns ships reliably, make this required.
-type AntiPatternViolation = {
-  rule: string;
-  severity: 'error' | 'warning';
-  line?: number;
-  snippet: string;
-  message: string;
-  suggestion?: string;
-};
-let antiPatternFn: ((code: string) => AntiPatternViolation[]) | null = null;
-async function loadAntiPatterns(): Promise<typeof antiPatternFn> {
-  if (antiPatternFn !== null) return antiPatternFn;
-  try {
-    const mod = (await import('@aiui/mcp-server/anti-patterns')) as {
-      detectAntiPatterns?: (code: string) => AntiPatternViolation[];
-    };
-    antiPatternFn = mod.detectAntiPatterns ?? null;
-  } catch {
-    antiPatternFn = null;
-  }
-  return antiPatternFn;
-}
-
 export interface ApprovedToken {
   tokenKey: string;
   tokenValue: string;
@@ -541,21 +516,6 @@ export async function scanFileAsync(
       message: `[a11y] ${a.message}`,
       line: a.line,
     });
-  }
-
-  // Anti-pattern (taste) rules — optional.
-  const detect = await loadAntiPatterns();
-  if (detect) {
-    for (const ap of detect(code)) {
-      result.result.violations.push({
-        type: 'general' as ComplianceViolationType,
-        severity: ap.severity,
-        message: `[taste/${ap.rule}] ${ap.message}`,
-        line: ap.line,
-        value: ap.snippet,
-        suggestion: ap.suggestion,
-      });
-    }
   }
 
   // Recompute compliance + score with the appended violations

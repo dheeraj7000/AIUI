@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { createToken } from '@/lib/jwt';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { setAuthCookies } from '@/lib/auth-cookies';
+import { bootstrapNewUser } from '@/lib/bootstrap-new-user';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -79,6 +80,14 @@ export async function POST(req: NextRequest) {
       })
       .returning({ id: users.id, email: users.email, name: users.name });
 
+    // Provision the user's workspace + seed a starter project so the dashboard
+    // has something useful on first load. Failures here don't block signup —
+    // the `ensureBootstrap` middleware can retry on the next authed request.
+    const bootstrap = await bootstrapNewUser(db, {
+      userId: newUser.id,
+      displayName: newUser.name ?? email.split('@')[0],
+    });
+
     // Create JWT tokens
     const { accessToken, idToken, expiresAt } = await createToken(newUser.id, newUser.email);
 
@@ -87,6 +96,10 @@ export async function POST(req: NextRequest) {
       accessToken,
       idToken,
       expiresAt,
+      workspace: { organizationId: bootstrap.organizationId },
+      starterProject: bootstrap.projectSlug
+        ? { slug: bootstrap.projectSlug, redirectTo: `/projects/${bootstrap.projectSlug}` }
+        : null,
     });
 
     // Set HttpOnly cookies so the middleware can read tokens server-side
