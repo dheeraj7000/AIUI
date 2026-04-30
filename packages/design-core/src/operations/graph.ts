@@ -1,12 +1,5 @@
-import { eq, or, inArray } from 'drizzle-orm';
-import {
-  graphNodes,
-  graphEdges,
-  stylePacks,
-  styleTokens,
-  componentRecipes,
-  projects,
-} from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { graphNodes, graphEdges, styleTokens } from '../db/schema';
 import type { Database } from '../db';
 
 /**
@@ -21,9 +14,6 @@ export async function getProjectGraph(db: Database, projectId: string) {
   return { nodes, edges };
 }
 
-/**
- * Create a single graph node.
- */
 export async function createGraphNode(
   db: Database,
   data: {
@@ -52,9 +42,6 @@ export async function createGraphNode(
   return node;
 }
 
-/**
- * Create a single graph edge.
- */
 export async function createGraphEdge(
   db: Database,
   data: {
@@ -81,150 +68,38 @@ export async function createGraphEdge(
   return edge;
 }
 
-/**
- * Delete a graph node by ID. Edges are cascade-deleted by the FK constraint.
- */
 export async function deleteGraphNode(db: Database, nodeId: string) {
   const [deleted] = await db.delete(graphNodes).where(eq(graphNodes.id, nodeId)).returning();
-
   return deleted ?? null;
 }
 
-/**
- * Delete a graph edge by ID.
- */
 export async function deleteGraphEdge(db: Database, edgeId: string) {
   const [deleted] = await db.delete(graphEdges).where(eq(graphEdges.id, edgeId)).returning();
-
   return deleted ?? null;
 }
 
 /**
- * Auto-generate a graph from existing project data.
- * Clears any existing graph, then creates nodes for style packs, tokens,
- * and component recipes, along with edges connecting them.
- *
- * Scoping: includes the project's active style pack (if set) plus all public
- * style packs so the graph is useful even for newly created projects.
+ * Auto-generate a project's graph from its design tokens.
+ * After the pack/recipe scope cut, the graph is a flat token list — one node
+ * per project token. Pages/components are handled by a future user-driven graph.
  */
 export async function autoGenerateGraph(db: Database, projectId: string) {
-  // Clear existing graph for this project
   await db.delete(graphEdges).where(eq(graphEdges.projectId, projectId));
   await db.delete(graphNodes).where(eq(graphNodes.projectId, projectId));
 
-  // Look up the project to find its activeStylePackId
-  const [project] = await db
-    .select({ activeStylePackId: projects.activeStylePackId })
-    .from(projects)
-    .where(eq(projects.id, projectId))
-    .limit(1);
+  const tokens = await db.select().from(styleTokens).where(eq(styleTokens.projectId, projectId));
 
-  // Build a filter for relevant style packs:
-  // - the project's active style pack (if any)
-  // - all public style packs
-  let packs: (typeof stylePacks.$inferSelect)[];
-  if (project?.activeStylePackId) {
-    packs = await db
-      .select()
-      .from(stylePacks)
-      .where(or(eq(stylePacks.id, project.activeStylePackId), eq(stylePacks.isPublic, true)));
-  } else {
-    packs = await db.select().from(stylePacks).where(eq(stylePacks.isPublic, true));
-  }
-
-  // If no packs found, return an empty graph gracefully
-  if (packs.length === 0) {
-    return getProjectGraph(db, projectId);
-  }
-
-  const packIds = packs.map((p) => p.id);
-
-  // Only fetch tokens and recipes linked to the relevant packs
-  const tokens = await db
-    .select()
-    .from(styleTokens)
-    .where(inArray(styleTokens.stylePackId, packIds));
-  const recipes = await db
-    .select()
-    .from(componentRecipes)
-    .where(inArray(componentRecipes.stylePackId, packIds));
-
-  const nodeMap = new Map<string, string>();
-
-  // Create nodes for style packs
-  for (const pack of packs) {
-    const [node] = await db
-      .insert(graphNodes)
-      .values({
-        projectId,
-        nodeType: 'style-pack',
-        label: pack.name,
-        metadata: { stylePackId: pack.id, slug: pack.slug, category: pack.category },
-      })
-      .returning();
-    nodeMap.set(`pack:${pack.id}`, node.id);
-  }
-
-  // Create nodes for tokens
   for (const token of tokens) {
-    const [node] = await db
-      .insert(graphNodes)
-      .values({
-        projectId,
-        nodeType: 'token',
-        label: token.tokenKey,
-        metadata: {
-          tokenId: token.id,
-          tokenType: token.tokenType,
-          tokenValue: token.tokenValue,
-        },
-      })
-      .returning();
-    nodeMap.set(`token:${token.id}`, node.id);
-  }
-
-  // Create nodes for component recipes
-  for (const recipe of recipes) {
-    const [node] = await db
-      .insert(graphNodes)
-      .values({
-        projectId,
-        nodeType: 'component',
-        label: recipe.name,
-        metadata: { recipeId: recipe.id, type: recipe.type, slug: recipe.slug },
-      })
-      .returning();
-    nodeMap.set(`recipe:${recipe.id}`, node.id);
-  }
-
-  // Create edges: style-pack --contains--> token
-  for (const token of tokens) {
-    const packNodeId = nodeMap.get(`pack:${token.stylePackId}`);
-    const tokenNodeId = nodeMap.get(`token:${token.id}`);
-    if (packNodeId && tokenNodeId) {
-      await db.insert(graphEdges).values({
-        projectId,
-        sourceNodeId: packNodeId,
-        targetNodeId: tokenNodeId,
-        edgeType: 'contains',
-      });
-    }
-  }
-
-  // Create edges: component --styled-by--> style-pack
-  for (const recipe of recipes) {
-    if (recipe.stylePackId) {
-      const recipeNodeId = nodeMap.get(`recipe:${recipe.id}`);
-      const packNodeId = nodeMap.get(`pack:${recipe.stylePackId}`);
-      if (recipeNodeId && packNodeId) {
-        await db.insert(graphEdges).values({
-          projectId,
-          sourceNodeId: recipeNodeId,
-          targetNodeId: packNodeId,
-          edgeType: 'styled-by',
-        });
-      }
-    }
+    await db.insert(graphNodes).values({
+      projectId,
+      nodeType: 'token',
+      label: token.tokenKey,
+      metadata: {
+        tokenId: token.id,
+        tokenType: token.tokenType,
+        tokenValue: token.tokenValue,
+      },
+    });
   }
 
   return getProjectGraph(db, projectId);

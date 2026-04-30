@@ -8,8 +8,6 @@ function makeValidConfig() {
   return {
     projectSlug: 'my-project',
     framework: 'nextjs',
-    registryUrl: 'https://registry.example.com',
-    activePack: 'saas-clean',
   };
 }
 
@@ -42,15 +40,12 @@ describe('configSchema', () => {
     }
   });
 
-  it('allows optional registries map', () => {
-    const config = {
-      ...makeValidConfig(),
-      registries: { acme: 'https://acme.registry.com' },
-    };
+  it('allows optional apiUrl', () => {
+    const config = { ...makeValidConfig(), apiUrl: 'https://aiui.store' };
     const result = configSchema.safeParse(config);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.registries).toEqual({ acme: 'https://acme.registry.com' });
+      expect(result.data.apiUrl).toBe('https://aiui.store');
     }
   });
 });
@@ -129,8 +124,6 @@ describe('writeConfig / readConfig', () => {
     expect(result).not.toBeNull();
     expect(result!.projectSlug).toBe('my-project');
     expect(result!.framework).toBe('nextjs');
-    expect(result!.registryUrl).toBe('https://registry.example.com');
-    expect(result!.activePack).toBe('saas-clean');
   });
 
   it('readConfig throws on malformed JSON in config file', () => {
@@ -145,8 +138,8 @@ describe('writeConfig / readConfig', () => {
     const dir = makeTempDir();
     const config = {
       ...makeValidConfig(),
+      apiUrl: 'https://aiui.store',
       lastSynced: '2026-04-01T12:00:00Z',
-      registries: { acme: 'https://acme.example.com', corp: 'https://corp.example.com' },
     };
     writeConfig(config, dir);
 

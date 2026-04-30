@@ -40,13 +40,7 @@ const PUBLIC_PAGE_PREFIXES = [
   '/favicon.ico',
 ];
 
-const PUBLIC_API_PREFIXES = [
-  '/api/health',
-  '/api/auth/',
-  '/api/registry/index',
-  '/api/registry/search',
-  '/llm/',
-];
+const PUBLIC_API_PREFIXES = ['/api/health', '/api/auth/', '/llm/'];
 
 function isPublicPath(pathname: string): boolean {
   if (pathname === '/') return true;
@@ -60,7 +54,6 @@ function isPublicApiPath(pathname: string): boolean {
   for (const prefix of PUBLIC_API_PREFIXES) {
     if (pathname === prefix || pathname.startsWith(prefix)) return true;
   }
-  if (pathname.startsWith('/api/registry/')) return true;
   return false;
 }
 

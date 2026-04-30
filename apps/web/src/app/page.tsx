@@ -6,7 +6,6 @@ import { FeatureGrid } from '@/components/landing/FeatureGrid';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { CodeComparison } from '@/components/landing/CodeComparison';
 import { Manifesto } from '@/components/landing/Manifesto';
-import { StylePackDemo } from '@/components/landing/StylePackDemo';
 import { CTA } from '@/components/landing/CTA';
 import { Footer } from '@/components/landing/Footer';
 
@@ -23,7 +22,6 @@ export default function HomePage() {
       <Hero />
       <StatsBar />
       <FeatureGrid />
-      <StylePackDemo />
       <HowItWorks />
       <CodeComparison />
       <Manifesto />

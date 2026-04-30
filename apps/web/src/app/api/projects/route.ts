@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createDb,
-  createProjectWithStarter,
+  createProjectWithDefaults,
   listProjects,
   verifyOrgMembership,
 } from '@aiui/design-core';
-import { createProjectSchema, listProjectsSchema } from '@aiui/design-core/src/validation/project';
+import { createProjectValidation, listProjectsSchema } from '@aiui/design-core';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { logWebEvent } from '@/lib/audit';
 
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const parsed = createProjectSchema.safeParse(body);
+    const parsed = createProjectValidation.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -94,22 +94,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Create the project AND seed it with the shadcn/ui Essentials starter
-    // pack, a design profile, and an initial graph. This mirrors the MCP
-    // init_project tool so web-created and MCP-created projects arrive in
-    // the same populated state instead of an empty one.
-    const result = await createProjectWithStarter(db, parsed.data);
+    // Create the project AND seed it with the default token set, a design
+    // profile, and an initial graph. This mirrors the MCP init_project tool
+    // so web-created and MCP-created projects arrive in the same populated
+    // state instead of an empty one.
+    const result = await createProjectWithDefaults(db, parsed.data);
 
     logWebEvent({ organizationId: parsed.data.orgId, action: 'web.create_project' });
 
     // Return the project row shape the client already expects, augmented
-    // with the seeded starter metadata for the dashboard to display.
+    // with the seeded token count for the dashboard to display.
     return NextResponse.json(
       {
         ...result.project,
-        stylePack: result.stylePack,
         tokenCount: result.tokenCount,
-        componentCount: result.componentCount,
       },
       { status: 201 }
     );

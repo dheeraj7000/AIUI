@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    const { project, stylePack, tokens } = result;
+    const { project, tokens } = result;
 
     // Group tokens by type
     const grouped = new Map<string, typeof tokens>();
@@ -72,7 +72,6 @@ export async function GET(req: NextRequest) {
     const lines: string[] = [];
     lines.push(`# Design Tokens — ${project.name}`);
     lines.push('');
-    lines.push(`Style Pack: ${stylePack.name} (${stylePack.category})`);
     lines.push(`Token Count: ${tokens.length}`);
     lines.push(`Generated: ${new Date().toISOString()}`);
 

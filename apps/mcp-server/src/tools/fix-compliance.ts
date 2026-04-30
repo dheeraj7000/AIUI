@@ -26,7 +26,6 @@ export function registerFixCompliance(server: AiuiMcpServer) {
       projectSlug: z.string().describe('Project slug to look up approved tokens'),
     },
     async (args) => {
-      // Enforce write scope if running in authenticated context
       const ctx = getContext();
       if (ctx) {
         requireScope(ctx.scopes, 'mcp:write');
@@ -42,11 +41,9 @@ export function registerFixCompliance(server: AiuiMcpServer) {
       }>;
       const projectSlug = args.projectSlug as string;
 
-      // Fetch the project and its active style pack tokens
       const [project] = await db
         .select({
           id: projects.id,
-          activeStylePackId: projects.activeStylePackId,
           organizationId: projects.organizationId,
         })
         .from(projects)
@@ -57,28 +54,24 @@ export function registerFixCompliance(server: AiuiMcpServer) {
         throw new NotFoundError('Project', projectSlug);
       }
 
-      // Verify project org matches auth context
       if (ctx?.organizationId && project.organizationId !== ctx.organizationId) {
         throw new NotFoundError('Project', projectSlug);
       }
 
-      // Build a map of approved token values
+      // Build a map of approved token values from the project's tokens
       const approvedTokens = new Map<string, string>();
-      if (project.activeStylePackId) {
-        const tokens = await db
-          .select({
-            tokenKey: styleTokens.tokenKey,
-            tokenValue: styleTokens.tokenValue,
-          })
-          .from(styleTokens)
-          .where(eq(styleTokens.stylePackId, project.activeStylePackId));
+      const tokens = await db
+        .select({
+          tokenKey: styleTokens.tokenKey,
+          tokenValue: styleTokens.tokenValue,
+        })
+        .from(styleTokens)
+        .where(eq(styleTokens.projectId, project.id));
 
-        for (const t of tokens) {
-          approvedTokens.set(t.tokenKey, t.tokenValue);
-        }
+      for (const t of tokens) {
+        approvedTokens.set(t.tokenKey, t.tokenValue);
       }
 
-      // Apply fixes
       let fixedCode = code;
       const fixesApplied: Array<{
         token: string;
@@ -93,20 +86,14 @@ export function registerFixCompliance(server: AiuiMcpServer) {
       }> = [];
 
       for (const violation of violations) {
-        // Determine the replacement value:
-        // prefer the approved token value from the database, fall back to the expected value
         const approvedValue = approvedTokens.get(violation.token);
         const replacement = approvedValue || violation.expected;
 
-        // Smart replacement for Tailwind: if found is in an arbitrary value block,
-        // try to replace it with the semantic token class if possible.
-        // e.g. bg-[#FF0000] -> bg-primary
         const tokenBaseName = violation.token.split('.').pop() || violation.token;
         const tailwindPrefixes = ['bg', 'text', 'border', 'ring', 'from', 'to', 'via', 'shadow'];
 
         let replaced = false;
 
-        // 1. Try Tailwind arbitrary value replacement: bg-[found] -> bg-tokenBaseName
         for (const prefix of tailwindPrefixes) {
           const arbPattern = `${prefix}-[${violation.found}]`;
           const semanticClass = `${prefix}-${tokenBaseName}`;
@@ -122,7 +109,6 @@ export function registerFixCompliance(server: AiuiMcpServer) {
           }
         }
 
-        // 2. Fall back to simple string replacement if not already replaced by Tailwind logic
         if (!replaced && fixedCode.includes(violation.found)) {
           fixedCode = fixedCode.split(violation.found).join(replacement);
           fixesApplied.push({

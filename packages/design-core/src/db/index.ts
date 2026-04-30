@@ -22,4 +22,3 @@ export function createDb(connectionString: string) {
 export type Database = ReturnType<typeof createDb>;
 
 export * from './schema';
-export * from './queries';

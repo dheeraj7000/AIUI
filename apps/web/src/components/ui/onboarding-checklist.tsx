@@ -2,20 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Circle, X, Palette, FolderOpen, Key, LayoutGrid } from 'lucide-react';
+import { CheckCircle2, Circle, X, FolderOpen, Key, Download } from 'lucide-react';
 
 interface OnboardingStep {
   label: string;
   href: string;
-  icon: typeof Palette;
+  icon: typeof FolderOpen;
   done: boolean;
 }
 
 interface OnboardingChecklistProps {
   hasProject: boolean;
-  hasStylePack: boolean;
   hasApiKey: boolean;
-  hasComponent: boolean;
 }
 
 const DISMISSED_KEY = 'aiui-onboarding-dismissed';
@@ -36,12 +34,7 @@ function patchOnboarding(patch: Record<string, unknown>): void {
   });
 }
 
-export function OnboardingChecklist({
-  hasProject,
-  hasStylePack,
-  hasApiKey,
-  hasComponent,
-}: OnboardingChecklistProps) {
+export function OnboardingChecklist({ hasProject, hasApiKey }: OnboardingChecklistProps) {
   const [dismissed, setDismissed] = useState(true); // default hidden to avoid flash
 
   useEffect(() => {
@@ -75,9 +68,8 @@ export function OnboardingChecklist({
   }, []);
 
   const steps: OnboardingStep[] = [
-    { label: 'Browse style packs', href: '/style-packs', icon: Palette, done: hasStylePack },
     { label: 'Create a project', href: '/projects', icon: FolderOpen, done: hasProject },
-    { label: 'Add components', href: '/components', icon: LayoutGrid, done: hasComponent },
+    { label: 'Import design tokens', href: '/import', icon: Download, done: hasProject },
     { label: 'Generate an API key', href: '/api-keys', icon: Key, done: hasApiKey },
   ];
 
@@ -87,13 +79,11 @@ export function OnboardingChecklist({
   useEffect(() => {
     patchOnboarding({
       checklistSteps: {
-        pack_browsed: hasStylePack,
         project_created: hasProject,
-        component_added: hasComponent,
         api_key_created: hasApiKey,
       },
     });
-  }, [hasStylePack, hasProject, hasComponent, hasApiKey]);
+  }, [hasProject, hasApiKey]);
 
   const completedCount = steps.filter((s) => s.done).length;
   const allDone = completedCount === steps.length;

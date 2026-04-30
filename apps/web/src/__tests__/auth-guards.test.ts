@@ -9,26 +9,16 @@ const {
   mockVerifyOrgMembership,
   mockListProjects,
   mockCreateProject,
-  mockCreateProjectWithStarter,
-  mockGetStylePack,
-  mockListStylePacks,
+  mockCreateProjectWithDefaults,
   mockCreateApiKey,
   mockListApiKeys,
-  mockCreateStylePack,
-  mockUpdateStylePack,
-  mockDeleteStylePack,
 } = vi.hoisted(() => ({
   mockVerifyOrgMembership: vi.fn<() => Promise<boolean>>(),
   mockListProjects: vi.fn(),
   mockCreateProject: vi.fn(),
-  mockCreateProjectWithStarter: vi.fn(),
-  mockGetStylePack: vi.fn(),
-  mockListStylePacks: vi.fn(),
+  mockCreateProjectWithDefaults: vi.fn(),
   mockCreateApiKey: vi.fn(),
   mockListApiKeys: vi.fn(),
-  mockCreateStylePack: vi.fn(),
-  mockUpdateStylePack: vi.fn(),
-  mockDeleteStylePack: vi.fn(),
 }));
 
 vi.mock('@aiui/design-core', async () => {
@@ -39,12 +29,7 @@ vi.mock('@aiui/design-core', async () => {
     verifyOrgMembership: mockVerifyOrgMembership,
     listProjects: mockListProjects,
     createProject: mockCreateProject,
-    createProjectWithStarter: mockCreateProjectWithStarter,
-    getStylePack: mockGetStylePack,
-    listStylePacks: mockListStylePacks,
-    createStylePack: mockCreateStylePack,
-    updateStylePack: mockUpdateStylePack,
-    deleteStylePack: mockDeleteStylePack,
+    createProjectWithDefaults: mockCreateProjectWithDefaults,
     createApiKey: mockCreateApiKey,
     listApiKeys: mockListApiKeys,
   };
@@ -58,7 +43,6 @@ vi.stubEnv('DATABASE_URL', 'postgres://test:test@localhost:5432/test');
 // ---------------------------------------------------------------------------
 
 import { GET as getProjects, POST as postProject } from '@/app/api/projects/route';
-import { GET as getStylePackById } from '@/app/api/style-packs/[id]/route';
 import { POST as postApiKey, GET as getApiKeys } from '@/app/api/api-keys/route';
 
 // ---------------------------------------------------------------------------
@@ -69,7 +53,6 @@ import { POST as postApiKey, GET as getApiKeys } from '@/app/api/api-keys/route'
 const USER_ID = '00000000-0000-4000-a000-000000000001';
 const OWN_ORG_ID = '00000000-0000-4000-a000-000000000010';
 const FOREIGN_ORG_ID = '00000000-0000-4000-a000-000000000099';
-const STYLE_PACK_ID = '00000000-0000-4000-a000-000000000020';
 
 function mockRequest(options: {
   method?: string;
@@ -83,11 +66,6 @@ function mockRequest(options: {
     headers: new Headers(headers),
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
-}
-
-/** Helper to build a route-context object for dynamic routes like /style-packs/[id] */
-function routeContext(id: string) {
-  return { params: Promise.resolve({ id }) };
 }
 
 // ---------------------------------------------------------------------------
@@ -216,15 +194,21 @@ describe('POST /api/projects', () => {
 
   it('returns 201 when user IS a member', async () => {
     mockVerifyOrgMembership.mockResolvedValue(true);
-    // POST /api/projects calls createProjectWithStarter, which returns a
-    // composite { project, stylePack, tokenCount, componentCount } shape.
-    // The route spreads project into the JSON body, so json.name must still
-    // resolve to the project's name.
-    mockCreateProjectWithStarter.mockResolvedValue({
-      project: { id: 'new-p', name: 'Good Project', organizationId: OWN_ORG_ID },
-      stylePack: { id: 'sp-1', name: 'Essentials', slug: 'shadcn-essentials' },
+    // POST /api/projects calls createProjectWithDefaults, which returns
+    // { project, designProfileId, tokenCount, created }. The route spreads
+    // project into the JSON body, so json.name must still resolve to the
+    // project's name.
+    mockCreateProjectWithDefaults.mockResolvedValue({
+      project: {
+        id: 'new-p',
+        name: 'Good Project',
+        slug: 'good-project',
+        organizationId: OWN_ORG_ID,
+        frameworkTarget: 'nextjs-tailwind',
+      },
+      designProfileId: 'dp-1',
       tokenCount: 42,
-      componentCount: 10,
+      created: true,
     });
 
     const req = mockRequest({
@@ -239,90 +223,13 @@ describe('POST /api/projects', () => {
 
     const json = await res.json();
     expect(json.name).toBe('Good Project');
-    expect(json.stylePack.slug).toBe('shadcn-essentials');
+    expect(json.tokenCount).toBe(42);
   });
 });
 
-// ===========================================================================
-// 4. GET /api/style-packs/[id] — resource-level org check
-// ===========================================================================
-
-describe('GET /api/style-packs/[id]', () => {
-  it('returns 403 when user is NOT a member of the style pack org', async () => {
-    mockGetStylePack.mockResolvedValue({
-      id: STYLE_PACK_ID,
-      name: 'Secret Pack',
-      organizationId: FOREIGN_ORG_ID,
-    });
-    mockVerifyOrgMembership.mockResolvedValue(false);
-
-    const req = mockRequest({
-      url: `http://localhost:3000/api/style-packs/${STYLE_PACK_ID}`,
-      headers: { 'x-user-id': USER_ID },
-    });
-
-    const res = await getStylePackById(req, routeContext(STYLE_PACK_ID));
-    expect(res.status).toBe(403);
-
-    const json = await res.json();
-    expect(json.error).toBe('Forbidden');
-    expect(mockVerifyOrgMembership).toHaveBeenCalledWith(
-      expect.anything(),
-      USER_ID,
-      FOREIGN_ORG_ID
-    );
-  });
-
-  it('returns 200 when user IS a member of the style pack org', async () => {
-    mockGetStylePack.mockResolvedValue({
-      id: STYLE_PACK_ID,
-      name: 'My Pack',
-      organizationId: OWN_ORG_ID,
-    });
-    mockVerifyOrgMembership.mockResolvedValue(true);
-
-    const req = mockRequest({
-      url: `http://localhost:3000/api/style-packs/${STYLE_PACK_ID}`,
-      headers: { 'x-user-id': USER_ID },
-    });
-
-    const res = await getStylePackById(req, routeContext(STYLE_PACK_ID));
-    expect(res.status).toBe(200);
-
-    const json = await res.json();
-    expect(json.name).toBe('My Pack');
-  });
-
-  it('returns 404 when style pack does not exist', async () => {
-    mockGetStylePack.mockResolvedValue(null);
-
-    const req = mockRequest({
-      url: `http://localhost:3000/api/style-packs/${STYLE_PACK_ID}`,
-      headers: { 'x-user-id': USER_ID },
-    });
-
-    const res = await getStylePackById(req, routeContext(STYLE_PACK_ID));
-    expect(res.status).toBe(404);
-  });
-
-  it('skips org check and returns 200 for packs with no organizationId', async () => {
-    mockGetStylePack.mockResolvedValue({
-      id: STYLE_PACK_ID,
-      name: 'Public Pack',
-      organizationId: null,
-    });
-
-    const req = mockRequest({
-      url: `http://localhost:3000/api/style-packs/${STYLE_PACK_ID}`,
-      headers: { 'x-user-id': USER_ID },
-    });
-
-    const res = await getStylePackById(req, routeContext(STYLE_PACK_ID));
-    expect(res.status).toBe(200);
-    // verifyOrgMembership should NOT have been called
-    expect(mockVerifyOrgMembership).not.toHaveBeenCalled();
-  });
-});
+// Note: the /api/style-packs/[id] suite was removed in the post-2026-04
+// scope cut. Style packs no longer exist as a resource; tokens are
+// project-scoped and policed via /api/projects/[id].
 
 // ===========================================================================
 // 5. POST /api/api-keys — org membership enforcement

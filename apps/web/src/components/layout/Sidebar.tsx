@@ -6,8 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   FolderOpen,
-  Palette,
-  LayoutGrid,
   Key,
   BookOpen,
   Download,
@@ -29,11 +27,7 @@ const mainItems: NavItem[] = [
   { label: 'Projects', href: '/projects', icon: FolderOpen },
 ];
 
-const designItems: NavItem[] = [
-  { label: 'Style Packs', href: '/style-packs', icon: Palette },
-  { label: 'Components', href: '/components', icon: LayoutGrid },
-  { label: 'Import', href: '/import', icon: Download },
-];
+const designItems: NavItem[] = [{ label: 'Import', href: '/import', icon: Download }];
 
 const integrationItems: NavItem[] = [
   { label: 'API Keys', href: '/api-keys', icon: Key },

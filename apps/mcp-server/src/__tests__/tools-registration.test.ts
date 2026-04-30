@@ -1,31 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { registerWriteStylePack } from '../tools/write-style-pack';
 import { registerWriteTokens } from '../tools/write-tokens';
-import { registerWriteProject } from '../tools/write-project';
 import { registerInitProject } from '../tools/init-project';
 import { registerFixCompliance } from '../tools/fix-compliance';
 import { registerResetProject } from '../tools/reset-project';
 import { registerUndoTokens } from '../tools/undo-tokens';
 import { registerGetProjectContext } from '../tools/get-project-context';
-import { registerComponentTools } from '../tools/components';
 import { registerThemeTokens } from '../tools/theme-tokens';
 import { registerAssetManifest } from '../tools/asset-manifest';
 import { registerValidateUiOutput } from '../tools/validate-ui-output';
 import { registerDesignMemory } from '../tools/design-memory';
 import { registerDesignStudio } from '../tools/design-studio';
+import { registerAuditDesignPrinciples } from '../tools/audit-design';
+import { registerSuggestPromotion } from '../tools/suggest-promotion';
 import { registerAllTools } from '../tools/index';
 
 describe('Tools registration exports', () => {
-  it('registerWriteStylePack is a function', () => {
-    expect(typeof registerWriteStylePack).toBe('function');
-  });
-
   it('registerWriteTokens is a function', () => {
     expect(typeof registerWriteTokens).toBe('function');
-  });
-
-  it('registerWriteProject is a function', () => {
-    expect(typeof registerWriteProject).toBe('function');
   });
 
   it('registerInitProject is a function', () => {
@@ -48,10 +39,6 @@ describe('Tools registration exports', () => {
     expect(typeof registerGetProjectContext).toBe('function');
   });
 
-  it('registerComponentTools is a function', () => {
-    expect(typeof registerComponentTools).toBe('function');
-  });
-
   it('registerThemeTokens is a function', () => {
     expect(typeof registerThemeTokens).toBe('function');
   });
@@ -72,26 +59,33 @@ describe('Tools registration exports', () => {
     expect(typeof registerDesignStudio).toBe('function');
   });
 
+  it('registerAuditDesignPrinciples is a function', () => {
+    expect(typeof registerAuditDesignPrinciples).toBe('function');
+  });
+
+  it('registerSuggestPromotion is a function', () => {
+    expect(typeof registerSuggestPromotion).toBe('function');
+  });
+
   it('registerAllTools is a function', () => {
     expect(typeof registerAllTools).toBe('function');
   });
 
   it('all registration functions accept exactly 1 argument (server)', () => {
     const fns = [
-      registerWriteStylePack,
       registerWriteTokens,
-      registerWriteProject,
       registerInitProject,
       registerFixCompliance,
       registerResetProject,
       registerUndoTokens,
       registerGetProjectContext,
-      registerComponentTools,
       registerThemeTokens,
       registerAssetManifest,
       registerValidateUiOutput,
       registerDesignMemory,
       registerDesignStudio,
+      registerAuditDesignPrinciples,
+      registerSuggestPromotion,
       registerAllTools,
     ];
 

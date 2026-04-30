@@ -3,18 +3,11 @@ export { TokenCategory, TOKEN_VALIDATION_RULES } from './tokens/token-types';
 export type { TokenValidationRule } from './tokens/token-types';
 
 // Token validation
-export { validateToken, validateStylePack } from './tokens/token-validator';
+export { validateToken, validateTokens } from './tokens/token-validator';
 export type { ValidationResult } from './tokens/token-validator';
 
 // Token merge utilities
 export { mergeTokens, mergeMultiple } from './tokens/token-merger';
-
-// Schemas
-export { stylePackInputSchema } from './schemas/style-pack.schema';
-export type { StylePackInput } from './schemas/style-pack.schema';
-
-export { designProfileCompositionSchema } from './schemas/design-profile.schema';
-export type { DesignProfileComposition } from './schemas/design-profile.schema';
 
 // Token compliance
 export { checkTokenCompliance } from './validation/token-compliance';
@@ -49,51 +42,7 @@ export type { Database } from './db';
 export * from './db/schema';
 
 // Workspace (personal organization) operations — retained after scope cut
-// Multi-tenant CRUD (create/update/delete, member invites, roles) is gone;
-// each user gets one workspace, auto-provisioned on signup.
 export { getOrganization, getUserWorkspace, ensureUserWorkspace } from './operations/organizations';
-
-// Style pack validation
-export {
-  createStylePackSchema as createStylePackValidation,
-  updateStylePackSchema,
-  listStylePacksSchema,
-} from './validation/style-pack';
-export type {
-  CreateStylePackInput,
-  UpdateStylePackInput,
-  ListStylePacksInput,
-} from './validation/style-pack';
-
-// Style pack operations
-export {
-  createStylePack,
-  getStylePack,
-  listStylePacks,
-  updateStylePack,
-  deleteStylePack,
-} from './operations/style-packs';
-
-// Component recipe validation
-export {
-  createRecipeSchema,
-  updateRecipeSchema,
-  listRecipesSchema,
-} from './validation/component-recipe';
-export type {
-  CreateRecipeInput,
-  UpdateRecipeInput,
-  ListRecipesInput,
-} from './validation/component-recipe';
-
-// Component recipe operations
-export {
-  createRecipe,
-  getRecipe,
-  listRecipes,
-  updateRecipe,
-  deleteRecipe,
-} from './operations/component-recipes';
 
 // Style token validation
 export {
@@ -109,7 +58,7 @@ export type {
   ListTokensInput,
 } from './validation/style-token';
 
-// Style token operations
+// Style token operations (project-scoped)
 export {
   createToken,
   getToken,
@@ -158,12 +107,11 @@ export {
   listProfiles,
   updateProfile,
   deleteProfile,
-  compileDesignProfile,
 } from './operations/design-profiles';
 
-// Compiler
-export { compileProfile, computeTokensHash, resolveTokens, computeMemoryDiff } from './compiler';
-export type { CompiledProfile, TokenMap, ResolveResult, MemoryDiff } from './compiler';
+// Compiler (token-only after scope cut)
+export { computeTokensHash, resolveTokens, computeMemoryDiff } from './compiler';
+export type { TokenMap, ResolveResult, MemoryDiff } from './compiler';
 
 // Project validation
 export {
@@ -186,23 +134,6 @@ export {
   deleteProject,
   generateProjectSlug,
 } from './operations/projects';
-
-// Project style pack operations
-export {
-  assignStylePack,
-  getProjectStylePack,
-  StylePackNotFoundError,
-  ProjectNotFoundError,
-} from './operations/project-style-pack';
-export type { MergedStylePack } from './operations/project-style-pack';
-
-// Project component selection
-export {
-  updateComponentSelection,
-  getComponentSelection,
-  InvalidComponentIdsError,
-} from './operations/project-components';
-export type { ComponentSelectionItem } from './operations/project-components';
 
 // Project asset operations
 export { getProjectAssets, getProjectAsset, unlinkProjectAsset } from './operations/project-assets';
@@ -231,29 +162,20 @@ export {
 } from './validation/common';
 export type { PaginationInput } from './validation/common';
 
-// Query helpers
-export {
-  buildStylePackListQuery,
-  buildStylePackByIdQuery,
-  buildStylePackBySlugQuery,
-  type StylePackListFilters,
-} from './db/queries';
-
-// API key operations (simplified after cleanup — no rotation / prefix masking)
+// API key operations
 export { createApiKey, listApiKeys, revokeApiKey, verifyApiKey } from './operations/api-keys';
 export type { CreateApiKeyInput, ApiKeyWithRaw, ApiKeyContext } from './operations/api-keys';
 
-// Project initialization with starter pack seeding
+// Project initialization with default tokens
 export {
-  initProjectWithStarter,
-  createProjectWithStarter,
-  seedProjectWithStarterPack,
-  DEFAULT_STARTER_PACK_SLUG,
+  initProject,
+  createProjectWithDefaults,
+  seedProjectWithDefaults,
 } from './operations/init-project';
-export type {
-  InitProjectWithStarterInput,
-  InitProjectWithStarterResult,
-} from './operations/init-project';
+export type { InitProjectInput, InitProjectResult } from './operations/init-project';
+
+// Default token set (used for fresh project init + reset)
+export { DEFAULT_PROJECT_TOKENS } from './db/seed-data/default-tokens';
 
 // Design token importers
 export {
@@ -275,5 +197,5 @@ export {
   autoGenerateGraph,
 } from './operations/graph';
 
-// Auth guards (retained — every authenticated route uses these)
+// Auth guards
 export { verifyOrgMembership, verifyResourceOwnership } from './lib/auth-guards';

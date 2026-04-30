@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createDb,
-  createStylePack,
   bulkImportTokens,
   parseTokens,
   verifyOrgMembership,
   designProfiles,
+  projects,
 } from '@aiui/design-core';
-import { assignStylePack } from '@aiui/design-core/src/operations/project-style-pack';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 function getDb() {
   const url = process.env.DATABASE_URL;
@@ -18,7 +17,11 @@ function getDb() {
 
 /**
  * POST /api/imports/tokens — Import tokens from CSS variables, Tokens Studio
- * JSON, or Tailwind config content.
+ * JSON, or Tailwind config content directly into a project.
+ *
+ * After the scope cut, tokens are project-scoped: callers must provide a
+ * `projectId` (membership-checked via the org). The old "create a style pack"
+ * indirection is gone.
  */
 export async function POST(req: NextRequest) {
   const userId = req.headers.get('x-user-id');
@@ -29,16 +32,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { content, format, name, projectId, organizationId } = body as {
+    const { content, format, projectId, organizationId } = body as {
       content: string;
       format?: 'css' | 'tokens-studio' | 'tailwind' | 'auto';
-      name: string;
-      projectId?: string;
+      projectId: string;
       organizationId: string;
     };
 
-    if (!content || !name) {
-      return NextResponse.json({ error: 'content and name are required' }, { status: 400 });
+    if (!content) {
+      return NextResponse.json({ error: 'content is required' }, { status: 400 });
+    }
+
+    if (!projectId) {
+      return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
     }
 
     if (!organizationId) {
@@ -60,38 +66,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const stylePack = await createStylePack(
-      db,
-      {
-        name,
-        category: 'imported',
-      },
-      organizationId
-    );
+    // Confirm project belongs to the org before writing tokens to it.
+    const [project] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(and(eq(projects.id, projectId), eq(projects.organizationId, organizationId)))
+      .limit(1);
 
-    await bulkImportTokens(db, stylePack.id, result.tokens);
+    if (!project) {
+      return NextResponse.json(
+        { error: 'Project not found in this organization' },
+        { status: 404 }
+      );
+    }
 
-    if (projectId) {
-      try {
-        await assignStylePack(db, projectId, stylePack.id);
-        // Mark the project's design profile as stale so MCP read tools
-        // surface a warning until sync_design_memory is called. Soft
-        // signal — log and continue on failure.
-        try {
-          await db
-            .update(designProfiles)
-            .set({ compilationValid: false, updatedAt: new Date() })
-            .where(eq(designProfiles.projectId, projectId));
-        } catch (staleErr) {
-          console.error('Failed to mark design profile stale:', staleErr);
-        }
-      } catch {
-        // Project assignment is best-effort
-      }
+    await bulkImportTokens(db, project.id, result.tokens);
+
+    // Mark the project's design profile as stale so MCP read tools surface
+    // a warning until sync_design_memory is called. Soft signal — log and
+    // continue on failure.
+    try {
+      await db
+        .update(designProfiles)
+        .set({ compilationValid: false, updatedAt: new Date() })
+        .where(eq(designProfiles.projectId, project.id));
+    } catch (staleErr) {
+      console.error('Failed to mark design profile stale:', staleErr);
     }
 
     return NextResponse.json(
-      { stylePack, stats: result.stats, warnings: result.warnings },
+      { projectId: project.id, stats: result.stats, warnings: result.warnings },
       { status: 201 }
     );
   } catch (error) {

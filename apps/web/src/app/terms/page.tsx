@@ -34,8 +34,8 @@ export default function TermsPage() {
 
         <Section title="Your content">
           <p>
-            You own everything you create in AIUI — your style packs, tokens, components, and
-            project data. We do not claim any rights to it.
+            You own everything you create in AIUI — your design tokens and project data. We do not
+            claim any rights to it.
           </p>
         </Section>
 

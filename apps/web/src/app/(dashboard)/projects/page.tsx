@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { createDb, projects, stylePacks } from '@aiui/design-core';
+import { createDb, projects } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import { getUserOrg } from '@/lib/get-user-org';
 import { CreateProjectButton } from '@/components/ui/create-project-button';
@@ -27,12 +27,9 @@ async function getProjects() {
       slug: projects.slug,
       description: projects.description,
       frameworkTarget: projects.frameworkTarget,
-      activeStylePackId: projects.activeStylePackId,
       createdAt: projects.createdAt,
-      packName: stylePacks.name,
     })
     .from(projects)
-    .leftJoin(stylePacks, eq(projects.activeStylePackId, stylePacks.id))
     .where(eq(projects.organizationId, orgId))
     .orderBy(projects.createdAt);
   return all;
@@ -71,11 +68,6 @@ export default async function ProjectsPage() {
                 <span className="rounded-full bg-white/5 border border-white/5 px-2.5 py-0.5 text-xs text-zinc-300">
                   {p.frameworkTarget}
                 </span>
-                {p.packName && (
-                  <span className="rounded-full bg-indigo-500/10 border border-indigo-500/10 px-2.5 py-0.5 text-xs text-indigo-400">
-                    {p.packName}
-                  </span>
-                )}
               </div>
               <p className="mt-3 text-xs text-zinc-500">/{p.slug}</p>
             </Link>
@@ -85,7 +77,7 @@ export default async function ProjectsPage() {
         <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
           <p className="text-sm font-medium text-zinc-300">No projects yet</p>
           <p className="mt-2 text-xs text-zinc-500">
-            Create a project to get a starter pack, tokens, and your MCP integration guide.
+            Create a project to seed default tokens and get your MCP integration guide.
           </p>
           {userOrg && (
             <div className="mt-6 flex justify-center">

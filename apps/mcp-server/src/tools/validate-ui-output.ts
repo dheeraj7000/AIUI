@@ -2,13 +2,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import {
-  projects,
-  styleTokens,
-  designProfiles,
-  computeTokensHash,
-  componentRecipes,
-} from '@aiui/design-core';
+import { projects, styleTokens, designProfiles, computeTokensHash } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
 import {
@@ -27,14 +21,12 @@ import {
   checkHeadingOrder,
   checkAriaRoles,
   checkColorContrast,
-  checkDataBinding,
   CSS_NAMED_COLORS,
   TAILWIND_PALETTE,
   type Violation,
 } from './detectors';
 
-// Re-export detectors so existing imports (e.g. `from './validate-ui-output'`)
-// continue to work. New consumers should import directly from './detectors'.
+// Re-export detectors for back-compat with consumers that import from here.
 export {
   extractColors,
   extractTailwindViolations,
@@ -57,58 +49,29 @@ export type { Violation };
 export function registerValidateUiOutput(server: AiuiMcpServer) {
   server.registerTool(
     'validate_ui_output',
-    "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, accessibility, and semantic data binding.",
+    "Check generated UI code for compliance against the project's design tokens. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
     {
       projectId: z.string().uuid().describe('The project ID to validate against'),
       code: z.string().describe('The generated UI code to validate'),
-      recipeId: z
-        .string()
-        .uuid()
-        .optional()
-        .describe('Optional recipe ID to validate against data-binding requirements'),
     },
     async (args) => {
       const db = getDb();
       const projectId = args.projectId as string;
       const code = args.code as string;
-      const recipeId = args.recipeId as string | undefined;
 
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
 
-      // Verify project org matches auth context
       const authCtx = getContext();
       if (authCtx?.organizationId && project?.organizationId !== authCtx.organizationId) {
         throw new NotFoundError('Project', projectId);
       }
 
-      if (!project || !project.activeStylePackId) {
+      if (!project) {
         throw new NotFoundError('Project', projectId);
       }
 
       const violations: Violation[] = [];
 
-      // -----------------------------------------------------------------------
-      // Data Binding Validation
-      // -----------------------------------------------------------------------
-      if (recipeId) {
-        const [recipe] = await db
-          .select()
-          .from(componentRecipes)
-          .where(eq(componentRecipes.id, recipeId))
-          .limit(1);
-
-        if (recipe) {
-          const schema = recipe.jsonSchema as {
-            dataRequirements?: Parameters<typeof checkDataBinding>[1];
-          } | null;
-          if (schema?.dataRequirements) {
-            const dataViolations = checkDataBinding(code, schema.dataRequirements);
-            violations.push(...dataViolations);
-          }
-        }
-      }
-
-      // Fetch approved tokens
       const tokens = await db
         .select({
           tokenKey: styleTokens.tokenKey,
@@ -116,37 +79,29 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
           tokenType: styleTokens.tokenType,
         })
         .from(styleTokens)
-        .where(eq(styleTokens.stylePackId, project.activeStylePackId));
+        .where(eq(styleTokens.projectId, project.id));
 
-      // Build approved sets per token type
       const approvedColors = new Set(
         tokens.filter((t) => t.tokenType === 'color').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedFonts = new Set(
         tokens.filter((t) => t.tokenType === 'font').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedSpacing = new Set(
         tokens.filter((t) => t.tokenType === 'spacing').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedRadius = new Set(
         tokens.filter((t) => t.tokenType === 'radius').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedFontSizes = new Set(
         tokens.filter((t) => t.tokenType === 'font-size').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedZIndex = new Set(
         tokens.filter((t) => t.tokenType === 'z-index').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedOpacity = new Set(
         tokens.filter((t) => t.tokenType === 'opacity').map((t) => t.tokenValue.toLowerCase())
       );
-
       const approvedBorderWidth = new Set(
         tokens.filter((t) => t.tokenType === 'border-width').map((t) => t.tokenValue.toLowerCase())
       );
@@ -155,7 +110,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
       // Token checks — only run when approved values exist for that type
       // -----------------------------------------------------------------------
 
-      // Check colors
       const usedColors = extractColors(code);
       if (approvedColors.size > 0) {
         for (const color of usedColors) {
@@ -169,7 +123,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check Tailwind utility/arbitrary-value color classes
       const approvedTailwind = new Set<string>();
       for (const v of approvedColors) approvedTailwind.add(v);
       const tailwindViolations = extractTailwindViolations(code, approvedTailwind);
@@ -185,7 +138,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         });
       }
 
-      // Check fonts
       const usedFonts = extractFonts(code);
       if (approvedFonts.size > 0) {
         for (const font of usedFonts) {
@@ -200,7 +152,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check spacing
       const usedSpacing = extractSpacingValues(code);
       if (approvedSpacing.size > 0) {
         for (const val of usedSpacing) {
@@ -214,7 +165,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check border-radius
       const usedRadius = extractBorderRadiusValues(code);
       if (approvedRadius.size > 0) {
         for (const val of usedRadius) {
@@ -228,7 +178,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check font-size
       const usedFontSizes = extractFontSizes(code);
       if (approvedFontSizes.size > 0) {
         for (const val of usedFontSizes) {
@@ -242,7 +191,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check z-index
       const usedZIndex = extractZIndexValues(code);
       if (approvedZIndex.size > 0) {
         for (const val of usedZIndex) {
@@ -256,7 +204,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check opacity
       const usedOpacity = extractOpacityValues(code);
       if (approvedOpacity.size > 0) {
         for (const val of usedOpacity) {
@@ -270,7 +217,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         }
       }
 
-      // Check border-width
       const usedBorderWidth = extractBorderWidthValues(code);
       if (approvedBorderWidth.size > 0) {
         for (const val of usedBorderWidth) {
@@ -298,9 +244,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
 
       violations.push(...a11yViolations);
 
-      // -----------------------------------------------------------------------
-      // Scoring
-      // -----------------------------------------------------------------------
       const errorCount = violations.filter((v) => v.severity === 'error').length;
       const warningCount = violations.filter(
         (v) => v.severity === 'warning' && v.type !== 'accessibility'
@@ -315,14 +258,13 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
         .select({
           tokensHash: designProfiles.tokensHash,
           compilationValid: designProfiles.compilationValid,
-          stylePackId: designProfiles.stylePackId,
         })
         .from(designProfiles)
         .where(eq(designProfiles.projectId, projectId))
         .limit(1);
 
-      if (profile?.stylePackId) {
-        const currentTokensHash = await computeTokensHash(db, profile.stylePackId);
+      if (profile) {
+        const currentTokensHash = await computeTokensHash(db, project.id);
         if (
           !profile.compilationValid ||
           (profile.tokensHash && profile.tokensHash !== currentTokensHash)

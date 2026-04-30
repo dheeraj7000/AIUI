@@ -3,9 +3,7 @@ import { users } from './users';
 import { organizations } from './organizations';
 import { organizationMembers } from './organization-members';
 import { projects } from './projects';
-import { stylePacks } from './style-packs';
 import { styleTokens } from './style-tokens';
-import { componentRecipes } from './component-recipes';
 import { assets } from './assets';
 import { designProfiles } from './design-profiles';
 import { promptBundles } from './prompt-bundles';
@@ -19,8 +17,6 @@ export const usersRelations = relations(users, ({ many }) => ({
 export const organizationsRelations = relations(organizations, ({ many }) => ({
   members: many(organizationMembers),
   projects: many(projects),
-  stylePacks: many(stylePacks),
-  componentRecipes: many(componentRecipes),
   assets: many(assets),
 }));
 
@@ -42,39 +38,17 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
     fields: [projects.organizationId],
     references: [organizations.id],
   }),
+  styleTokens: many(styleTokens),
   assets: many(assets),
   designProfiles: many(designProfiles),
   promptBundles: many(promptBundles),
 }));
 
-// ── Style Packs ────────────────────────────────────────────────────────────
-export const stylePacksRelations = relations(stylePacks, ({ one, many }) => ({
-  organization: one(organizations, {
-    fields: [stylePacks.organizationId],
-    references: [organizations.id],
-  }),
-  styleTokens: many(styleTokens),
-  componentRecipes: many(componentRecipes),
-  designProfiles: many(designProfiles),
-}));
-
 // ── Style Tokens ───────────────────────────────────────────────────────────
 export const styleTokensRelations = relations(styleTokens, ({ one }) => ({
-  stylePack: one(stylePacks, {
-    fields: [styleTokens.stylePackId],
-    references: [stylePacks.id],
-  }),
-}));
-
-// ── Component Recipes ──────────────────────────────────────────────────────
-export const componentRecipesRelations = relations(componentRecipes, ({ one }) => ({
-  stylePack: one(stylePacks, {
-    fields: [componentRecipes.stylePackId],
-    references: [stylePacks.id],
-  }),
-  organization: one(organizations, {
-    fields: [componentRecipes.organizationId],
-    references: [organizations.id],
+  project: one(projects, {
+    fields: [styleTokens.projectId],
+    references: [projects.id],
   }),
 }));
 
@@ -95,10 +69,6 @@ export const designProfilesRelations = relations(designProfiles, ({ one, many })
   project: one(projects, {
     fields: [designProfiles.projectId],
     references: [projects.id],
-  }),
-  stylePack: one(stylePacks, {
-    fields: [designProfiles.stylePackId],
-    references: [stylePacks.id],
   }),
   promptBundles: many(promptBundles),
 }));

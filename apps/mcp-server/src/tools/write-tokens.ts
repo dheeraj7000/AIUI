@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { stylePacks, styleTokens } from '@aiui/design-core';
+import { projects, styleTokens } from '@aiui/design-core';
 import { NotFoundError, ValidationError } from '../lib/errors';
 import { getContext } from '../lib/context';
 import { requireScope } from '../lib/auth';
@@ -47,13 +47,13 @@ const VALID_TOKEN_TYPES: TokenType[] = [
 export function registerWriteTokens(server: AiuiMcpServer) {
   server.registerTool(
     'update_tokens',
-    'Add, update, or delete design tokens in a style pack. Returns counts of added, modified, and deleted tokens.',
+    'Add, update, or delete design tokens on a project. Returns counts of added, modified, and deleted tokens.',
     {
-      stylePackId: z.string().uuid().describe('The style pack ID to update tokens in'),
+      projectSlug: z.string().min(1).describe('Project slug whose tokens you want to edit'),
       updates: z
         .array(
           z.object({
-            key: z.string().describe('Token key (e.g., color-primary)'),
+            key: z.string().describe('Token key (e.g., color.primary)'),
             value: z.string().optional().describe('New token value'),
             type: z.string().optional().describe('Token type (color, font, spacing, etc.)'),
             delete: z.boolean().optional().describe('Set true to delete this token'),
@@ -62,14 +62,13 @@ export function registerWriteTokens(server: AiuiMcpServer) {
         .describe('Array of token updates'),
     },
     async (args) => {
-      // Enforce write scope if running in authenticated context
       const ctx = getContext();
       if (ctx) {
         requireScope(ctx.scopes, 'mcp:write');
       }
 
       const db = getDb();
-      const stylePackId = args.stylePackId as string;
+      const projectSlug = args.projectSlug as string;
       const updates = args.updates as Array<{
         key: string;
         value?: string;
@@ -77,18 +76,16 @@ export function registerWriteTokens(server: AiuiMcpServer) {
         delete?: boolean;
       }>;
 
-      // Verify the style pack exists
-      const [pack] = await db
-        .select({ id: stylePacks.id })
-        .from(stylePacks)
-        .where(eq(stylePacks.id, stylePackId))
+      const [project] = await db
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.slug, projectSlug))
         .limit(1);
 
-      if (!pack) {
-        throw new NotFoundError('Style pack', stylePackId);
+      if (!project) {
+        throw new NotFoundError('Project', projectSlug);
       }
 
-      // Validate token types where provided
       for (const update of updates) {
         if (
           update.type &&
@@ -101,7 +98,6 @@ export function registerWriteTokens(server: AiuiMcpServer) {
         }
       }
 
-      // Fetch existing tokens for this pack
       const existingTokens = await db
         .select({
           id: styleTokens.id,
@@ -110,7 +106,7 @@ export function registerWriteTokens(server: AiuiMcpServer) {
           tokenValue: styleTokens.tokenValue,
         })
         .from(styleTokens)
-        .where(eq(styleTokens.stylePackId, stylePackId));
+        .where(eq(styleTokens.projectId, project.id));
 
       const existingMap = new Map(existingTokens.map((t) => [t.tokenKey, t]));
 
@@ -123,20 +119,15 @@ export function registerWriteTokens(server: AiuiMcpServer) {
           const existing = existingMap.get(update.key);
 
           if (update.delete) {
-            // Delete the token
             if (existing) {
               await tx
                 .delete(styleTokens)
                 .where(
-                  and(
-                    eq(styleTokens.stylePackId, stylePackId),
-                    eq(styleTokens.tokenKey, update.key)
-                  )
+                  and(eq(styleTokens.projectId, project.id), eq(styleTokens.tokenKey, update.key))
                 );
               deleted++;
             }
           } else if (existing) {
-            // Update existing token
             const setValues: Record<string, unknown> = {};
             if (update.value !== undefined) {
               setValues.tokenValue = update.value;
@@ -150,15 +141,11 @@ export function registerWriteTokens(server: AiuiMcpServer) {
                 .update(styleTokens)
                 .set(setValues)
                 .where(
-                  and(
-                    eq(styleTokens.stylePackId, stylePackId),
-                    eq(styleTokens.tokenKey, update.key)
-                  )
+                  and(eq(styleTokens.projectId, project.id), eq(styleTokens.tokenKey, update.key))
                 );
               modified++;
             }
           } else {
-            // Insert new token
             if (!update.value) {
               throw new ValidationError(
                 `Token '${update.key}' does not exist and no value was provided for creation`
@@ -170,7 +157,7 @@ export function registerWriteTokens(server: AiuiMcpServer) {
               );
             }
             await tx.insert(styleTokens).values({
-              stylePackId,
+              projectId: project.id,
               tokenKey: update.key,
               tokenType: update.type as TokenType,
               tokenValue: update.value,
@@ -180,11 +167,10 @@ export function registerWriteTokens(server: AiuiMcpServer) {
         }
       });
 
-      // Get final token count
       const finalTokens = await db
         .select({ id: styleTokens.id })
         .from(styleTokens)
-        .where(eq(styleTokens.stylePackId, stylePackId));
+        .where(eq(styleTokens.projectId, project.id));
 
       return {
         added,

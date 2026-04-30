@@ -4,77 +4,57 @@ import {
   writeDesignMemory,
   writeTokensJson,
   addToGitignore,
+  type LocalToken,
 } from '../lib/writer';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 
-function makePack() {
-  return {
-    name: 'Test Pack',
-    slug: 'test-pack',
-    version: '1.0.0',
-    category: 'test',
-    description: 'A test style pack',
-    tokenCount: 3,
-    componentCount: 2,
-    tokens: [
-      { key: 'color-primary', type: 'color', value: '#3b82f6' },
-      { key: 'font-body', type: 'font', value: 'Inter' },
-      { key: 'spacing-sm', type: 'spacing', value: '0.5rem' },
-    ],
-    componentSlugs: ['button', 'card'],
-  };
+function makeTokens(): LocalToken[] {
+  return [
+    { key: 'color.primary', type: 'color', value: '#3b82f6' },
+    { key: 'font.body', type: 'font', value: 'Inter' },
+    { key: 'spacing.sm', type: 'spacing', value: '0.5rem' },
+  ];
 }
 
+const PROJECT = 'test-project';
+
 describe('generateDesignMemory', () => {
-  it('returns string containing the pack name', () => {
-    const md = generateDesignMemory(makePack());
-    expect(md).toContain('Test Pack');
+  it('returns string containing the project name', () => {
+    const md = generateDesignMemory(PROJECT, makeTokens());
+    expect(md).toContain(PROJECT);
   });
 
   it('contains Design Rules section', () => {
-    const md = generateDesignMemory(makePack());
+    const md = generateDesignMemory(PROJECT, makeTokens());
     expect(md).toContain('## Design Rules');
   });
 
-  it('contains Foundation Tokens section', () => {
-    const md = generateDesignMemory(makePack());
-    expect(md).toContain('## Foundation Tokens');
+  it('contains Tokens section', () => {
+    const md = generateDesignMemory(PROJECT, makeTokens());
+    expect(md).toContain('## Tokens');
   });
 
-  it('contains all 7 design rules', () => {
-    const md = generateDesignMemory(makePack());
+  it('contains the six core design rules', () => {
+    const md = generateDesignMemory(PROJECT, makeTokens());
     expect(md).toContain('1. **Always use design tokens**');
-    expect(md).toContain('2. **Follow the component library**');
-    expect(md).toContain('3. **Maintain visual hierarchy**');
-    expect(md).toContain('4. **Respect the type system**');
-    expect(md).toContain('5. **Use the spacing scale**');
-    expect(md).toContain('6. **Maintain accessibility**');
-    expect(md).toContain('7. **Preserve design consistency**');
+    expect(md).toContain('2. **Maintain visual hierarchy**');
+    expect(md).toContain('3. **Respect the type system**');
+    expect(md).toContain('4. **Use the spacing scale**');
+    expect(md).toContain('5. **Maintain accessibility**');
+    expect(md).toContain('6. **Preserve design consistency**');
   });
 
   it('contains token values in markdown table format', () => {
-    const md = generateDesignMemory(makePack());
-    expect(md).toContain('| `color-primary` | `#3b82f6` |');
-    expect(md).toContain('| `font-body` | `Inter` |');
-    expect(md).toContain('| `spacing-sm` | `0.5rem` |');
-  });
-
-  it('contains component slugs', () => {
-    const md = generateDesignMemory(makePack());
-    expect(md).toContain('`button`');
-    expect(md).toContain('`card`');
-  });
-
-  it('contains the pack category and version', () => {
-    const md = generateDesignMemory(makePack());
-    expect(md).toContain('test');
-    expect(md).toContain('1.0.0');
+    const md = generateDesignMemory(PROJECT, makeTokens());
+    expect(md).toContain('| `color.primary` | `#3b82f6` |');
+    expect(md).toContain('| `font.body` | `Inter` |');
+    expect(md).toContain('| `spacing.sm` | `0.5rem` |');
   });
 
   it('contains Generated: with ISO date substring', () => {
-    const md = generateDesignMemory(makePack());
+    const md = generateDesignMemory(PROJECT, makeTokens());
     expect(md).toMatch(/\*\*Generated:\*\* \d{4}-\d{2}-\d{2}T/);
   });
 });
@@ -97,22 +77,19 @@ describe('writeDesignMemory', () => {
 
   it('creates .aiui/design-memory.md file', () => {
     const dir = makeTempDir();
-    writeDesignMemory(makePack(), dir);
+    writeDesignMemory(PROJECT, makeTokens(), dir);
     const filePath = path.join(dir, '.aiui', 'design-memory.md');
     expect(fs.existsSync(filePath)).toBe(true);
   });
 
-  it('file content matches generateDesignMemory output', () => {
+  it('file content matches generateDesignMemory output structure', () => {
     const dir = makeTempDir();
-    const pack = makePack();
-    writeDesignMemory(pack, dir);
+    writeDesignMemory(PROJECT, makeTokens(), dir);
     const filePath = path.join(dir, '.aiui', 'design-memory.md');
     const content = fs.readFileSync(filePath, 'utf-8');
-    // The generated date will differ slightly, but the structure should match.
-    // We check key sections instead of exact equality.
-    expect(content).toContain('# Design Memory — Test Pack');
+    expect(content).toContain(`# Design Memory — ${PROJECT}`);
     expect(content).toContain('## Design Rules');
-    expect(content).toContain('## Foundation Tokens');
+    expect(content).toContain('## Tokens');
   });
 });
 
@@ -134,14 +111,14 @@ describe('writeTokensJson', () => {
 
   it('creates .aiui/tokens.json file', () => {
     const dir = makeTempDir();
-    writeTokensJson(makePack().tokens, dir);
+    writeTokensJson(makeTokens(), dir);
     const filePath = path.join(dir, '.aiui', 'tokens.json');
     expect(fs.existsSync(filePath)).toBe(true);
   });
 
   it('file content is valid JSON', () => {
     const dir = makeTempDir();
-    writeTokensJson(makePack().tokens, dir);
+    writeTokensJson(makeTokens(), dir);
     const filePath = path.join(dir, '.aiui', 'tokens.json');
     const raw = fs.readFileSync(filePath, 'utf-8');
     expect(() => JSON.parse(raw)).not.toThrow();
@@ -149,13 +126,12 @@ describe('writeTokensJson', () => {
 
   it('JSON has correct key-value pairs', () => {
     const dir = makeTempDir();
-    const tokens = makePack().tokens;
-    writeTokensJson(tokens, dir);
+    writeTokensJson(makeTokens(), dir);
     const filePath = path.join(dir, '.aiui', 'tokens.json');
     const parsed = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    expect(parsed['color-primary']).toBe('#3b82f6');
-    expect(parsed['font-body']).toBe('Inter');
-    expect(parsed['spacing-sm']).toBe('0.5rem');
+    expect(parsed['color.primary']).toBe('#3b82f6');
+    expect(parsed['font.body']).toBe('Inter');
+    expect(parsed['spacing.sm']).toBe('0.5rem');
   });
 });
 
@@ -194,7 +170,6 @@ describe('addToGitignore', () => {
 
   it('handles missing .gitignore gracefully', () => {
     const dir = makeTempDir();
-    // No .gitignore exists — should not throw and should not create one
     expect(() => addToGitignore(dir)).not.toThrow();
     expect(fs.existsSync(path.join(dir, '.gitignore'))).toBe(false);
   });

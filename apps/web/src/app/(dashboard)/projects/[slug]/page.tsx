@@ -1,16 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Network } from 'lucide-react';
-import {
-  createDb,
-  projects,
-  stylePacks,
-  styleTokens,
-  componentRecipes,
-  designProfiles,
-  assets,
-} from '@aiui/design-core';
-import { eq, count, inArray } from 'drizzle-orm';
+import { createDb, projects, styleTokens, designProfiles, assets } from '@aiui/design-core';
+import { eq, count } from 'drizzle-orm';
 import { DesignMemoryStalenessBanner } from '@/components/ui/design-memory-staleness-banner';
 
 export const dynamic = 'force-dynamic';
@@ -30,54 +22,25 @@ async function getProject(slug: string) {
 
   if (!project) return null;
 
-  // Style pack
-  let pack = null;
-  let tokens: { tokenKey: string; tokenType: string; tokenValue: string }[] = [];
-  if (project.activeStylePackId) {
-    const [p] = await db
-      .select()
-      .from(stylePacks)
-      .where(eq(stylePacks.id, project.activeStylePackId))
-      .limit(1);
-    pack = p ?? null;
-    if (pack) {
-      tokens = await db
-        .select({
-          tokenKey: styleTokens.tokenKey,
-          tokenType: styleTokens.tokenType,
-          tokenValue: styleTokens.tokenValue,
-        })
-        .from(styleTokens)
-        .where(eq(styleTokens.stylePackId, pack.id))
-        .orderBy(styleTokens.tokenType, styleTokens.tokenKey);
-    }
-  }
+  // Project-scoped tokens
+  const tokens = await db
+    .select({
+      tokenKey: styleTokens.tokenKey,
+      tokenType: styleTokens.tokenType,
+      tokenValue: styleTokens.tokenValue,
+    })
+    .from(styleTokens)
+    .where(eq(styleTokens.projectId, project.id))
+    .orderBy(styleTokens.tokenType, styleTokens.tokenKey);
 
-  // Selected components from design profile (also used as sync-freshness proxy).
+  // Design profile (used as sync-freshness proxy).
   const [profile] = await db
     .select({
-      selectedComponents: designProfiles.selectedComponents,
       updatedAt: designProfiles.updatedAt,
     })
     .from(designProfiles)
     .where(eq(designProfiles.projectId, project.id))
     .limit(1);
-
-  let selectedRecipes: { id: string; name: string; type: string; slug: string }[] = [];
-  if (profile) {
-    const ids = profile.selectedComponents as string[];
-    if (ids && ids.length > 0) {
-      selectedRecipes = await db
-        .select({
-          id: componentRecipes.id,
-          name: componentRecipes.name,
-          type: componentRecipes.type,
-          slug: componentRecipes.slug,
-        })
-        .from(componentRecipes)
-        .where(inArray(componentRecipes.id, ids));
-    }
-  }
 
   // Asset count
   const [assetCount] = await db
@@ -86,10 +49,7 @@ async function getProject(slug: string) {
     .where(eq(assets.projectId, project.id));
 
   // Design memory staleness — use the design profile's updatedAt as a
-  // best-effort proxy for last sync. Before the scope cut, we queried a
-  // usage_events table populated by the MCP sync tool; that table is gone,
-  // so the profile's updatedAt is the closest remaining signal (it changes
-  // on pack swap, component edits, etc.).
+  // best-effort proxy for last sync.
   let daysStale: number | null = null;
   let isStale = false;
   if (!profile) {
@@ -106,9 +66,7 @@ async function getProject(slug: string) {
 
   return {
     ...project,
-    pack,
     tokens,
-    selectedRecipes,
     assetCount: assetCount?.count ?? 0,
     designMemoryStale: isStale,
     designMemoryDaysStale: daysStale,
@@ -168,14 +126,10 @@ export default async function ProjectDetailPage(props: RouteContext) {
       )}
 
       {/* Stats */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
           <div className="text-2xl font-bold text-white">{project.tokens.length}</div>
           <div className="text-sm text-zinc-500">Tokens</div>
-        </div>
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-          <div className="text-2xl font-bold text-white">{project.selectedRecipes.length}</div>
-          <div className="text-sm text-zinc-500">Components</div>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
           <div className="text-2xl font-bold text-white">{project.assetCount}</div>
@@ -183,30 +137,11 @@ export default async function ProjectDetailPage(props: RouteContext) {
         </div>
       </div>
 
-      {/* Style Pack */}
+      {/* Tokens */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-white">Style Pack</h2>
-        {project.pack ? (
+        <h2 className="text-lg font-semibold text-white">Design Tokens</h2>
+        {project.tokens.length > 0 ? (
           <div className="mt-3 space-y-4">
-            <Link
-              href={`/style-packs/${project.pack.id}`}
-              className="block rounded-xl border border-zinc-800 bg-zinc-900 p-4 hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="font-medium text-white">{project.pack.name}</span>
-                  <span className="ml-2 text-xs text-zinc-500">
-                    {project.pack.category} · v{project.pack.version}
-                  </span>
-                </div>
-                <span className="text-xs text-indigo-400">View pack</span>
-              </div>
-              {project.pack.description && (
-                <p className="mt-1 text-sm text-zinc-500">{project.pack.description}</p>
-              )}
-            </Link>
-
-            {/* Token preview */}
             {Object.entries(tokensByType).map(([type, typeTokens]) => (
               <div key={type} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
                 <h3 className="flex items-center gap-2 text-sm font-medium text-zinc-300">
@@ -238,43 +173,12 @@ export default async function ProjectDetailPage(props: RouteContext) {
           </div>
         ) : (
           <div className="mt-3 rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-6 text-center">
-            <p className="text-sm text-zinc-500">No style pack assigned.</p>
+            <p className="text-sm text-zinc-500">No tokens yet.</p>
             <Link
-              href="/style-packs"
+              href="/import"
               className="mt-1 inline-block text-sm text-indigo-400 hover:underline"
             >
-              Browse style packs
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* Components */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-white">Components</h2>
-        {project.selectedRecipes.length > 0 ? (
-          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {project.selectedRecipes.map((r) => (
-              <Link
-                key={r.id}
-                href={`/components/${r.id}`}
-                className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm hover:shadow-md"
-              >
-                <span className="font-medium text-white">{r.name}</span>
-                <span className="ml-2 rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-400">
-                  {r.type}
-                </span>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="mt-3 rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-6 text-center">
-            <p className="text-sm text-zinc-500">No components selected.</p>
-            <Link
-              href="/components"
-              className="mt-1 inline-block text-sm text-indigo-400 hover:underline"
-            >
-              Browse components
+              Import tokens
             </Link>
           </div>
         )}
@@ -373,7 +277,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
             <ul className="mt-1 space-y-1 text-xs text-zinc-500">
               <li>
                 <code className="rounded bg-zinc-800 px-1">.aiui/design-memory.md</code> — Full
-                design context: tokens, components, rules
+                design context: tokens and rules
               </li>
               <li>
                 <code className="rounded bg-zinc-800 px-1">.aiui/tokens.json</code> —
@@ -397,7 +301,7 @@ export default async function ProjectDetailPage(props: RouteContext) {
             <pre className="mt-3 rounded-md bg-zinc-950 p-4 text-xs text-zinc-200 overflow-x-auto">
               {`# Design System
 This project uses AIUI for design management.
-See \`.aiui/design-memory.md\` for the active design system — tokens, components, and rules.
+See \`.aiui/design-memory.md\` for the active design system — tokens and rules.
 Always follow the design rules defined there before building any UI.`}
             </pre>
           </div>
@@ -416,15 +320,15 @@ Always follow the design rules defined there before building any UI.`}
               <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
                 <div className="text-xs font-semibold text-zinc-500 uppercase">Dynamic</div>
                 <p className="mt-1 text-sm text-zinc-300">
-                  Say &quot;re-sync design memory&quot; after changing your style pack or components
-                  in AIUI. Files update from the database.
+                  Say &quot;re-sync design memory&quot; after changing your tokens in AIUI. Files
+                  update from the database.
                 </p>
               </div>
               <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
                 <div className="text-xs font-semibold text-zinc-500 uppercase">Contextual</div>
                 <p className="mt-1 text-sm text-zinc-300">
-                  Memory contains your exact token values, component list, and usage rules — not
-                  generic instructions.
+                  Memory contains your exact token values and usage rules — not generic
+                  instructions.
                 </p>
               </div>
               <div className="rounded-xl bg-zinc-900 p-3 shadow-sm">
@@ -435,60 +339,6 @@ Always follow the design rules defined there before building any UI.`}
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* The flow */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-            <h3 className="text-sm font-semibold text-white">The flow</h3>
-            <ol className="mt-3 space-y-2 text-sm text-zinc-400">
-              <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
-                  1
-                </span>
-                <span>
-                  You ask Claude to build UI — Claude reads{' '}
-                  <code className="text-xs bg-zinc-800 rounded px-1">.aiui/design-memory.md</code>{' '}
-                  automatically
-                </span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
-                  2
-                </span>
-                <span>
-                  Claude knows your {project.tokens.length} tokens, {project.selectedRecipes.length}{' '}
-                  components, and design rules from memory
-                </span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
-                  3
-                </span>
-                <span>
-                  Claude calls{' '}
-                  <code className="text-xs bg-zinc-800 rounded px-1">get_component_recipe</code> to
-                  get the full code template for each component it needs
-                </span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
-                  4
-                </span>
-                <span>
-                  Claude generates on-brand code using your exact tokens and component patterns
-                </span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-medium text-zinc-400">
-                  5
-                </span>
-                <span>
-                  Claude calls{' '}
-                  <code className="text-xs bg-zinc-800 rounded px-1">validate_ui_output</code> to
-                  verify compliance — catches hardcoded colors and wrong fonts
-                </span>
-              </li>
-            </ol>
           </div>
 
           {/* Quick test */}
@@ -502,12 +352,6 @@ Always follow the design rules defined there before building any UI.`}
               <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
                 &quot;Build a landing page using my design system&quot;
               </div>
-              {project.selectedRecipes.length > 0 && (
-                <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
-                  &quot;Get the {project.selectedRecipes[0].name} recipe and build a{' '}
-                  {project.selectedRecipes[0].type} section&quot;
-                </div>
-              )}
               <div className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300">
                 &quot;Re-sync design memory&quot;{' '}
                 <span className="text-xs text-zinc-500">— after changing your design in AIUI</span>

@@ -1,6 +1,6 @@
 import type { Database } from '@aiui/design-core';
 import {
-  createProjectWithStarter,
+  createProjectWithDefaults,
   ensureUserWorkspace,
   getUserWorkspace,
   projects,
@@ -42,7 +42,7 @@ export async function bootstrapNewUser(
   // Swallow failures — the account still works, the user can hit
   // "New project" from the dashboard to try again.
   try {
-    const result = await createProjectWithStarter(db, {
+    const result = await createProjectWithDefaults(db, {
       orgId: organizationId,
       name: 'My first project',
       description: 'Default project created on signup. Rename or replace anytime.',

@@ -27,14 +27,14 @@ const quickSteps = [
   {
     n: '01',
     title: 'Create an account.',
-    body: 'Sign up and a starter project is provisioned for you — shadcn/ui Essentials tokens, a handful of components, and an empty design profile. No manual setup.',
+    body: 'Sign up and a starter project is provisioned for you — a default token set and an empty design profile. No manual setup.',
     action: { href: '/sign-up', label: 'Sign up' },
   },
   {
     n: '02',
-    title: 'Pick a style pack.',
-    body: 'Browse 14 packs or paste tokens you already have (CSS variables, Tokens Studio, Tailwind config). Everything you select becomes part of your design memory.',
-    action: { href: '/style-packs', label: 'Browse packs' },
+    title: 'Bring your tokens.',
+    body: 'Import tokens you already have (CSS variables, Tokens Studio, Tailwind config) into the project. Everything you bring becomes part of your design memory.',
+    action: { href: '/import', label: 'Import tokens' },
   },
   {
     n: '03',
@@ -52,16 +52,10 @@ const concepts = [
       'Two files written to your project root (.aiui/design-memory.md and .aiui/tokens.json). Your AI editor reads them on every message. Add a line to CLAUDE.md and the design system follows every response.',
   },
   {
-    id: 'style-packs',
-    title: 'Style packs',
+    id: 'tokens',
+    title: 'Project tokens',
     description:
-      'Curated sets of tokens — colors, fonts, spacing, radii, shadows, elevation. Switching packs re-compiles the memory; Claude picks up the change on the next message.',
-  },
-  {
-    id: 'component-recipes',
-    title: 'Component recipes',
-    description:
-      'Each recipe is a code template plus a props schema plus a one-paragraph AI usage rule. When Claude needs a button, it fetches the recipe and writes code that respects it.',
+      'Each project owns its own set of tokens — colors, fonts, spacing, radii, shadows, elevation. Update them in AIUI; the next sync pushes the new values into the design memory and Claude picks up the change on the next message.',
   },
   {
     id: 'validation',
@@ -74,16 +68,11 @@ const concepts = [
 const mcpReadTools: Array<{ name: string; desc: string }> = [
   {
     name: 'get_project_context',
-    desc: 'Fetch framework, active pack, components, and token count for a project.',
+    desc: 'Fetch framework and token count for a project.',
   },
   { name: 'get_design_memory', desc: 'Return the design memory markdown as a string.' },
   { name: 'check_design_memory', desc: 'Is the local memory still fresh, or is a resync needed?' },
   { name: 'sync_design_memory', desc: 'Write .aiui/design-memory.md and .aiui/tokens.json.' },
-  { name: 'list_components', desc: 'Enumerate component recipes, optionally filtered by pack.' },
-  {
-    name: 'get_component_recipe',
-    desc: 'Full code template, schema, and usage rule for one recipe.',
-  },
   { name: 'get_theme_tokens', desc: 'Export tokens as Tailwind config, CSS vars, or raw JSON.' },
   { name: 'get_asset_manifest', desc: 'Categorized list of project assets with public URLs.' },
   { name: 'validate_ui_output', desc: 'Check generated code against the project token set.' },
@@ -91,12 +80,16 @@ const mcpReadTools: Array<{ name: string; desc: string }> = [
 ];
 
 const mcpWriteTools: Array<{ name: string; desc: string }> = [
-  { name: 'init_project', desc: 'First call on an empty repo — seeds pack, profile, and memory.' },
-  { name: 'create_style_pack', desc: 'Define a new pack with tokens inline.' },
-  { name: 'apply_style_pack', desc: 'Attach a pack to a project and recompile the memory.' },
-  { name: 'update_tokens', desc: 'Add, change, or remove tokens on a pack.' },
+  {
+    name: 'init_project',
+    desc: 'First call on an empty repo — seeds default tokens, profile, and memory.',
+  },
+  { name: 'update_tokens', desc: 'Add, change, or remove tokens on a project.' },
   { name: 'fix_compliance_issues', desc: 'Rewrite code to use approved tokens.' },
-  { name: 'reset_project_to_starter', desc: 'Discard customizations, reseed the starter pack.' },
+  {
+    name: 'reset_project_to_starter',
+    desc: 'Discard customizations, reseed the default token set.',
+  },
   { name: 'undo_last_token_change', desc: 'Revert the most recent token edit.' },
 ];
 
@@ -392,7 +385,7 @@ export default function DocsPage() {
               <SectionHeading
                 numeral="04"
                 eyebrow="MCP reference"
-                title="Seventeen tools, grouped by intent."
+                title="A focused tool set, grouped by intent."
               />
               <p style={bodyCopyStyle}>
                 Claude calls these automatically. You rarely need to name them — they&rsquo;re here
@@ -537,25 +530,25 @@ export default function DocsPage() {
                   href="/dashboard"
                   eyebrow="Build"
                   title="Open your dashboard"
-                  body="Create a project, assign a pack, pick components."
+                  body="Create a project and inspect its tokens."
                 />
                 <NextStepCard
                   href="/studio"
                   eyebrow="Explore"
                   title="Try the studio"
-                  body="Walk the shape-discovery flow — it ranks packs against your brand intent."
+                  body="Walk the shape-discovery flow — it surfaces token directions from your brand intent."
                 />
                 <NextStepCard
-                  href="/style-packs"
-                  eyebrow="Browse"
-                  title="Read the pack library"
-                  body="14 seeded packs, each with its own token set and curated component list."
+                  href="/import"
+                  eyebrow="Import"
+                  title="Bring your tokens"
+                  body="Load existing CSS variables, Tokens Studio JSON, or a Tailwind config straight into a project."
                 />
                 <NextStepCard
-                  href="/components"
-                  eyebrow="Browse"
-                  title="Read the component library"
-                  body="~160 recipes across heroes, pricing, cards, CTAs, footers, and more."
+                  href="/api-keys"
+                  eyebrow="Connect"
+                  title="Generate an API key"
+                  body="Wire the MCP server into Claude Code, Cursor, VS Code, or Windsurf."
                 />
               </div>
             </section>

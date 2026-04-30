@@ -1,21 +1,26 @@
 import * as path from 'node:path';
 import { detectFramework } from '../lib/detect-framework.js';
 import { writeConfig, type AiuiConfig } from '../lib/config.js';
-import { fetchRegistryIndex, fetchPack, cachePack } from '../lib/registry-client.js';
-import { transformTokens, inferFormat } from '../lib/transformer.js';
 import { writeDesignMemory, writeTokensJson, addToGitignore } from '../lib/writer.js';
-import * as fs from 'node:fs';
+import type { LocalToken } from '../lib/writer.js';
+import { DEFAULT_PROJECT_TOKENS } from '@aiui/design-core';
 
 export interface InitOptions {
   yes?: boolean;
-  local?: boolean;
-  db?: string;
-  registry?: string;
+  apiUrl?: string;
 }
 
-const DEFAULT_REGISTRY = process.env.AIUI_REGISTRY_URL ?? 'https://aiui.store';
-const DEFAULT_PACK = 'saas-clean';
+const DEFAULT_API_URL = process.env.AIUI_API_URL ?? 'https://aiui.store';
 
+/**
+ * Scaffold a local AIUI workspace: write `.aiui/config.json`, a starter
+ * `design-memory.md`, and `tokens.json` seeded with the default token set
+ * shipped from `@aiui/design-core`.
+ *
+ * After the marketplace scope cut, the CLI no longer fetches packs from a
+ * registry. The richer DB-backed design memory lives on the server — use
+ * the MCP `init_project` tool from your AI agent for the full flow.
+ */
 export async function init(options: InitOptions): Promise<void> {
   const cwd = process.cwd();
   const ora = (await import('ora')).default;
@@ -25,7 +30,6 @@ export async function init(options: InitOptions): Promise<void> {
   console.log(chalk.bold('  AIUI — Design System Setup'));
   console.log('');
 
-  // 1. Detect framework
   const spinner = ora('Detecting project...').start();
   const info = detectFramework(cwd);
   spinner.succeed(
@@ -33,7 +37,6 @@ export async function init(options: InitOptions): Promise<void> {
       (info.hasTailwind ? ` (Tailwind CSS detected)` : '')
   );
 
-  // 2. Get project name
   let projectSlug: string;
   if (options.yes) {
     projectSlug = path
@@ -59,82 +62,30 @@ export async function init(options: InitOptions): Promise<void> {
     projectSlug = slug;
   }
 
-  // 3. Determine registry
-  const registryUrl = options.registry ?? DEFAULT_REGISTRY;
+  const apiUrl = options.apiUrl ?? DEFAULT_API_URL;
 
-  // 4. Select pack
-  let packSlug = DEFAULT_PACK;
-  if (!options.yes) {
-    try {
-      const indexSpinner = ora('Fetching available style packs...').start();
-      const index = await fetchRegistryIndex(registryUrl);
-      indexSpinner.stop();
+  // Convert the design-core CreateTokenInput[] into the LocalToken[] shape
+  // the writer wants. They differ only in field names.
+  const seedTokens: LocalToken[] = DEFAULT_PROJECT_TOKENS.map((t) => ({
+    key: t.tokenKey,
+    type: t.tokenType,
+    value: t.tokenValue,
+    description: t.description,
+  }));
 
-      if (index.length > 0) {
-        const prompts = (await import('prompts')).default;
-        const { selected } = await prompts({
-          type: 'select',
-          name: 'selected',
-          message: 'Style pack',
-          choices: index.map((p) => ({
-            title: `${p.name} — ${p.description} (${p.tokenCount} tokens, ${p.componentCount} components)`,
-            value: p.slug,
-          })),
-          initial: index.findIndex((p) => p.slug === DEFAULT_PACK),
-        });
-        if (!selected) {
-          console.error(chalk.red('  Cancelled.'));
-          process.exit(1);
-        }
-        packSlug = selected;
-      }
-    } catch {
-      // Registry not available — use default
-    }
-  }
-
-  // 5. Fetch pack
-  const fetchSpinner = ora(`Fetching ${packSlug} from registry...`).start();
-  let pack;
-  try {
-    pack = await fetchPack(packSlug, {
-      projectSlug,
-      framework: info.framework,
-      registryUrl,
-      activePack: packSlug,
-    });
-    fetchSpinner.succeed(`Fetched ${chalk.cyan(pack.name)}`);
-  } catch (err) {
-    fetchSpinner.fail(`Failed to fetch pack: ${err instanceof Error ? err.message : err}`);
-    process.exit(1);
-  }
-
-  // 6. Transform tokens
-  const format = inferFormat(info.framework, info.hasTailwind);
-  const { content: tokenFileContent, filename: tokenFilename } = transformTokens(
-    pack.tokens,
-    format
-  );
-
-  // 7. Write files
   const writeSpinner = ora('Writing .aiui/ files...').start();
   try {
     const config: AiuiConfig = {
       projectSlug,
       framework: info.framework,
-      registryUrl,
-      activePack: packSlug,
+      apiUrl,
       lastSynced: new Date().toISOString(),
     };
 
     writeConfig(config, cwd);
-    writeDesignMemory(pack, cwd);
-    writeTokensJson(pack.tokens, cwd);
-    cachePack(pack, cwd);
+    writeDesignMemory(projectSlug, seedTokens, cwd);
+    writeTokensJson(seedTokens, cwd);
     addToGitignore(cwd);
-
-    // Write framework-specific token file
-    fs.writeFileSync(path.join(cwd, '.aiui', tokenFilename), tokenFileContent);
 
     writeSpinner.succeed('Written .aiui/ files');
   } catch (err) {
@@ -142,20 +93,19 @@ export async function init(options: InitOptions): Promise<void> {
     process.exit(1);
   }
 
-  // 8. Post-init summary
   console.log('');
   console.log(chalk.green('  Done!') + ' Add this to your ' + chalk.bold('CLAUDE.md') + ':');
   console.log('');
   console.log(chalk.gray('  ## Design System'));
   console.log(chalk.gray('  This project uses AIUI for design management.'));
-  console.log(chalk.gray('  See `.aiui/design-memory.md` for the active design system.'));
-  console.log(chalk.gray('  Always follow the design rules defined there before building any UI.'));
+  console.log(chalk.gray('  See `.aiui/design-memory.md` for the active design tokens and rules.'));
+  console.log(chalk.gray('  Always follow the design memory before building any UI.'));
   console.log('');
   console.log(`  ${chalk.bold('MCP setup')} (Claude Code):`);
-  console.log(chalk.gray(`  claude mcp add --transport http aiui ${registryUrl}/mcp`));
+  console.log(chalk.gray(`  claude mcp add --transport http aiui ${apiUrl}/mcp`));
   console.log('');
   console.log(
-    `  Next: ${chalk.cyan('aiui add <pack>')} | ${chalk.cyan('aiui sync')} | ${chalk.cyan('aiui validate')}`
+    `  Next: ${chalk.cyan('aiui validate')} — lint your code against these tokens, or use the MCP \`update_tokens\` tool from your AI agent to evolve them.`
   );
   console.log('');
 }

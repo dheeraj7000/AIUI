@@ -13,10 +13,6 @@ export {
 } from './common';
 export type { PaginationInput } from './common';
 
-// Style packs
-export { createStylePackSchema, updateStylePackSchema, listStylePacksSchema } from './style-pack';
-export type { CreateStylePackInput, UpdateStylePackInput, ListStylePacksInput } from './style-pack';
-
 // Style tokens
 export {
   createTokenSchema,
@@ -31,9 +27,9 @@ export type {
   ListTokensInput,
 } from './style-token';
 
-// Component recipes
-export { createRecipeSchema, updateRecipeSchema, listRecipesSchema } from './component-recipe';
-export type { CreateRecipeInput, UpdateRecipeInput, ListRecipesInput } from './component-recipe';
+// Design profile
+export { createProfileSchema, updateProfileSchema, listProfilesSchema } from './design-profile';
+export type { CreateProfileInput, UpdateProfileInput, ListProfilesInput } from './design-profile';
 
 // Asset validation
 export {

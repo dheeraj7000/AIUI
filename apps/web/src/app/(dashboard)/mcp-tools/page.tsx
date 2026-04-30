@@ -45,9 +45,6 @@ interface McpTool extends CatalogTool {
 const TOOL_EXAMPLES: Record<string, string> = {
   // Read tools
   get_project_context: `{ slug: "my-app" }`,
-  resolve_tag: `{ projectSlug: "my-app", tag: "primary color" }`,
-  list_components: `{ projectSlug: "my-app" }`,
-  get_component_recipe: `{ recipeId: "abc-123" }`,
   get_theme_tokens: `{ projectSlug: "my-app" }`,
   get_asset_manifest: `{ projectSlug: "my-app" }`,
   validate_ui_output: `{ projectSlug: "my-app", code: "<your TSX>" }`,
@@ -57,21 +54,10 @@ const TOOL_EXAMPLES: Record<string, string> = {
   open_design_studio: `{ slug: "my-app" }`,
   // Write tools
   init_project: `{ slug: "my-app", targetDir: "/abs/path/to/repo" }`,
-  create_style_pack: `{ name: "Brand V2", slug: "brand-v2", tokens: [...] }`,
-  apply_style_pack: `{ projectSlug: "my-app", stylePackSlug: "saas-clean-v1" }`,
   update_tokens: `{ projectSlug: "my-app", tokens: [{ key: "color.primary", value: "#4f46e5" }] }`,
   fix_compliance_issues: `{ projectSlug: "my-app", code: "<your TSX>" }`,
   reset_project_to_starter: `{ slug: "my-app", targetDir: "/abs/path/to/repo" }`,
   undo_last_token_change: `{ projectSlug: "my-app" }`,
-  // Discipline-named aliases
-  audit: `{ projectId: "<uuid>", code: "<your TSX>" }`,
-  polish: `{ projectId: "<uuid>", projectSlug: "my-app", code: "<your TSX>" }`,
-  critique: `{ projectId: "<uuid>", code: "<your TSX>" }`,
-  typeset: `{ projectId: "<uuid>", code: "<your TSX>", format: "json" }`,
-  tokens: `{ projectId: "<uuid>", format: "json" }`,
-  context: `{ slug: "my-app" }`,
-  components: `{ stylePackId: "<uuid>" }`,
-  recipe: `{ recipeId: "abc-123" }`,
 };
 
 const GENERIC_EXAMPLE = `{ slug: "my-app" }`;

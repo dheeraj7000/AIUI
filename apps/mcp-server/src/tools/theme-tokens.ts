@@ -21,15 +21,14 @@ export function registerThemeTokens(server: AiuiMcpServer) {
 
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
 
-      if (!project || !project.activeStylePackId) {
-        throw new NotFoundError('Project or style pack', projectId);
+      if (!project) {
+        throw new NotFoundError('Project', projectId);
       }
 
-      // Fetch tokens
       const tokens = await db
         .select({ tokenKey: styleTokens.tokenKey, tokenValue: styleTokens.tokenValue })
         .from(styleTokens)
-        .where(eq(styleTokens.stylePackId, project.activeStylePackId));
+        .where(eq(styleTokens.projectId, project.id));
 
       const tokenMap: Record<string, string> = {};
       for (const t of tokens) {
@@ -38,8 +37,6 @@ export function registerThemeTokens(server: AiuiMcpServer) {
 
       const { tokens: merged } = mergeTokens(tokenMap, {}, { applyDefaults: true });
 
-      // Surface a stale-warning if the design profile has been marked invalid
-      // by a recent write from the dashboard or another MCP session.
       let staleWarning: string | null = null;
       const [profile] = await db
         .select({ compilationValid: designProfiles.compilationValid })

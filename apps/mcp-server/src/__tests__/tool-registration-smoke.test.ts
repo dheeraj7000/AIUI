@@ -27,8 +27,6 @@ import { registerAllTools } from '../tools';
 const EXPECTED_TOOLS = [
   // Read
   'get_project_context',
-  'list_components',
-  'get_component_recipe',
   'get_theme_tokens',
   'get_asset_manifest',
   'validate_ui_output',
@@ -39,9 +37,7 @@ const EXPECTED_TOOLS = [
   'audit_design_principles',
   'suggest_pattern_promotion',
   // Write
-  'create_style_pack',
   'update_tokens',
-  'apply_style_pack',
   'init_project',
   'fix_compliance_issues',
   'reset_project_to_starter',

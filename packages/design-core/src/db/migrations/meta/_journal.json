@@ -36,6 +36,13 @@
       "when": 1776453300404,
       "tag": "0004_add_studio_draft",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777286400000,
+      "tag": "0005_remove_packs_and_recipes",
+      "breakpoints": true
     }
   ]
 }

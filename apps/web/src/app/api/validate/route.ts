@@ -65,19 +65,19 @@ async function resolveProjectId(
 }
 
 /**
- * Fetch the approved tokens for a project's active style pack.
+ * Fetch the approved tokens for a project (project-scoped after scope cut).
  */
 async function getProjectTokens(
   db: Database,
   projectId: string
 ): Promise<Array<{ tokenKey: string; tokenValue: string; tokenType: string }> | null> {
   const [project] = await db
-    .select({ activeStylePackId: projects.activeStylePackId })
+    .select({ id: projects.id })
     .from(projects)
     .where(eq(projects.id, projectId))
     .limit(1);
 
-  if (!project?.activeStylePackId) return null;
+  if (!project) return null;
 
   const tokens = await db
     .select({
@@ -86,7 +86,7 @@ async function getProjectTokens(
       tokenType: styleTokens.tokenType,
     })
     .from(styleTokens)
-    .where(eq(styleTokens.stylePackId, project.activeStylePackId));
+    .where(eq(styleTokens.projectId, project.id));
 
   return tokens;
 }
@@ -133,10 +133,7 @@ export async function POST(req: NextRequest) {
 
     const tokens = await getProjectTokens(db, resolvedProjectId);
     if (!tokens) {
-      return NextResponse.json(
-        { error: 'Project has no active style pack with tokens' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
     const result = checkTokenCompliance(code, tokens);

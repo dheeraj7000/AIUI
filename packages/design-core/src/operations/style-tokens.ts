@@ -1,5 +1,5 @@
 import { eq, and, asc, count } from 'drizzle-orm';
-import { styleTokens, stylePacks, designProfiles } from '../db/schema';
+import { styleTokens, projects, designProfiles } from '../db/schema';
 import type { Database } from '../db';
 import type {
   CreateTokenInput,
@@ -8,38 +8,36 @@ import type {
 } from '../validation/style-token';
 
 /**
- * Invalidate all design profiles that reference a given style pack.
- * Sets compilationValid = false so downstream consumers know the
- * compiled profile may be stale.
+ * Mark a project's design profile(s) as needing recompilation.
+ * Called whenever a token changes so consumers know cached snapshots are stale.
  */
-async function invalidateProfilesForPack(db: Database, stylePackId: string): Promise<void> {
+async function invalidateProfilesForProject(db: Database, projectId: string): Promise<void> {
   await db
     .update(designProfiles)
     .set({ compilationValid: false, updatedAt: new Date() })
-    .where(eq(designProfiles.stylePackId, stylePackId));
+    .where(eq(designProfiles.projectId, projectId));
 }
 
 /**
- * Create a single style token within a style pack.
- * Throws on duplicate tokenKey within the same pack (unique index).
+ * Create a single token under a project.
+ * Throws on duplicate tokenKey within the same project (unique index).
  */
-export async function createToken(db: Database, stylePackId: string, data: CreateTokenInput) {
-  // Verify the style pack exists
-  const [pack] = await db
-    .select({ id: stylePacks.id })
-    .from(stylePacks)
-    .where(eq(stylePacks.id, stylePackId))
+export async function createToken(db: Database, projectId: string, data: CreateTokenInput) {
+  const [project] = await db
+    .select({ id: projects.id })
+    .from(projects)
+    .where(eq(projects.id, projectId))
     .limit(1);
 
-  if (!pack) {
-    return { error: 'style_pack_not_found' as const };
+  if (!project) {
+    return { error: 'project_not_found' as const };
   }
 
   try {
     const [token] = await db
       .insert(styleTokens)
       .values({
-        stylePackId,
+        projectId,
         tokenKey: data.tokenKey,
         tokenType: data.tokenType,
         tokenValue: data.tokenValue,
@@ -47,34 +45,28 @@ export async function createToken(db: Database, stylePackId: string, data: Creat
       })
       .returning();
 
-    await invalidateProfilesForPack(db, stylePackId);
+    await invalidateProfilesForProject(db, projectId);
 
     return { data: token };
   } catch (err: unknown) {
-    if (err instanceof Error && err.message.includes('style_tokens_pack_key_idx')) {
+    if (err instanceof Error && err.message.includes('style_tokens_project_key_idx')) {
       return { error: 'duplicate_token_key' as const };
     }
     throw err;
   }
 }
 
-/**
- * Fetch a single token by ID, verifying it belongs to the given style pack.
- */
-export async function getToken(db: Database, tokenId: string, stylePackId: string) {
+export async function getToken(db: Database, tokenId: string, projectId: string) {
   const [token] = await db
     .select()
     .from(styleTokens)
-    .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.stylePackId, stylePackId)));
+    .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.projectId, projectId)));
 
   return token ?? null;
 }
 
-/**
- * List all tokens for a style pack with optional tokenType filter.
- */
-export async function listTokens(db: Database, stylePackId: string, filters: ListTokensInput) {
-  const conditions = [eq(styleTokens.stylePackId, stylePackId)];
+export async function listTokens(db: Database, projectId: string, filters: ListTokensInput) {
+  const conditions = [eq(styleTokens.projectId, projectId)];
 
   if (filters.tokenType) {
     conditions.push(eq(styleTokens.tokenType, filters.tokenType));
@@ -90,13 +82,10 @@ export async function listTokens(db: Database, stylePackId: string, filters: Lis
   return { data, total: totalResult[0]?.total ?? 0 };
 }
 
-/**
- * Update a token's value or description.
- */
 export async function updateToken(
   db: Database,
   tokenId: string,
-  stylePackId: string,
+  projectId: string,
   data: UpdateTokenInput
 ) {
   const [updated] = await db
@@ -105,56 +94,48 @@ export async function updateToken(
       ...data,
       updatedAt: new Date(),
     })
-    .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.stylePackId, stylePackId)))
+    .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.projectId, projectId)))
     .returning();
 
   if (updated) {
-    await invalidateProfilesForPack(db, stylePackId);
+    await invalidateProfilesForProject(db, projectId);
   }
 
   return updated ?? null;
 }
 
-/**
- * Delete a token by ID, verifying it belongs to the given style pack.
- */
-export async function deleteToken(db: Database, tokenId: string, stylePackId: string) {
+export async function deleteToken(db: Database, tokenId: string, projectId: string) {
   const [deleted] = await db
     .delete(styleTokens)
-    .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.stylePackId, stylePackId)))
+    .where(and(eq(styleTokens.id, tokenId), eq(styleTokens.projectId, projectId)))
     .returning();
 
   if (deleted) {
-    await invalidateProfilesForPack(db, stylePackId);
+    await invalidateProfilesForProject(db, projectId);
   }
 
   return deleted ?? null;
 }
 
-/**
- * Bulk import tokens into a style pack, skipping duplicates.
- */
 export async function bulkImportTokens(
   db: Database,
-  stylePackId: string,
+  projectId: string,
   tokens: CreateTokenInput[]
 ) {
-  // Verify the style pack exists
-  const [pack] = await db
-    .select({ id: stylePacks.id })
-    .from(stylePacks)
-    .where(eq(stylePacks.id, stylePackId))
+  const [project] = await db
+    .select({ id: projects.id })
+    .from(projects)
+    .where(eq(projects.id, projectId))
     .limit(1);
 
-  if (!pack) {
-    return { error: 'style_pack_not_found' as const };
+  if (!project) {
+    return { error: 'project_not_found' as const };
   }
 
-  // Get existing token keys for this pack
   const existing = await db
     .select({ tokenKey: styleTokens.tokenKey })
     .from(styleTokens)
-    .where(eq(styleTokens.stylePackId, stylePackId));
+    .where(eq(styleTokens.projectId, projectId));
 
   const existingKeys = new Set(existing.map((t) => t.tokenKey));
 
@@ -164,7 +145,7 @@ export async function bulkImportTokens(
   if (toInsert.length > 0) {
     await db.insert(styleTokens).values(
       toInsert.map((t) => ({
-        stylePackId,
+        projectId,
         tokenKey: t.tokenKey,
         tokenType: t.tokenType,
         tokenValue: t.tokenValue,
@@ -172,7 +153,7 @@ export async function bulkImportTokens(
       }))
     );
 
-    await invalidateProfilesForPack(db, stylePackId);
+    await invalidateProfilesForProject(db, projectId);
   }
 
   return {
@@ -185,14 +166,14 @@ export async function bulkImportTokens(
 }
 
 /**
- * Export all tokens grouped by tokenType into structured JSON.
+ * Export all tokens for a project, grouped by token type.
  * Output: { "color": { "primary": "#000" }, "radius": { "sm": "4px" } }
  */
-export async function exportTokens(db: Database, stylePackId: string) {
+export async function exportTokens(db: Database, projectId: string) {
   const tokens = await db
     .select()
     .from(styleTokens)
-    .where(eq(styleTokens.stylePackId, stylePackId))
+    .where(eq(styleTokens.projectId, projectId))
     .orderBy(asc(styleTokens.tokenKey));
 
   const grouped: Record<string, Record<string, string>> = {};
@@ -201,7 +182,6 @@ export async function exportTokens(db: Database, stylePackId: string) {
     if (!grouped[token.tokenType]) {
       grouped[token.tokenType] = {};
     }
-    // Strip the type prefix from the key: "color.primary" → "primary"
     const shortKey = token.tokenKey.includes('.')
       ? token.tokenKey.substring(token.tokenKey.indexOf('.') + 1)
       : token.tokenKey;

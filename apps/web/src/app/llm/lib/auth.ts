@@ -1,20 +1,11 @@
 import { NextRequest } from 'next/server';
-import {
-  createDb,
-  verifyApiKey,
-  projects,
-  stylePacks,
-  styleTokens,
-  componentRecipes,
-} from '@aiui/design-core';
+import { createDb, verifyApiKey, projects, styleTokens } from '@aiui/design-core';
 import { eq } from 'drizzle-orm';
 import type { Database } from '@aiui/design-core';
 
 export interface LlmAuthResult {
   project: typeof projects.$inferSelect;
-  stylePack: typeof stylePacks.$inferSelect;
   tokens: (typeof styleTokens.$inferSelect)[];
-  components: (typeof componentRecipes.$inferSelect)[];
 }
 
 export interface LlmAuthError {
@@ -35,10 +26,10 @@ export { getDb };
 /**
  * Authenticate and load all data needed by LLM documentation routes.
  *
- * - If the project's active style pack is public, no auth is required.
- * - If private, a valid `Authorization: Bearer <key>` header is required.
+ * After the scope cut, tokens are project-scoped (no style packs). All LLM
+ * routes require a valid `Authorization: Bearer <key>` header.
  *
- * On success returns { project, stylePack, tokens, components }.
+ * On success returns { project, tokens }.
  * On failure returns { error, status }.
  */
 export async function authenticateLlmRequest(
@@ -53,46 +44,23 @@ export async function authenticateLlmRequest(
     return { error: 'Project not found', status: 404 };
   }
 
-  if (!project.activeStylePackId) {
-    return { error: 'Project has no active style pack', status: 404 };
+  // 2. Require API key
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { error: 'Authorization required', status: 401 };
   }
 
-  // 2. Get style pack
-  const [pack] = await db
-    .select()
-    .from(stylePacks)
-    .where(eq(stylePacks.id, project.activeStylePackId))
-    .limit(1);
+  const rawKey = authHeader.slice(7);
+  const keyContext = await verifyApiKey(db, rawKey);
 
-  if (!pack) {
-    return { error: 'Style pack not found', status: 404 };
+  if (!keyContext) {
+    return { error: 'Invalid or expired API key', status: 401 };
   }
 
-  // 3. Check auth — public packs don't require authentication
-  if (!pack.isPublic) {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return { error: 'Authorization required for private style packs', status: 401 };
-    }
+  // 3. Get project tokens
+  const tokens = await db.select().from(styleTokens).where(eq(styleTokens.projectId, project.id));
 
-    const rawKey = authHeader.slice(7);
-    const keyContext = await verifyApiKey(db, rawKey);
-
-    if (!keyContext) {
-      return { error: 'Invalid or expired API key', status: 401 };
-    }
-  }
-
-  // 4. Get tokens
-  const tokens = await db.select().from(styleTokens).where(eq(styleTokens.stylePackId, pack.id));
-
-  // 5. Get components
-  const components = await db
-    .select()
-    .from(componentRecipes)
-    .where(eq(componentRecipes.stylePackId, pack.id));
-
-  return { project, stylePack: pack, tokens, components };
+  return { project, tokens };
 }
 
 /**

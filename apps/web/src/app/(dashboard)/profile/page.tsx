@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/providers/AuthProvider';
-import { LogOut, Trash2, Palette, LayoutGrid, Key, AlertTriangle, X } from 'lucide-react';
+import { LogOut, Trash2, FolderOpen, Download, Key, AlertTriangle, X } from 'lucide-react';
 
 const DELETE_CONFIRM_PHRASE = 'DELETE my account';
 
@@ -143,26 +143,24 @@ export default function ProfilePage() {
         </p>
         <div className="space-y-3">
           <Link
-            href="/style-packs"
+            href="/projects"
             className="flex items-center gap-3 rounded-lg border border-zinc-800 px-4 py-3 text-sm text-zinc-300 transition-colors hover:bg-zinc-800"
           >
-            <Palette size={18} className="text-blue-400" />
+            <FolderOpen size={18} className="text-emerald-400" />
             <div>
-              <div className="font-medium text-white">Browse Style Packs</div>
-              <div className="text-xs text-zinc-500">
-                Choose a design token set for your project
-              </div>
+              <div className="font-medium text-white">Open Projects</div>
+              <div className="text-xs text-zinc-500">Manage projects and their design tokens</div>
             </div>
           </Link>
           <Link
-            href="/components"
+            href="/import"
             className="flex items-center gap-3 rounded-lg border border-zinc-800 px-4 py-3 text-sm text-zinc-300 transition-colors hover:bg-zinc-800"
           >
-            <LayoutGrid size={18} className="text-violet-400" />
+            <Download size={18} className="text-teal-400" />
             <div>
-              <div className="font-medium text-white">Explore Components</div>
+              <div className="font-medium text-white">Import Tokens</div>
               <div className="text-xs text-zinc-500">
-                Browse 50+ component recipes with code templates
+                Bring tokens from CSS, Tokens Studio, or Tailwind into a project
               </div>
             </div>
           </Link>
@@ -271,7 +269,7 @@ export default function ProfilePage() {
         </div>
         <p className="mt-3 text-xs text-zinc-500">
           Permanently delete your account, your sole-owner workspaces, and all associated projects,
-          style packs, components, and API keys. This cannot be undone.
+          tokens, and API keys. This cannot be undone.
         </p>
       </div>
 

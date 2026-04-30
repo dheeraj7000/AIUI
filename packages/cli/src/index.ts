@@ -13,31 +13,18 @@ program
 // --- init ---
 program
   .command('init')
-  .description('Initialize AIUI in the current project')
+  .description('Initialize AIUI in the current project (writes .aiui/ scaffold)')
   .option('-y, --yes', 'Non-interactive mode with sensible defaults')
-  .option('--local', 'Use local database instead of registry')
-  .option('--db <url>', 'Database URL (for --local mode)')
-  .option('--registry <url>', 'Custom registry URL')
+  .option('--api-url <url>', 'AIUI server URL for MCP setup hint')
   .action(async (options) => {
     const { init } = await import('./commands/init.js');
     await init(options);
   });
 
-// --- add ---
-program
-  .command('add <pack>')
-  .description('Add a style pack from the registry')
-  .option('--local', 'Fetch from local database')
-  .option('--db <url>', 'Database URL (for --local mode)')
-  .action(async (pack, options) => {
-    const { add } = await import('./commands/add.js');
-    await add(pack, options);
-  });
-
 // --- sync ---
 program
   .command('sync')
-  .description('Regenerate .aiui/ files from the current config')
+  .description('Regenerate local .aiui/ files from the default token set')
   .action(async () => {
     const { sync } = await import('./commands/sync.js');
     await sync();
@@ -83,7 +70,6 @@ program
     const opts: ValidateOptions = {
       files: options.files,
       tokensPath: options.tokens,
-      // Env fallback — convenient for CI pipelines.
       apiKey: options.apiKey ?? process.env.AIUI_API_KEY,
       apiUrl: options.apiUrl,
       project: options.project,
@@ -106,17 +92,6 @@ program
   .action(async () => {
     const { detectPatternsCommand } = await import('./commands/detect-patterns.js');
     await detectPatternsCommand();
-  });
-
-// --- publish (placeholder) ---
-program
-  .command('publish')
-  .description('Publish a style pack to the marketplace')
-  .option('--namespace <ns>', 'Pack namespace (e.g., @myorg)')
-  .option('--key <key>', 'API key for publishing')
-  .action(async () => {
-    console.log('Publishing is not yet available. Coming soon.');
-    process.exit(0);
   });
 
 program.parse();

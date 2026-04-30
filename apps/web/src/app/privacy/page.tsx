@@ -27,9 +27,8 @@ export default function PrivacyPage() {
 
         <Section title="What we store">
           <p>
-            AIUI stores the design data you create — projects, style packs, tokens, component
-            recipes, and design profiles — along with the email address you signed up with. Nothing
-            else is collected.
+            AIUI stores the design data you create — projects, design tokens, and design profiles —
+            along with the email address you signed up with. Nothing else is collected.
           </p>
         </Section>
 

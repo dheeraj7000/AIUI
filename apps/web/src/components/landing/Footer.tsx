@@ -4,9 +4,8 @@ const sections = [
   {
     title: 'Product',
     links: [
-      { label: 'Style packs', href: '/style-packs' },
-      { label: 'Components', href: '/components' },
       { label: 'Visual studio', href: '/studio' },
+      { label: 'Documentation', href: '/docs' },
       { label: 'Start free', href: '/sign-up' },
     ],
   },

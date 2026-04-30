@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { createDb, stylePacks, componentRecipes, projects, apiKeys } from '@aiui/design-core';
-import { count, eq, or } from 'drizzle-orm';
-import { Palette, LayoutGrid, FolderOpen, ArrowRight, Inbox, Key, Download } from 'lucide-react';
+import { createDb, projects, apiKeys, styleTokens } from '@aiui/design-core';
+import { count, eq } from 'drizzle-orm';
+import { FolderOpen, ArrowRight, Inbox, Key, Download, Palette } from 'lucide-react';
 import { getUserOrg } from '@/lib/get-user-org';
 import { OnboardingChecklist } from '@/components/ui/onboarding-checklist';
 import { McpWalkthrough } from '@/components/ui/mcp-walkthrough';
@@ -21,27 +21,6 @@ async function getStats() {
   const userOrg = await getUserOrg();
   const orgId = userOrg?.organizationId;
 
-  // Style packs: user's org packs + public packs
-  const [packCount] = orgId
-    ? await db
-        .select({ count: count() })
-        .from(stylePacks)
-        .where(or(eq(stylePacks.organizationId, orgId), eq(stylePacks.isPublic, true)))
-    : await db.select({ count: count() }).from(stylePacks).where(eq(stylePacks.isPublic, true));
-
-  // Component recipes: scoped to org or null org (public seed data)
-  const [recipeCount] = orgId
-    ? await db
-        .select({ count: count() })
-        .from(componentRecipes)
-        .innerJoin(stylePacks, eq(componentRecipes.stylePackId, stylePacks.id))
-        .where(or(eq(stylePacks.organizationId, orgId), eq(stylePacks.isPublic, true)))
-    : await db
-        .select({ count: count() })
-        .from(componentRecipes)
-        .innerJoin(stylePacks, eq(componentRecipes.stylePackId, stylePacks.id))
-        .where(eq(stylePacks.isPublic, true));
-
   // Projects: scoped to org
   const [projectCount] = orgId
     ? await db.select({ count: count() }).from(projects).where(eq(projects.organizationId, orgId))
@@ -57,6 +36,26 @@ async function getStats() {
         .limit(6)
     : [];
 
+  // Token count: sum across all projects in the org (project-scoped after scope cut).
+  // Cheap proxy — gives the dashboard something concrete to display now that
+  // packs/recipes no longer exist as top-level resources.
+  let tokenCount = 0;
+  if (orgId && recentProjects.length > 0) {
+    const ids = recentProjects.map((p) => p.id);
+    // We only count tokens for the recent slice; if you want the global
+    // total, do a join here. Avoiding for now to keep this query fast.
+    const tokenCounts = await Promise.all(
+      ids.map(async (id) => {
+        const [r] = await db
+          .select({ count: count() })
+          .from(styleTokens)
+          .where(eq(styleTokens.projectId, id));
+        return r?.count ?? 0;
+      })
+    );
+    tokenCount = tokenCounts.reduce((sum, n) => sum + n, 0);
+  }
+
   // Check onboarding state
   const hasApiKey = orgId
     ? (
@@ -65,8 +64,7 @@ async function getStats() {
     : false;
 
   return {
-    packs: packCount?.count ?? 0,
-    recipes: recipeCount?.count ?? 0,
+    tokens: tokenCount,
     projects: projectCount?.count ?? 0,
     recentProjects,
     hasApiKey,
@@ -74,26 +72,6 @@ async function getStats() {
 }
 
 const statCards = [
-  {
-    label: 'Style Packs',
-    key: 'packs' as const,
-    href: '/style-packs',
-    icon: Palette,
-    iconColor: 'text-blue-400',
-    glowColor: 'group-hover:shadow-blue-500/10',
-    bgColor: 'bg-blue-500/10',
-    borderHover: 'hover:border-blue-500/20',
-  },
-  {
-    label: 'Component Recipes',
-    key: 'recipes' as const,
-    href: '/components',
-    icon: LayoutGrid,
-    iconColor: 'text-violet-400',
-    glowColor: 'group-hover:shadow-violet-500/10',
-    bgColor: 'bg-violet-500/10',
-    borderHover: 'hover:border-violet-500/20',
-  },
   {
     label: 'Projects',
     key: 'projects' as const,
@@ -103,6 +81,16 @@ const statCards = [
     glowColor: 'group-hover:shadow-emerald-500/10',
     bgColor: 'bg-emerald-500/10',
     borderHover: 'hover:border-emerald-500/20',
+  },
+  {
+    label: 'Design Tokens',
+    key: 'tokens' as const,
+    href: '/projects',
+    icon: Palette,
+    iconColor: 'text-blue-400',
+    glowColor: 'group-hover:shadow-blue-500/10',
+    bgColor: 'bg-blue-500/10',
+    borderHover: 'hover:border-blue-500/20',
   },
 ];
 
@@ -123,16 +111,11 @@ export default async function DashboardPage() {
       {/* Onboarding */}
       <div className="mt-6 space-y-4">
         <McpWalkthrough hasApiKey={stats.hasApiKey} hasProject={stats.projects > 0} />
-        <OnboardingChecklist
-          hasProject={stats.projects > 0}
-          hasStylePack={stats.packs > 0}
-          hasApiKey={stats.hasApiKey}
-          hasComponent={stats.recipes > 0}
-        />
+        <OnboardingChecklist hasProject={stats.projects > 0} hasApiKey={stats.hasApiKey} />
       </div>
 
       {/* Stat cards */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -255,7 +238,7 @@ export default async function DashboardPage() {
             </div>
             <p className="text-sm font-medium text-zinc-400">No projects yet</p>
             <p className="mt-1 text-xs text-zinc-500">
-              Create your first project — a starter pack and tokens are seeded for you.
+              Create your first project — default tokens are seeded for you.
             </p>
             {userOrg && (
               <div className="mt-5 flex justify-center">

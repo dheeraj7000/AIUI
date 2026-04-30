@@ -42,9 +42,7 @@ describe('isAuthError', () => {
     // Construct a minimal mock that satisfies the LlmAuthResult shape
     const success = {
       project: { id: '1', name: 'Test', slug: 'test' },
-      stylePack: { id: '2', name: 'Pack' },
       tokens: [],
-      components: [],
     } as unknown as LlmAuthResult;
 
     expect(isAuthError(success)).toBe(false);

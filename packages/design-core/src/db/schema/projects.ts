@@ -27,10 +27,8 @@ export type StudioDraftShape = {
 };
 
 export type StudioDraft = {
-  packId?: string;
-  selectedComponentIds?: string[];
   tokenOverrides?: Record<string, string>;
-  // Pre-pack discovery interview — see StudioClient.tsx "shape" step.
+  // Pre-token discovery interview — see StudioClient.tsx "shape" step.
   // Flows into design-memory.md under `## Intent` via generateDesignMemory.
   shape?: StudioDraftShape;
   updatedAt: string;
@@ -47,7 +45,6 @@ export const projects = pgTable(
     slug: varchar('slug', { length: 255 }).notNull(),
     description: text('description'),
     frameworkTarget: frameworkTargetEnum('framework_target').default('nextjs-tailwind').notNull(),
-    activeStylePackId: uuid('active_style_pack_id'),
     // Nullable Design Studio draft — see StudioDraft type above.
     studioDraft: jsonb('studio_draft').$type<StudioDraft>(),
     createdAt: timestamp('created_at').defaultNow().notNull(),

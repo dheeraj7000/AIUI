@@ -198,7 +198,7 @@ const FORMAT_PLACEHOLDERS: Record<ImportFormat, string> = {
 function ManualFormatTab({ format }: { format: ImportFormat }) {
   const router = useRouter();
   const [content, setContent] = useState('');
-  const [packName, setPackName] = useState('');
+  const [projectId, setProjectId] = useState('');
   const [state, setState] = useState<ImportState>('idle');
   const [preview, setPreview] = useState<PreviewData | null>(null);
   const [error, setError] = useState('');
@@ -230,7 +230,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
   }, [content, format]);
 
   const handleImport = useCallback(async () => {
-    if (!content || !packName) return;
+    if (!content || !projectId) return;
     setState('importing');
     setError('');
 
@@ -240,7 +240,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
       const res = await authedFetch('/api/imports/tokens', {
         content,
         format,
-        name: packName,
+        projectId,
         organizationId: orgId,
       });
 
@@ -249,16 +249,15 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
         throw new Error(data.error || 'Failed to import tokens');
       }
 
-      const data = await res.json();
       setState('success');
       setTimeout(() => {
-        router.push(`/style-packs/${data.stylePack.id}`);
+        router.push(`/projects`);
       }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       setState('error');
     }
-  }, [content, format, packName, router]);
+  }, [content, format, projectId, router]);
 
   return (
     <div className="space-y-4">
@@ -277,17 +276,18 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
       </div>
 
       <div>
-        <label htmlFor={`${format}-name`} className="block text-sm font-medium text-zinc-400">
-          Style Pack Name
+        <label htmlFor={`${format}-project`} className="block text-sm font-medium text-zinc-400">
+          Target Project ID
         </label>
         <input
-          id={`${format}-name`}
+          id={`${format}-project`}
           type="text"
-          placeholder="My Imported Tokens"
-          value={packName}
-          onChange={(e) => setPackName(e.target.value)}
+          placeholder="Paste a project UUID from /projects"
+          value={projectId}
+          onChange={(e) => setProjectId(e.target.value)}
           className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
+        {/* TODO: rebuild without style packs — wire a project picker once /projects exposes IDs */}
       </div>
 
       {error && (
@@ -319,7 +319,7 @@ function ManualFormatTab({ format }: { format: ImportFormat }) {
           <>
             <button
               onClick={handleImport}
-              disabled={!packName}
+              disabled={!projectId}
               className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Import Tokens

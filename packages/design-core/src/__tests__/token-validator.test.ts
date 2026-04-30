@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateToken, validateStylePack } from '../tokens/token-validator';
+import { validateToken, validateTokens } from '../tokens/token-validator';
 
 describe('validateToken', () => {
   // --- Color tests ---
@@ -124,7 +124,7 @@ describe('validateToken', () => {
   });
 });
 
-describe('validateStylePack', () => {
+describe('validateTokens', () => {
   it('should validate a full style pack of tokens', () => {
     const tokens = [
       { tokenKey: 'color.primary', tokenValue: '#3b82f6', tokenType: 'color' },
@@ -136,7 +136,7 @@ describe('validateStylePack', () => {
       { tokenKey: 'elevation.modal', tokenValue: '1000', tokenType: 'elevation' },
     ];
 
-    const results = validateStylePack(tokens);
+    const results = validateTokens(tokens);
     expect(results).toHaveLength(7);
     results.forEach((r) => {
       expect(r.valid).toBe(true);
@@ -150,7 +150,7 @@ describe('validateStylePack', () => {
       { tokenKey: 'radius.md', tokenValue: '8px', tokenType: 'radius' },
     ];
 
-    const results = validateStylePack(tokens);
+    const results = validateTokens(tokens);
     expect(results[0].valid).toBe(false);
     expect(results[1].valid).toBe(true);
   });

@@ -1,11 +1,18 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { readConfig, writeConfig } from '../lib/config.js';
-import { fetchPack, cachePack } from '../lib/registry-client.js';
-import { transformTokens, inferFormat } from '../lib/transformer.js';
-import { writeDesignMemory, writeTokensJson } from '../lib/writer.js';
-import { detectFramework } from '../lib/detect-framework.js';
+import { writeDesignMemory, writeTokensJson, type LocalToken } from '../lib/writer.js';
+import { DEFAULT_PROJECT_TOKENS } from '@aiui/design-core';
 
+/**
+ * Re-emit `.aiui/design-memory.md` and `.aiui/tokens.json` from the
+ * default token set.
+ *
+ * After the marketplace scope cut, the CLI no longer pulls remote packs.
+ * For server-backed token sync (where the AI agent has been editing tokens
+ * via MCP), use the MCP `sync_design_memory` tool from your editor — it
+ * reads live state from the database and writes richer memory than the CLI.
+ *
+ * This command is mostly useful for offline / local-only workflows.
+ */
 export async function sync(): Promise<void> {
   const cwd = process.cwd();
   const ora = (await import('ora')).default;
@@ -19,41 +26,20 @@ export async function sync(): Promise<void> {
     process.exit(1);
   }
 
-  const spinner = ora(`Syncing ${config.activePack}...`).start();
-  let pack;
+  const writeSpinner = ora('Regenerating .aiui/ files from default tokens...').start();
   try {
-    pack = await fetchPack(config.activePack, config);
-    spinner.succeed(`Fetched ${chalk.cyan(pack.name)}`);
-  } catch (err) {
-    spinner.fail(`Failed to fetch: ${err instanceof Error ? err.message : err}`);
-    process.exit(1);
-  }
+    const seedTokens: LocalToken[] = DEFAULT_PROJECT_TOKENS.map((t) => ({
+      key: t.tokenKey,
+      type: t.tokenType,
+      value: t.tokenValue,
+      description: t.description,
+    }));
 
-  const info = detectFramework(cwd);
-  const writeSpinner = ora('Regenerating .aiui/ files...').start();
-
-  try {
-    writeDesignMemory(pack, cwd);
-    writeTokensJson(pack.tokens, cwd);
-    cachePack(pack, cwd);
-
-    // Support multiple targets if defined in config, otherwise fall back to detected framework
-    const targets =
-      config.targets && config.targets.length > 0
-        ? config.targets
-        : [inferFormat(info.framework, info.hasTailwind)];
-
-    for (const target of targets) {
-      const { content, filename } = transformTokens(
-        pack.tokens,
-        target as Parameters<typeof transformTokens>[1]
-      );
-      fs.writeFileSync(path.join(cwd, '.aiui', filename), content);
-    }
-
+    writeDesignMemory(config.projectSlug, seedTokens, cwd);
+    writeTokensJson(seedTokens, cwd);
     writeConfig({ ...config, lastSynced: new Date().toISOString() }, cwd);
 
-    writeSpinner.succeed(`Synced .aiui/ files for ${targets.length} target(s)`);
+    writeSpinner.succeed(`Synced ${seedTokens.length} default tokens to .aiui/`);
   } catch (err) {
     writeSpinner.fail(`Failed: ${err instanceof Error ? err.message : err}`);
     process.exit(1);
@@ -61,7 +47,9 @@ export async function sync(): Promise<void> {
 
   console.log('');
   console.log(
-    `  ${chalk.green('Synced.')} ${pack.tokenCount} tokens, ${pack.componentCount} components.`
+    `  ${chalk.dim(
+      'For server-backed sync, use the MCP `sync_design_memory` tool from your AI agent.'
+    )}`
   );
   console.log('');
 }

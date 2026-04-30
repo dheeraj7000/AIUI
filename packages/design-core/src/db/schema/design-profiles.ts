@@ -8,7 +8,6 @@ import {
   boolean,
   index,
 } from 'drizzle-orm/pg-core';
-import { stylePacks } from './style-packs';
 import { projects } from './projects';
 
 export const designProfiles = pgTable(
@@ -20,11 +19,7 @@ export const designProfiles = pgTable(
       .references(() => projects.id, { onDelete: 'cascade' }),
     name: varchar('name', { length: 255 }).notNull(),
     version: integer('version').default(1).notNull(),
-    stylePackId: uuid('style_pack_id').references(() => stylePacks.id, {
-      onDelete: 'cascade',
-    }),
     overridesJson: jsonb('overrides_json'),
-    selectedComponents: jsonb('selected_components').default([]).notNull(),
     compiledJson: jsonb('compiled_json'),
     compiledHash: varchar('compiled_hash', { length: 64 }),
     lastCompiledAt: timestamp('last_compiled_at'),
@@ -36,7 +31,6 @@ export const designProfiles = pgTable(
   },
   (table) => [
     index('design_profiles_project_id_idx').on(table.projectId),
-    index('design_profiles_style_pack_id_idx').on(table.stylePackId),
     index('design_profiles_created_at_idx').on(table.createdAt),
   ]
 );

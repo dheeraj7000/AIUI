@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { getProjectContext, initProjectWithStarter } from '@aiui/design-core';
+import { getProjectContext, initProject } from '@aiui/design-core';
 import { projects, designProfiles } from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
@@ -10,7 +10,7 @@ import { getContext } from '../lib/context';
 export function registerGetProjectContext(server: AiuiMcpServer) {
   server.registerTool(
     'get_project_context',
-    'Fetch the complete design profile for a project by slug. Returns framework target, active style pack, components, assets, and token count. Also checks for stale design memory.',
+    'Fetch the project context for a slug. Returns framework target, asset list, token count, and a stale-memory warning if the design profile has been invalidated since last sync.',
     { slug: z.string().describe('The project slug (URL-safe identifier)') },
     async (args) => {
       const db = getDb();
@@ -19,17 +19,14 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
       let autoCreated = false;
 
       if (!context) {
-        // Attempt to auto-create the project if we have auth context.
-        // Routes through initProjectWithStarter so the new project is seeded
-        // with a real starter style pack + component selection + graph,
-        // matching the init_project MCP tool. This closes the "empty state"
-        // gap where slug-first callers used to land on {tokens:{}}.
+        // If we have an authed org context, auto-create the project so
+        // slug-first callers don't crash on a missing row.
         const authCtx = getContext();
         if (!authCtx?.organizationId) {
           throw new NotFoundError('Project', slug);
         }
 
-        await initProjectWithStarter(db, {
+        await initProject(db, {
           organizationId: authCtx.organizationId,
           slug,
         });
@@ -55,7 +52,8 @@ export function registerGetProjectContext(server: AiuiMcpServer) {
         }
       }
 
-      // Check if the design profile's compilationValid is false (stale memory)
+      // Surface stale memory warning if the project's design profile has been
+      // invalidated by a write since last sync.
       const [project] = await db
         .select({ id: projects.id })
         .from(projects)
