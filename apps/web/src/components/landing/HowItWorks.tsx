@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 interface Step {
   id: string;
   title: string;
@@ -9,183 +11,113 @@ interface Step {
 const steps: Step[] = [
   {
     id: '01',
-    title: 'Write down your design decisions.',
-    body: 'Pick a style pack in the studio or paste CSS variables, a Tailwind config, or Tokens Studio JSON. AIUI turns those decisions into a small set of files inside your project — .aiui/ — that become the source of truth.',
+    title: 'Codify Design Logic',
+    body: 'Define your design authority in the studio. AIUI transforms your tokens, recipes, and compliance rules into an orchestration layer Claude reads every session.',
     specimen: (
-      <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
-        <code>
-          <span className="cm-dim">// .aiui/tokens.json</span>
-          {'\n'}
-          {'{\n  '}
-          <span className="cm-key">&quot;color.primary&quot;</span>
-          <span className="cm-punct">:</span>{' '}
-          <span className="cm-string">&quot;oklch(44% 0.14 28)&quot;</span>
-          <span className="cm-punct">,</span>
-          {'\n  '}
-          <span className="cm-key">&quot;radius.md&quot;</span>
-          <span className="cm-punct">:</span> <span className="cm-string">&quot;2px&quot;</span>
-          <span className="cm-punct">,</span>
-          {'\n  '}
-          <span className="cm-key">&quot;type.body&quot;</span>
-          <span className="cm-punct">:</span>{' '}
-          <span className="cm-string">&quot;Switzer, sans-serif&quot;</span>
-          {'\n}'}
-        </code>
-      </pre>
+      <div className="bg-[var(--paper-sunk)] p-4 border border-[var(--rule)] font-mono text-[10px] leading-relaxed">
+        <div className="flex gap-2">
+          <span className="text-[var(--accent)]">WRITE</span>
+          <span>.aiui/tokens.json</span>
+        </div>
+        <div className="mt-1 text-[var(--ink-soft)]">
+          {'{ "color.primary": "#0F172A", "radius.md": "2px" }'}
+        </div>
+      </div>
     ),
-    takeaway: 'Your tokens, written once, in one place.',
+    takeaway: 'ONE_SOURCE_OF_TRUTH',
   },
   {
     id: '02',
-    title: 'Connect your editor.',
-    body: 'Run one command. Claude Code, Cursor, Windsurf, and VS Code all pick up the same AIUI server — no packages, no build plugins, no config to maintain. (AIUI runs over MCP, the standard extension protocol Claude and Cursor already use; think of it as a VS Code plugin, but for any AI editor.)',
+    title: 'Initialize Protocol',
+    body: 'Connect your development environment with a single command. Every AI agent in your project now operates under the same design contract.',
     specimen: (
-      <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
-        <code>
-          <span className="cm-dim">$</span> <span className="cm-key">claude</span>{' '}
-          <span className="cm-tag">mcp</span> <span className="cm-attr">add</span>{' '}
-          <span className="cm-string">aiui</span>
-          {'\n'}
-          <span className="cm-dim">✓ connected to aiui.store</span>
-          {'\n'}
-          <span className="cm-dim">✓ 24 tokens · 12 components · 8 rules in scope</span>
-        </code>
-      </pre>
+      <div className="bg-[var(--paper-sunk)] p-4 border border-[var(--rule)] font-mono text-[10px] leading-relaxed">
+        <div className="flex gap-2">
+          <span className="text-[var(--accent)]">EXEC</span>
+          <span>claude mcp add aiui</span>
+        </div>
+        <div className="mt-1 text-[var(--success)]">✓ PROTOCOL_ESTABLISHED</div>
+      </div>
     ),
-    takeaway: 'Ninety seconds, tops.',
+    takeaway: 'ZERO_CONFIGURATION',
   },
   {
     id: '03',
-    title: 'Build as usual. The AI follows.',
-    body: 'Keep prompting the way you already do. Every UI Claude produces now pulls from your tokens, uses your approved components, and respects your rules. Output gets validated against the tokens before it lands.',
+    title: 'Enforce Compliance',
+    body: 'Generate UI as usual. The orchestration layer intercepts every generation, ensuring tokens are used and components are correctly bound.',
     specimen: (
-      <pre className="specimen" style={{ padding: '1rem 1.25rem' }}>
-        <code>
-          <span className="cm-dim">you:</span> &quot;Add a settings page.&quot;
-          {'\n\n'}
-          <span className="cm-dim">claude:</span>
-          {'\n'}
-          <span className="cm-punct">{'<'}</span>
-          <span className="cm-tag">Page</span> <span className="cm-attr">title</span>
-          <span className="cm-punct">=</span>
-          <span className="cm-string">&quot;Settings&quot;</span>
-          <span className="cm-punct">{'>'}</span>
-          {'\n  '}
-          <span className="cm-punct">{'<'}</span>
-          <span className="cm-tag">Button</span> <span className="cm-attr">variant</span>
-          <span className="cm-punct">=</span>
-          <span className="cm-string">&quot;primary&quot;</span>
-          <span className="cm-punct">{'>'}</span>
-          Save<span className="cm-punct">{'</'}</span>
-          <span className="cm-tag">Button</span>
-          <span className="cm-punct">{'>'}</span>
-          {'\n'}
-          <span className="cm-punct">{'</'}</span>
-          <span className="cm-tag">Page</span>
-          <span className="cm-punct">{'>'}</span>
-        </code>
-      </pre>
+      <div className="bg-[var(--paper-sunk)] p-4 border border-[var(--rule)] font-mono text-[10px] leading-relaxed">
+        <div className="flex gap-2">
+          <span className="text-[var(--accent)]">AUDIT</span>
+          <span>Scanning generation [82ms]</span>
+        </div>
+        <div className="mt-1 text-[var(--success)]">✓ 100% COMPLIANCE</div>
+      </div>
     ),
-    takeaway: 'Your design, on every screen, automatically.',
+    takeaway: 'AUTONOMOUS_ALIGNMENT',
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative" style={{ background: 'var(--paper-deep)' }}>
-      <div className="mx-auto max-w-[1240px] px-6 lg:px-10 py-24 lg:py-32">
+    <section
+      id="how-it-works"
+      className="relative border-b border-[var(--rule)] bg-[var(--paper-deep)]"
+    >
+      <div className="mx-auto max-w-[1400px] px-6 lg:px-12 py-24 lg:py-40">
         {/* Opener */}
-        <div className="grid grid-cols-12 gap-6 items-baseline">
-          <div className="col-span-12 md:col-span-3 lg:col-span-2">
-            <span className="section-numeral">03</span>
+        <div className="flex flex-col gap-6 max-w-4xl">
+          <div className="flex items-center gap-4">
+            <span className="section-numeral">LOGIC_02</span>
+            <span className="eyebrow">The Implementation Flow</span>
           </div>
-          <div className="col-span-12 md:col-span-9 lg:col-span-10">
-            <span className="eyebrow">How it works</span>
-            <h2
-              className="display mt-3"
-              style={{ fontSize: 'clamp(2rem, 3.6vw, 3rem)', lineHeight: 1.05 }}
-            >
-              Three steps. Read top to bottom.
-            </h2>
-            <p className="lede mt-5">
-              No build plugins to configure. No packages to install. Just three moments where you
-              make a decision, and then the AI stops inventing.
-            </p>
-          </div>
+          <h2
+            className="display mt-6"
+            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 0.95 }}
+          >
+            From design system to <span>agent memory</span>.
+          </h2>
+          <p className="lede mt-8" style={{ maxWidth: '60ch' }}>
+            We don&rsquo;t believe in "hand-offs." We believe in codified authority. Three steps to
+            lock your design system into the AI workflow.
+          </p>
         </div>
 
-        <hr className="rule mt-12" style={{ height: 1, border: 0, background: 'var(--ink)' }} />
-
-        <ol>
-          {steps.map((step, idx) => (
-            <li
+        <div className="mt-24 space-y-1">
+          {steps.map((step) => (
+            <div
               key={step.id}
-              className="grid grid-cols-12 gap-6 py-12 lg:py-16"
-              style={{
-                borderBottom: idx < steps.length - 1 ? '1px solid var(--rule)' : undefined,
-              }}
+              className="grid grid-cols-12 gap-12 bg-[var(--paper)] border border-[var(--rule)] p-12 hover:border-[var(--ink)] transition-colors group"
             >
-              <div className="col-span-2 md:col-span-1">
-                <span
-                  className="display"
-                  style={{
-                    fontSize: 'clamp(2.25rem, 3vw, 2.75rem)',
-                    lineHeight: 1,
-                    color: 'var(--accent)',
-                    fontVariantNumeric: 'oldstyle-nums',
-                  }}
-                >
-                  {step.id}
-                </span>
+              <div className="col-span-12 lg:col-span-1 flex flex-col gap-4">
+                <span className="font-mono text-xs font-black text-[var(--accent)]">{step.id}</span>
+                <div className="h-full w-[2px] bg-[var(--rule)] mx-auto group-hover:bg-[var(--accent)] transition-colors" />
               </div>
 
-              <div className="col-span-10 md:col-span-5 lg:col-span-5">
-                <h3
-                  className="display"
-                  style={{
-                    fontSize: 'clamp(1.625rem, 2.2vw, 2rem)',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {step.title}
-                </h3>
-                <p
-                  className="mt-4"
-                  style={{
-                    color: 'var(--ink-soft)',
-                    fontSize: '1rem',
-                    lineHeight: 1.6,
-                    maxWidth: '52ch',
-                  }}
-                >
+              <div className="col-span-12 lg:col-span-5">
+                <h3 className="display text-2xl font-bold mb-6">{step.title}</h3>
+                <p className="text-[var(--ink-soft)] text-sm leading-relaxed mb-8 max-w-[42ch]">
                   {step.body}
                 </p>
-                <p
-                  className="mt-5"
-                  style={{
-                    color: 'var(--ink)',
-                    fontSize: '0.9375rem',
-                    fontStyle: 'italic',
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: 500,
-                    maxWidth: '48ch',
-                  }}
-                >
-                  {step.takeaway}
-                </p>
-              </div>
-
-              <div className="col-span-12 md:col-span-6 lg:col-span-6 md:pl-4">
-                {step.specimen}
-                <div className="figure-caption" style={{ justifyContent: 'space-between' }}>
-                  <span className="fig-id">Fig. 03.{step.id.replace('0', '')}</span>
-                  <span className="leader" aria-hidden />
-                  <span>Step {step.id}, in detail.</span>
+                <div className="inline-block px-2 py-1 bg-[var(--accent-soft)] rounded border border-[var(--accent)]">
+                  <span className="font-mono text-[9px] font-black text-[var(--accent)]">
+                    {step.takeaway}
+                  </span>
                 </div>
               </div>
-            </li>
+
+              <div className="col-span-12 lg:col-span-6">
+                <div className="mb-4">{step.specimen}</div>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[9px] font-bold text-[var(--ink-muted)] tracking-widest uppercase">
+                    SYSLOG_NODE_03_{step.id}
+                  </span>
+                  <span className="h-[1px] flex-1 bg-[var(--rule)]" />
+                </div>
+              </div>
+            </div>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );

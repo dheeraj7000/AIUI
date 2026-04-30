@@ -98,8 +98,32 @@ export function registerFixCompliance(server: AiuiMcpServer) {
         const approvedValue = approvedTokens.get(violation.token);
         const replacement = approvedValue || violation.expected;
 
-        // Check if the found value actually exists in the code
-        if (fixedCode.includes(violation.found)) {
+        // Smart replacement for Tailwind: if found is in an arbitrary value block,
+        // try to replace it with the semantic token class if possible.
+        // e.g. bg-[#FF0000] -> bg-primary
+        const tokenBaseName = violation.token.split('.').pop() || violation.token;
+        const tailwindPrefixes = ['bg', 'text', 'border', 'ring', 'from', 'to', 'via', 'shadow'];
+
+        let replaced = false;
+
+        // 1. Try Tailwind arbitrary value replacement: bg-[found] -> bg-tokenBaseName
+        for (const prefix of tailwindPrefixes) {
+          const arbPattern = `${prefix}-[${violation.found}]`;
+          const semanticClass = `${prefix}-${tokenBaseName}`;
+          if (fixedCode.includes(arbPattern)) {
+            fixedCode = fixedCode.split(arbPattern).join(semanticClass);
+            fixesApplied.push({
+              token: violation.token,
+              found: arbPattern,
+              replacedWith: semanticClass,
+              line: violation.line,
+            });
+            replaced = true;
+          }
+        }
+
+        // 2. Fall back to simple string replacement if not already replaced by Tailwind logic
+        if (!replaced && fixedCode.includes(violation.found)) {
           fixedCode = fixedCode.split(violation.found).join(replacement);
           fixesApplied.push({
             token: violation.token,
@@ -107,7 +131,10 @@ export function registerFixCompliance(server: AiuiMcpServer) {
             replacedWith: replacement,
             line: violation.line,
           });
-        } else {
+          replaced = true;
+        }
+
+        if (!replaced) {
           remainingIssues.push({
             token: violation.token,
             found: violation.found,

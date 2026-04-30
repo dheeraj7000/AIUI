@@ -15,13 +15,15 @@
   "dependencies": {
     "@aiui/design-core": "workspace:*",
     "@aiui/mcp-server": "workspace:*",
-    "zod": "^4.3.6",
-    "commander": "^13.1.0",
-    "ora": "^8.2.0",
     "chalk": "^5.4.1",
-    "prompts": "^2.4.2"
+    "commander": "^13.1.0",
+    "glob": "^13.0.6",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/glob": "^9.0.0",
     "@types/node": "^25.5.0",
     "@types/prompts": "^2.4.9",
     "vitest": "^4.1.2"

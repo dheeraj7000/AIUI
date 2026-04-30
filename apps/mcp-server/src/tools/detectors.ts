@@ -566,3 +566,132 @@ export function runAllAccessibilityChecks(code: string): Violation[] {
     ...checkColorContrast(code),
   ];
 }
+
+// ---------------------------------------------------------------------------
+// Design Principle Heuristics
+// ---------------------------------------------------------------------------
+
+/**
+ * Check if heading sizes are logically decreasing (h1 > h2 > h3).
+ */
+export function checkTypographicHierarchy(code: string): Violation[] {
+  const violations: Violation[] = [];
+  const lines = code.split('\n');
+  const headingSizes: Record<number, number> = {};
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const sizeMatch = line.match(/font-size\s*:\s*(\d+)(?:px|rem)/i);
+    const headingMatch = line.match(/<h([1-6])\b/i);
+
+    if (headingMatch && sizeMatch) {
+      const level = parseInt(headingMatch[1], 10);
+      const size = parseInt(sizeMatch[1], 10);
+      headingSizes[level] = size;
+
+      // Compare with higher level headings found so far
+      for (let prev = 1; prev < level; prev++) {
+        if (headingSizes[prev] && headingSizes[prev] <= size) {
+          violations.push({
+            type: 'general',
+            severity: 'warning',
+            message: `Visual hierarchy mismatch: h${level} size (${size}px) is >= h${prev} size (${headingSizes[prev]}px)`,
+            line: i + 1,
+          });
+        }
+      }
+    }
+  }
+  return violations;
+}
+
+/**
+ * Check for excessive visual noise (too many different colors or font sizes).
+ */
+export function checkVisualNoise(code: string): Violation[] {
+  const violations: Violation[] = [];
+  const colors = extractColors(code);
+  const fontSizes = extractFontSizes(code);
+
+  if (colors.length > 5) {
+    violations.push({
+      type: 'general',
+      severity: 'warning',
+      message: `High visual noise: ${colors.length} unique colors detected. Consider consolidating your palette.`,
+    });
+  }
+
+  if (fontSizes.length > 4) {
+    violations.push({
+      type: 'general',
+      severity: 'warning',
+      message: `High visual noise: ${fontSizes.length} unique font sizes detected. Use a standardized typographic scale.`,
+    });
+  }
+
+  return violations;
+}
+
+/**
+ * Check if the code handles required data states (loading, empty, error).
+ */
+export function checkDataBinding(
+  code: string,
+  requirements: { requiresLoading?: boolean; requiresEmpty?: boolean; requiresError?: boolean }
+): Violation[] {
+  const violations: Violation[] = [];
+
+  if (requirements.requiresLoading) {
+    const hasLoading =
+      /loading/i.test(code) ||
+      /Skeleton/i.test(code) ||
+      /Spinner/i.test(code) ||
+      /isFetching/i.test(code);
+    if (!hasLoading) {
+      violations.push({
+        type: 'general',
+        severity: 'warning',
+        message: 'Component lacks loading state handling (Spinner, Skeleton, or isLoading check)',
+      });
+    }
+  }
+
+  if (requirements.requiresEmpty) {
+    const hasEmpty =
+      /length\s*===?\s*0/i.test(code) ||
+      /!data/i.test(code) ||
+      /EmptyState/i.test(code) ||
+      /No\s+results/i.test(code);
+    if (!hasEmpty) {
+      violations.push({
+        type: 'general',
+        severity: 'warning',
+        message:
+          'Component lacks empty state handling (length === 0 check or EmptyState component)',
+      });
+    }
+  }
+
+  if (requirements.requiresError) {
+    const hasError =
+      /error/i.test(code) ||
+      /catch/i.test(code) ||
+      (/Alert/i.test(code) && /variant="destructive"/i.test(code));
+    if (!hasError) {
+      violations.push({
+        type: 'general',
+        severity: 'warning',
+        message: 'Component lacks error state handling (error check or Alert component)',
+      });
+    }
+  }
+
+  return violations;
+}
+
+/**
+ * Run heuristic design audit.
+ */
+export function runDesignAudit(code: string): Violation[] {
+  return [...checkTypographicHierarchy(code), ...checkVisualNoise(code)];
+}

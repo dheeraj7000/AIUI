@@ -4,8 +4,8 @@ const sections = [
   {
     title: 'Product',
     links: [
-      { label: 'Style packs', href: '/#features' },
-      { label: 'Components', href: '/#features' },
+      { label: 'Style packs', href: '/style-packs' },
+      { label: 'Components', href: '/components' },
       { label: 'Visual studio', href: '/studio' },
       { label: 'Start free', href: '/sign-up' },
     ],
@@ -15,13 +15,13 @@ const sections = [
     links: [
       { label: 'Documentation', href: '/docs' },
       { label: 'MCP integration', href: '/#how-it-works' },
-      { label: 'Status', href: '/api/health' },
+      { label: 'Status', href: '/status' },
     ],
   },
   {
     title: 'About',
     links: [
-      { label: 'Self-hosting', href: '/docs' },
+      { label: 'Self-hosting', href: '/docs#integration' },
       { label: 'Beta access', href: '/sign-up' },
       { label: 'Contact', href: '/#contact' },
     ],
@@ -119,10 +119,14 @@ export function Footer() {
             © {year} AIUI · All rights reserved
           </span>
           <div className="flex items-baseline gap-6">
-            <Link href="/docs" className="text-[0.8125rem]" style={{ color: 'var(--ink-muted)' }}>
+            <Link
+              href="/privacy"
+              className="text-[0.8125rem]"
+              style={{ color: 'var(--ink-muted)' }}
+            >
               Privacy
             </Link>
-            <Link href="/docs" className="text-[0.8125rem]" style={{ color: 'var(--ink-muted)' }}>
+            <Link href="/terms" className="text-[0.8125rem]" style={{ color: 'var(--ink-muted)' }}>
               Terms
             </Link>
           </div>

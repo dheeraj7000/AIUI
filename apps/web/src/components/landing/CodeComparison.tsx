@@ -1,218 +1,140 @@
-'use client';
-
 export function CodeComparison() {
   return (
-    <section className="relative">
-      <div className="mx-auto max-w-[1240px] px-6 lg:px-10 py-24 lg:py-32">
+    <section className="relative border-b border-[var(--rule)]">
+      <div className="mx-auto max-w-[1400px] px-6 lg:px-12 py-24 lg:py-40">
         {/* Opener */}
-        <div className="grid grid-cols-12 gap-6 items-baseline">
-          <div className="col-span-12 md:col-span-3 lg:col-span-2">
-            <span className="section-numeral">04</span>
+        <div className="flex flex-col gap-6 max-w-4xl">
+          <div className="flex items-center gap-4">
+            <span className="section-numeral">LOGIC_03</span>
+            <span className="eyebrow">The Performance Gap</span>
           </div>
-          <div className="col-span-12 md:col-span-9 lg:col-span-10">
-            <span className="eyebrow">The difference</span>
-            <h2
-              className="display mt-3"
-              style={{ fontSize: 'clamp(2rem, 3.6vw, 3rem)', lineHeight: 1.05 }}
-            >
-              Same prompt. Same model. Different output.
-            </h2>
-            <p className="lede mt-5">
-              The only variable between these two generations is whether AIUI was connected. On the
-              left, the AI invents. On the right, it obeys.
-            </p>
-          </div>
+          <h2
+            className="display mt-6"
+            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 0.95 }}
+          >
+            Same prompt. Same model. <span>Orchestrated output</span>.
+          </h2>
+          <p className="lede mt-8" style={{ maxWidth: '60ch' }}>
+            The only variable between these two generations is whether AIUI was active. On the left,
+            the agent invents. On the right, it complies.
+          </p>
         </div>
 
-        <hr className="rule mt-12" style={{ height: 1, border: 0, background: 'var(--ink)' }} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 relative">
-          {/* Verso — without AIUI */}
-          <div
-            className="py-10 lg:py-12 lg:pr-10"
-            style={{
-              borderBottom: '1px solid var(--rule)',
-            }}
-          >
-            <div className="flex items-baseline gap-3">
-              <span className="eyebrow">Verso</span>
-              <span className="leader" aria-hidden />
-              <span className="eyebrow">Unguided</span>
-            </div>
-            <h3 className="display mt-4" style={{ fontSize: '1.5rem', lineHeight: 1.1 }}>
-              Prompt: <em>Build me a settings page.</em>
-            </h3>
-            <p
-              className="mt-4 text-[0.9375rem]"
-              style={{ color: 'var(--ink-soft)', lineHeight: 1.6, maxWidth: '48ch' }}
-            >
-              Inline styles. A color the AI made up. A radius that matches nothing else in the app.
-              A heading size no one approved.
-            </p>
-
-            <pre className="specimen mt-6" style={{ padding: '1.125rem 1.375rem' }}>
-              <code>
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">div</span> <span className="cm-attr">style</span>
-                <span className="cm-punct">={'{{ '}</span>
-                <span className="cm-attr">padding</span>
-                <span className="cm-punct">: </span>
-                <span className="cm-num">20</span>
-                <span className="cm-punct">{' }}'}</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n  '}
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">h1</span> <span className="cm-attr">style</span>
-                <span className="cm-punct">={'{{ '}</span>
-                <span className="cm-attr">fontSize</span>
-                <span className="cm-punct">: </span>
-                <span className="cm-num">24</span>
-                <span className="cm-punct">, </span>
-                <span className="cm-attr">color</span>
-                <span className="cm-punct">: </span>
-                <span className="cm-string">&quot;navy&quot;</span>
-                <span className="cm-punct">{' }}'}</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n    '}Settings
-                {'\n  '}
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">h1</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n  '}
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">button</span> <span className="cm-attr">style</span>
-                <span className="cm-punct">={'{{ '}</span>
-                {'\n    '}
-                <span className="cm-attr">background</span>
-                <span className="cm-punct">: </span>
-                <span className="cm-string">&quot;cornflowerblue&quot;</span>
-                <span className="cm-punct">,</span>
-                {'\n    '}
-                <span className="cm-attr">padding</span>
-                <span className="cm-punct">: </span>
-                <span className="cm-string">&quot;8px 16px&quot;</span>
-                <span className="cm-punct">,</span>
-                {'\n    '}
-                <span className="cm-attr">borderRadius</span>
-                <span className="cm-punct">: </span>
-                <span className="cm-num">4</span>
-                <span className="cm-punct">,</span>
-                {'\n  '}
-                <span className="cm-punct">{'}}'}</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n    '}Save Changes
-                {'\n  '}
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">button</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n'}
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">div</span>
-                <span className="cm-punct">{'>'}</span>
-              </code>
-            </pre>
-            <div className="figure-caption" style={{ justifyContent: 'space-between' }}>
-              <span className="fig-id">Fig. 04.A</span>
-              <span className="leader" aria-hidden />
-              <span>3 hard-coded values. 0 tokens. 0 approved components.</span>
-            </div>
-          </div>
-
-          {/* Recto — with AIUI */}
-          <div
-            className="py-10 lg:py-12 lg:pl-10 relative"
-            style={{
-              borderLeft: '1px solid var(--rule)',
-              borderBottom: '1px solid var(--rule)',
-            }}
-          >
-            <div className="flex items-baseline gap-3">
-              <span className="eyebrow">Recto</span>
-              <span className="leader" aria-hidden />
-              <span className="eyebrow" style={{ color: 'var(--accent)' }}>
-                AIUI connected
+        <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-1 bg-[var(--rule)] border border-[var(--rule)]">
+          {/* Left — Unmanaged */}
+          <div className="bg-[var(--paper)] p-12">
+            <div className="flex items-center justify-between mb-10">
+              <span className="font-mono text-[10px] font-bold text-red-500 uppercase tracking-widest">
+                UNMANAGED_GENERATION
               </span>
+              <div className="h-2 w-2 rounded-full bg-red-500" />
             </div>
-            <h3 className="display mt-4" style={{ fontSize: '1.5rem', lineHeight: 1.1 }}>
-              Prompt: <em>Build me a settings page.</em>
-            </h3>
-            <p
-              className="mt-4 text-[0.9375rem]"
-              style={{ color: 'var(--ink-soft)', lineHeight: 1.6, maxWidth: '48ch' }}
-            >
-              Your approved Button component. Your page-heading scale. Your spacing rhythm. Zero
-              inline styles — every visual decision traces back to a token.
+
+            <h3 className="display text-xl font-bold mb-6">Prompt: Build me a settings page.</h3>
+            <p className="text-[var(--ink-soft)] text-sm leading-relaxed mb-10 max-w-[40ch]">
+              Hardcoded hex values. Random border radii. Arbitrary padding. This is the "design
+              drift" that kills production systems.
             </p>
 
-            <pre className="specimen mt-6" style={{ padding: '1.125rem 1.375rem' }}>
-              <code>
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">Page</span> <span className="cm-attr">title</span>
-                <span className="cm-punct">=</span>
-                <span className="cm-string">&quot;Settings&quot;</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n  '}
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">Heading</span> <span className="cm-attr">level</span>
-                <span className="cm-punct">=</span>
-                <span className="cm-string">&quot;page&quot;</span>
-                <span className="cm-punct">{'>'}</span>Settings
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">Heading</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n  '}
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">Stack</span> <span className="cm-attr">gap</span>
-                <span className="cm-punct">=</span>
-                <span className="cm-string">&quot;space.6&quot;</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n    '}
-                <span className="cm-dim">{'/* fields omitted */'}</span>
-                {'\n    '}
-                <span className="cm-punct">{'<'}</span>
-                <span className="cm-tag">Button</span> <span className="cm-attr">variant</span>
-                <span className="cm-punct">=</span>
-                <span className="cm-string">&quot;primary&quot;</span>{' '}
-                <span className="cm-attr">size</span>
-                <span className="cm-punct">=</span>
-                <span className="cm-string">&quot;md&quot;</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n      '}Save changes
-                {'\n    '}
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">Button</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n  '}
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">Stack</span>
-                <span className="cm-punct">{'>'}</span>
-                {'\n'}
-                <span className="cm-punct">{'</'}</span>
-                <span className="cm-tag">Page</span>
-                <span className="cm-punct">{'>'}</span>
-              </code>
-            </pre>
-            <div className="figure-caption" style={{ justifyContent: 'space-between' }}>
-              <span className="fig-id">Fig. 04.B</span>
-              <span className="leader" aria-hidden />
-              <span>3 approved components. 1 spacing token. 0 drift.</span>
+            <div className="bg-[#0F172A] p-6 rounded-lg font-mono text-[11px] leading-relaxed shadow-xl border border-white/10">
+              <div className="text-white/40 mb-4 border-b border-white/5 pb-2 flex gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-400/20" />
+                <div className="w-2 h-2 rounded-full bg-red-400/20" />
+                <div className="w-2 h-2 rounded-full bg-red-400/20" />
+              </div>
+              <div className="text-blue-300">
+                {'<'}div style={'{{'} padding: 20 {'}}'}
+                {'>'}
+              </div>
+              <div className="text-blue-300 pl-4">
+                {'<'}h1 style={'{{'} fontSize: 24, color:{' '}
+                <span className="text-pink-400">"navy"</span> {'}}'}
+                {'>'}
+              </div>
+              <div className="text-white/80 pl-8">Settings</div>
+              <div className="text-blue-300 pl-4">
+                {'</'}h1{'>'}
+              </div>
+              <div className="text-blue-300 pl-4">
+                {'<'}button style={'{{'} background:{' '}
+                <span className="text-pink-400">"cornflowerblue"</span>, padding:{' '}
+                <span className="text-pink-400">"8px 16px"</span> {'}}'}
+                {'>'}
+              </div>
+              <div className="text-white/80 pl-8">Save Changes</div>
+              <div className="text-blue-300 pl-4">
+                {'</'}button{'>'}
+              </div>
+              <div className="text-blue-300">
+                {'</'}div{'>'}
+              </div>
+            </div>
+            <div className="mt-8 flex items-center gap-3">
+              <span className="font-mono text-[9px] font-bold text-red-500/50 tracking-widest">
+                DRIFT_DETECTED_100%
+              </span>
+              <span className="h-[1px] flex-1 bg-[var(--rule)] opacity-50" />
+            </div>
+          </div>
+
+          {/* Right — Orchestrated */}
+          <div className="bg-[var(--paper)] p-12">
+            <div className="flex items-center justify-between mb-10">
+              <span className="font-mono text-[10px] font-bold text-[var(--success)] uppercase tracking-widest">
+                ORCHESTRATED_GENERATION
+              </span>
+              <div className="h-2 w-2 rounded-full bg-[var(--success)]" />
+            </div>
+
+            <h3 className="display text-xl font-bold mb-6">Prompt: Build me a settings page.</h3>
+            <p className="text-[var(--ink-soft)] text-sm leading-relaxed mb-10 max-w-[40ch]">
+              Zero drift. Every decision is mapped to your approved tokens and component library.
+              The agent follows the established protocol.
+            </p>
+
+            <div className="bg-[#0F172A] p-6 rounded-lg font-mono text-[11px] leading-relaxed shadow-xl border border-white/10">
+              <div className="text-white/40 mb-4 border-b border-white/5 pb-2 flex gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400/20" />
+                <div className="w-2 h-2 rounded-full bg-green-400/20" />
+                <div className="w-2 h-2 rounded-full bg-green-400/20" />
+              </div>
+              <div className="text-blue-300">
+                {'<'}Page title=<span className="text-green-400">"Settings"</span>
+                {'>'}
+              </div>
+              <div className="text-blue-300 pl-4">
+                {'<'}Heading level=<span className="text-green-400">"page"</span>
+                {'>'}Settings{'</'}Heading{'>'}
+              </div>
+              <div className="text-blue-300 pl-4">
+                {'<'}Stack gap=<span className="text-green-400">"space.6"</span>
+                {'>'}
+              </div>
+              <div className="text-white/40 pl-8">{'/* fields orchestrated */'}</div>
+              <div className="text-blue-300 pl-8">
+                {'<'}Button variant=<span className="text-green-400">"primary"</span> size=
+                <span className="text-green-400">"md"</span>
+                {'>'}
+              </div>
+              <div className="text-white/80 pl-12">Save changes</div>
+              <div className="text-blue-300 pl-8">
+                {'</'}Button{'>'}
+              </div>
+              <div className="text-blue-300 pl-4">
+                {'</'}Stack{'>'}
+              </div>
+              <div className="text-blue-300">
+                {'</'}Page{'>'}
+              </div>
+            </div>
+            <div className="mt-8 flex items-center gap-3">
+              <span className="font-mono text-[9px] font-bold text-[var(--success)] tracking-widest">
+                COMPLIANCE_VERIFIED_100%
+              </span>
+              <span className="h-[1px] flex-1 bg-[var(--rule)]" />
             </div>
           </div>
         </div>
-
-        {/* Editorial takeaway */}
-        <p
-          className="display mt-10 lg:mt-12"
-          style={{
-            fontSize: 'clamp(1.25rem, 2vw, 1.625rem)',
-            lineHeight: 1.35,
-            color: 'var(--ink)',
-            maxWidth: '42ch',
-            fontStyle: 'italic',
-          }}
-        >
-          The AI didn&rsquo;t get smarter. It got <em>instructed</em>.
-        </p>
       </div>
     </section>
   );

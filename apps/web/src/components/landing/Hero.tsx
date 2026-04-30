@@ -17,320 +17,205 @@ export function Hero() {
   }
 
   return (
-    <section className="relative">
-      <div className="mx-auto max-w-[1240px] px-6 lg:px-10 pt-20 pb-28 lg:pt-28 lg:pb-36">
-        {/* Front matter: section numeral + eyebrow meta */}
-        <div className="grid grid-cols-12 gap-x-6 gap-y-10">
-          {/* Left — editorial opening */}
+    <section className="relative border-b border-[var(--rule)]">
+      <div className="mx-auto max-w-[1400px] px-6 lg:px-12 pt-24 pb-28 lg:pt-32 lg:pb-40">
+        <div className="grid grid-cols-12 gap-x-12 gap-y-16">
+          {/* Left — Technical Authority */}
           <div className="col-span-12 lg:col-span-7">
-            <div className="flex items-baseline gap-6">
-              <span className="section-numeral">00</span>
-              <span className="eyebrow">The AI design control layer</span>
+            <div className="flex items-center gap-4">
+              <span className="section-numeral">LOGIC_00</span>
+              <span className="eyebrow">Design Authority for AI Agents</span>
             </div>
 
-            <hr className="rule mt-8" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
-
             <h1
-              className="display mt-10"
+              className="display mt-12"
               style={{
-                fontSize: 'clamp(2.75rem, 6.5vw, 5rem)',
-                lineHeight: 0.98,
-                fontWeight: 400,
-                letterSpacing: '-0.02em',
+                fontSize: 'clamp(3rem, 7vw, 5.5rem)',
+                lineHeight: 0.9,
+                fontWeight: 800,
+                letterSpacing: '-0.05em',
               }}
             >
-              Design that doesn&rsquo;t <em>drift</em>,
-              <br />
-              no matter who builds it.
+              Design that <br />
+              doesn&rsquo;t <span>drift</span>.
             </h1>
 
-            <p
-              className="mt-8"
-              style={{
-                fontSize: '1.25rem',
-                lineHeight: 1.45,
-                color: 'var(--ink)',
-                maxWidth: '48ch',
-                fontWeight: 500,
-              }}
-            >
-              Every time your AI generates UI, it invents new colors, spacing, and components —
-              quietly breaking your design system. AIUI stops that.
-            </p>
+            <div className="mt-12 space-y-6">
+              <p
+                style={{
+                  fontSize: '1.5rem',
+                  lineHeight: 1.3,
+                  color: 'var(--ink)',
+                  maxWidth: '42ch',
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                AI generates UI, but it doesn&rsquo;t understand your brand. AIUI enforces design
+                compliance at the token level.
+              </p>
 
-            <p className="lede mt-6" style={{ maxWidth: '52ch' }}>
-              A persistent design memory for Claude, Cursor, and your other AI tools. Your tokens,
-              your components, your rules — followed on every screen, in every conversation.
-            </p>
+              <p
+                className="lede"
+                style={{ fontSize: '1.125rem', maxWidth: '50ch', fontWeight: 400 }}
+              >
+                A persistent design orchestration layer for Claude and Cursor. Your tokens, your
+                components, your rules — hardcoded into the agent&rsquo;s memory.
+              </p>
+            </div>
 
-            <p
-              className="mt-4 text-[0.8125rem]"
-              style={{
-                color: 'var(--ink-muted)',
-                fontFamily: 'var(--font-mono-editorial)',
-                letterSpacing: '0.04em',
-              }}
-            >
-              Free in open beta · No credit card · Works with Claude, Cursor, Windsurf
-            </p>
-
-            {/* Install, first. Morgan copies in one click. */}
-            <div className="mt-10 flex flex-col gap-3" style={{ maxWidth: '34rem' }}>
-              <div className="flex items-baseline gap-3">
-                <span className="eyebrow shrink-0">Already using Claude? Copy one line</span>
-                <span className="leader" aria-hidden />
+            {/* Tactical Install Panel */}
+            <div className="mt-12 p-1 border border-[var(--rule)] rounded-lg bg-[var(--paper-deep)] max-w-lg">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--rule)]">
+                <span className="font-mono text-[10px] font-bold text-[var(--ink-muted)]">
+                  MCP_PROTOCOL_V1
+                </span>
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                  style={{
-                    fontFamily: 'var(--font-mono-editorial)',
-                    color: copied ? 'var(--accent)' : 'var(--ink-muted)',
-                    outlineColor: 'var(--accent)',
-                  }}
-                  aria-label="Copy install command"
+                  className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider hover:text-[var(--accent)] transition-colors"
+                  style={{ color: copied ? 'var(--success)' : 'var(--ink-muted)' }}
                 >
-                  {copied ? (
-                    <Check className="h-3 w-3" strokeWidth={1.5} />
-                  ) : (
-                    <Copy className="h-3 w-3" strokeWidth={1.5} />
-                  )}
-                  {copied ? 'Copied' : 'Copy'}
+                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  {copied ? 'Success' : 'Copy'}
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="specimen text-left transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                style={{
-                  padding: '1.25rem 1.5rem',
-                  fontSize: '0.9375rem',
-                  background: copied ? 'var(--accent-soft)' : 'var(--paper-sunk)',
-                  outlineColor: 'var(--accent)',
-                }}
-                aria-label="Copy claude mcp add aiui"
-              >
-                <code>
-                  <span className="cm-dim">$</span> <span className="cm-key">claude</span>{' '}
-                  <span className="cm-tag">mcp</span> <span className="cm-attr">add</span>{' '}
-                  <span className="cm-string">aiui</span>
-                </code>
-              </button>
+              <div className="p-4 font-mono text-sm overflow-x-auto whitespace-nowrap">
+                <span className="text-[var(--ink-muted)]">$</span>{' '}
+                <span className="text-[var(--accent)]">claude</span> mcp add aiui
+              </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link href="/sign-up" className="btn-ink">
-                Start free in the studio
-                <span aria-hidden style={{ fontFamily: 'var(--font-display)' }}>
+            <div className="mt-10 flex flex-wrap items-center gap-6">
+              <Link href="/sign-up" className="btn-ink px-8 py-4">
+                Access the Studio
+                <span aria-hidden className="ml-2">
                   →
                 </span>
               </Link>
-              <a href="#how-it-works" className="ink-link text-[0.9375rem]">
-                Or see how it works
+              <a
+                href="#how-it-works"
+                className="font-bold text-sm underline decoration-2 underline-offset-4 hover:text-[var(--accent)] transition-colors"
+              >
+                System Documentation
               </a>
             </div>
           </div>
 
-          {/* Right — token specimen sheet */}
-          <aside className="col-span-12 lg:col-span-5 lg:pl-8">
-            <TokenSpecimen />
+          {/* Right — Design Logic Manifest */}
+          <aside className="col-span-12 lg:col-span-5">
+            <DesignLogicManifest />
           </aside>
-        </div>
-      </div>
-
-      {/* Bottom rule + colophon-style meta */}
-      <div className="mx-auto max-w-[1240px] px-6 lg:px-10">
-        <hr className="rule" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
-        <div className="py-5 flex flex-wrap items-baseline justify-between gap-y-2">
-          <span className="eyebrow">Compatible with</span>
-          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-            {['Claude Code', 'Cursor', 'Windsurf', 'VS Code'].map((item) => (
-              <span
-                key={item}
-                className="text-sm"
-                style={{ color: 'var(--ink-soft)', fontFeatureSettings: '"ss01","kern"' }}
-              >
-                {item}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ------------------------------------------------------------------------- */
-/* Right-column specimen: shows AIUI as a design specimen sheet              */
-/* ------------------------------------------------------------------------- */
-
-function TokenSpecimen() {
-  const swatches = [
-    { name: 'color.surface', sample: 'oklch(97.5% 0.008 60)' },
-    { name: 'color.ink', sample: 'oklch(22% 0.020 30)' },
-    { name: 'color.accent', sample: 'oklch(44% 0.140 28)' },
-    { name: 'color.muted', sample: 'oklch(48% 0.016 45)' },
-  ];
-
+function DesignLogicManifest() {
   return (
-    <figure
-      style={{
-        background: 'var(--paper-deep)',
-        border: '1px solid var(--rule)',
-        padding: '1.75rem 1.75rem 1.5rem',
-      }}
-    >
-      {/* Header row */}
-      <header className="flex items-baseline justify-between">
-        <span className="eyebrow">Specimen</span>
-        <span
-          className="text-[0.6875rem]"
-          style={{
-            fontFamily: 'var(--font-mono-editorial)',
-            color: 'var(--ink-muted)',
-            letterSpacing: '0.08em',
-          }}
-        >
-          PROFILE · WARM PAPER
-        </span>
-      </header>
+    <div className="relative">
+      {/* Blueprint Grid Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(var(--rule-strong)_0.5px,transparent_0.5px)] [background-size:20px_20px] -z-10 opacity-30" />
 
-      <h3 className="display mt-3" style={{ fontSize: '1.625rem', lineHeight: 1.05 }}>
-        Your tokens,
-        <br />
-        set in type.
-      </h3>
-
-      <hr className="rule mt-5" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
-
-      {/* Color section */}
-      <section className="mt-5">
-        <div className="flex items-baseline justify-between mb-3">
-          <span className="eyebrow" style={{ fontSize: '0.6875rem' }}>
-            § 01 · Color
-          </span>
-          <span className="caption" style={{ fontSize: '0.6875rem' }}>
-            4 of 360
-          </span>
-        </div>
-        <ul className="flex flex-col gap-2">
-          {swatches.map((s) => (
-            <li key={s.name} className="flex items-center gap-3">
-              <span
-                aria-hidden
-                className="block"
-                style={{
-                  width: 22,
-                  height: 22,
-                  background: s.sample,
-                  border: '1px solid var(--rule)',
-                }}
-              />
-              <span
-                className="text-[0.8125rem]"
-                style={{ color: 'var(--ink)', fontFamily: 'var(--font-mono-editorial)' }}
-              >
-                {s.name}
-              </span>
-              <span className="leader" aria-hidden />
-              <span
-                className="text-[0.6875rem] text-right tabular-nums"
-                style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono-editorial)' }}
-              >
-                {s.sample}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <hr className="rule mt-5" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
-
-      {/* Type section */}
-      <section className="mt-5">
-        <div className="flex items-baseline justify-between mb-3">
-          <span className="eyebrow" style={{ fontSize: '0.6875rem' }}>
-            § 02 · Type
-          </span>
-          <span className="caption" style={{ fontSize: '0.6875rem' }}>
-            Display + Body
-          </span>
-        </div>
-        <div className="flex items-baseline gap-4">
-          <span
-            className="display"
-            style={{ fontSize: '2.75rem', lineHeight: 1, color: 'var(--ink)' }}
-          >
-            Aa
-          </span>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[0.75rem]" style={{ color: 'var(--ink)' }}>
-              Gambarino · Display
+      <figure className="bg-[var(--paper)] border-2 border-[var(--ink)] shadow-[8px_8px_0px_var(--rule-strong)] p-8">
+        <header className="flex items-center justify-between border-b-2 border-[var(--ink)] pb-4">
+          <div className="flex flex-col">
+            <span className="font-mono text-[10px] font-bold text-[var(--ink-muted)]">
+              MANIFEST_TYPE
             </span>
-            <span className="caption" style={{ fontSize: '0.6875rem' }}>
-              type.display · 400
-            </span>
+            <span className="font-bold text-sm">DESIGN_SYSTEM_MEMORY</span>
           </div>
-        </div>
-        <div className="mt-3 flex items-baseline gap-4">
-          <span
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '1.875rem',
-              lineHeight: 1,
-              color: 'var(--ink)',
-              fontWeight: 500,
-            }}
-          >
-            Aa
-          </span>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[0.75rem]" style={{ color: 'var(--ink)' }}>
-              Switzer · Body
-            </span>
-            <span className="caption" style={{ fontSize: '0.6875rem' }}>
-              type.body · 500
-            </span>
+          <div className="h-8 w-8 bg-[var(--ink)] flex items-center justify-center text-[var(--paper)] font-bold text-xs">
+            01
           </div>
+        </header>
+
+        <div className="mt-8 space-y-8">
+          {/* Tokens Layer */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
+                L01_FOUNDATION_TOKENS
+              </span>
+              <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: 'BRAND_PRIMARY', value: '#0F172A', color: 'oklch(15% 0.05 260)' },
+                { label: 'ACCENT_CORE', value: '#3B82F6', color: 'oklch(60% 0.2 250)' },
+                { label: 'SURFACE_100', value: '#FFFFFF', color: 'oklch(100% 0 0)' },
+                { label: 'RULE_HAIRLINE', value: '#E2E8F0', color: 'oklch(92% 0.01 260)' },
+              ].map((t) => (
+                <div
+                  key={t.label}
+                  className="p-3 border border-[var(--rule)] bg-[var(--paper-deep)] flex items-center gap-3"
+                >
+                  <div
+                    className="w-4 h-4 border border-[var(--ink)]"
+                    style={{ background: t.color }}
+                  />
+                  <div className="flex flex-col leading-none">
+                    <span className="font-mono text-[9px] font-bold">{t.label}</span>
+                    <span className="font-mono text-[8px] text-[var(--ink-muted)] mt-1">
+                      {t.value}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Logic Layer */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
+                L02_COMPLIANCE_LOGIC
+              </span>
+              <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
+            </div>
+            <div className="bg-[var(--paper-sunk)] p-4 font-mono text-[10px] leading-relaxed border border-[var(--rule)] text-[var(--ink-soft)]">
+              <div className="flex gap-2">
+                <span className="text-[var(--success)]">PASS</span>
+                <span>validate_ui_output(projectId, code)</span>
+              </div>
+              <div className="mt-1 flex gap-2">
+                <span className="text-[var(--accent)]">INFO</span>
+                <span>Checking typographic hierarchy...</span>
+              </div>
+              <div className="mt-1 flex gap-2">
+                <span className="text-[var(--success)]">DONE</span>
+                <span>100% token compliance detected.</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Component Schema */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
+                L03_COMPONENT_CONTRACT
+              </span>
+              <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
+            </div>
+            <div className="flex items-end gap-2">
+              {[4, 8, 12, 16, 24, 32].map((h) => (
+                <div key={h} className="bg-[var(--ink)] w-full" style={{ height: h }} />
+              ))}
+            </div>
+            <p className="mt-3 font-mono text-[9px] text-[var(--ink-muted)] text-right">
+              SPACING_SCALE_4PX_OPTIMIZED
+            </p>
+          </section>
         </div>
-      </section>
 
-      <hr className="rule mt-5" style={{ height: 1, border: 0, background: 'var(--rule)' }} />
-
-      {/* Radius + spacing */}
-      <section className="mt-5">
-        <div className="flex items-baseline justify-between mb-3">
-          <span className="eyebrow" style={{ fontSize: '0.6875rem' }}>
-            § 03 · Measure
+        <footer className="mt-8 pt-6 border-t border-[var(--rule)] flex items-center justify-between">
+          <span className="font-mono text-[9px] text-[var(--ink-muted)] italic">
+            AIUI_SYSTEM_ORCHESTRATOR
           </span>
-          <span className="caption" style={{ fontSize: '0.6875rem' }}>
-            scale.step · 1.333
-          </span>
-        </div>
-        <div className="flex items-end gap-2 h-10">
-          {[6, 9, 12, 18, 24, 32, 44].map((w) => (
-            <span
-              key={w}
-              aria-hidden
-              style={{
-                width: w,
-                height: w,
-                border: '1px solid var(--ink)',
-                background: 'var(--paper)',
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      <figcaption
-        className="figure-caption"
-        style={{ marginTop: '1.25rem', paddingTop: '0.75rem', borderTop: '1px solid var(--rule)' }}
-      >
-        <span className="fig-id">Fig. 00.2</span>
-        <span className="leader" aria-hidden />
-        <span>A slice of one project&rsquo;s design memory.</span>
-      </figcaption>
-    </figure>
+          <span className="font-mono text-[9px] font-bold text-[var(--ink)]">REV_2026.04</span>
+        </footer>
+      </figure>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { eq, and, ilike, asc, desc, sql, count } from 'drizzle-orm';
+import { eq, and, or, isNull, ilike, asc, desc, sql, count } from 'drizzle-orm';
 import { stylePacks, styleTokens } from '../db/schema';
 import type { Database } from '../db';
 import type {
@@ -108,7 +108,14 @@ export async function listStylePacks(
   organizationId: string,
   filters: ListStylePacksInput
 ) {
-  const conditions = [eq(stylePacks.organizationId, organizationId)];
+  // Include the user's org-owned packs AND seeded system packs (org_id IS NULL).
+  // Without the IS NULL branch, every fresh signup sees an empty list because
+  // all 6 seeded packs have organization_id = NULL.
+  const orgScope = or(
+    eq(stylePacks.organizationId, organizationId),
+    isNull(stylePacks.organizationId)
+  );
+  const conditions = orgScope ? [orgScope] : [];
 
   if (filters.search) {
     conditions.push(ilike(stylePacks.name, `%${filters.search}%`));

@@ -99,6 +99,15 @@ program
     process.exit(exitCode);
   });
 
+// --- detect-patterns ---
+program
+  .command('detect-patterns')
+  .description('Identify repetitive design debt patterns in the codebase')
+  .action(async () => {
+    const { detectPatternsCommand } = await import('./commands/detect-patterns.js');
+    await detectPatternsCommand();
+  });
+
 // --- publish (placeholder) ---
 program
   .command('publish')

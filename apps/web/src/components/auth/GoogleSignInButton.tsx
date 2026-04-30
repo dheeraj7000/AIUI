@@ -8,6 +8,8 @@ interface GoogleSignInButtonProps {
 /**
  * Initiates the Google OAuth flow by navigating to /api/auth/google/start.
  * The endpoint redirects to Google, which then redirects back to our callback.
+ * If OAuth is not configured, the start route gracefully redirects back to
+ * /sign-in?error=google_not_configured.
  */
 export function GoogleSignInButton({
   label = 'Continue with Google',
@@ -22,7 +24,19 @@ export function GoogleSignInButton({
     <button
       type="button"
       onClick={handleClick}
-      className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:ring-offset-2 focus:ring-offset-zinc-950"
+      className="flex w-full items-center justify-center gap-3 px-4 py-2.5 text-[0.9375rem] transition-colors duration-150 focus:outline-none"
+      style={{
+        background: 'var(--paper)',
+        color: 'var(--ink)',
+        border: '1px solid var(--rule-strong)',
+        fontFamily: 'var(--font-body)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'var(--paper-sunk)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'var(--paper)';
+      }}
     >
       <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
         <path

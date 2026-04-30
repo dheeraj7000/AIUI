@@ -27,6 +27,7 @@ interface Recipe {
   stylePackId: string | null;
   aiUsageRules: string | null;
   packName: string | null;
+  codeTemplate?: string;
 }
 
 interface Project {
@@ -223,6 +224,36 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
   const [shape, setShape] = useState<ShapeState>(EMPTY_SHAPE);
   const [personalityInput, setPersonalityInput] = useState('');
   const [customAntiRef, setCustomAntiRef] = useState('');
+
+  const [activeTokens, setActiveTokens] = useState<Array<{ tokenKey: string; tokenValue: string }>>(
+    []
+  );
+  const [previewRecipe, setPreviewRecipe] = useState<Recipe | null>(null);
+
+  // Fetch tokens when pack changes
+  useEffect(() => {
+    if (!selectedPackId) {
+      setActiveTokens([]);
+      return;
+    }
+    fetch(`/api/style-packs/${selectedPackId}/tokens`)
+      .then((res) => res.json())
+      .then((data) => setActiveTokens(data))
+      .catch(() => setActiveTokens([]));
+  }, [selectedPackId]);
+
+  const getPreviewCode = (recipe: Recipe) => {
+    let code = recipe.codeTemplate || '';
+    activeTokens.forEach((t) => {
+      const regex = new RegExp(`{{token:${t.tokenKey}}}`, 'g');
+      code = code.replace(regex, t.tokenValue);
+    });
+    // Replace some common variables for demo
+    code = code.replace(/{headline}/g, 'Beautiful UI, Controlled by AI');
+    code = code.replace(/{subheadline}/g, 'The bridge between your design system and Claude.');
+    code = code.replace(/{ctaText}/g, 'Get Started');
+    return code;
+  };
 
   // Debounced autosave for Design Studio drafts. Stored server-side so a
   // user who closes the tab can resume on next open. Fire-and-forget — a
@@ -1066,8 +1097,8 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
 
         {/* STEP: Components */}
         {step === 'components' && (
-          <div>
-            <div className="flex items-center justify-between">
+          <div className="flex h-[calc(100vh-280px)] flex-col">
+            <div className="flex items-center justify-between pb-6">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Pick components</h1>
                 <p className="mt-1 text-sm text-gray-500">
@@ -1091,71 +1122,114 @@ export function StudioClient({ packs, recipes }: StudioClientProps) {
               </div>
             </div>
 
-            {/* Quick-add by pack */}
-            {selectedPackId && (
-              <div className="mt-4">
-                <button
-                  onClick={() => selectAllFromPack(selectedPackId)}
-                  className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
-                >
-                  + Add all from {packs.find((p) => p.id === selectedPackId)?.name}
-                </button>
-              </div>
-            )}
+            <div className="flex flex-1 gap-6 overflow-hidden">
+              {/* Left: Component List */}
+              <div className="w-1/2 overflow-y-auto pr-2">
+                {selectedPackId && (
+                  <div className="mb-4">
+                    <button
+                      onClick={() => selectAllFromPack(selectedPackId)}
+                      className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                    >
+                      + Add all from {packs.find((p) => p.id === selectedPackId)?.name}
+                    </button>
+                  </div>
+                )}
 
-            {/* Type filter */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              {allTypes.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTypeFilter(t)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    typeFilter === t
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {allTypes.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTypeFilter(t)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        typeFilter === t
+                          ? 'bg-gray-900 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
 
-            {/* Component grid */}
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredRecipes.map((r) => {
-                const selected = selectedRecipeIds.has(r.id);
-                return (
-                  <button
-                    key={r.id}
-                    onClick={() => toggleRecipe(r.id)}
-                    className={`rounded-xl border-2 p-4 text-left transition-all ${
-                      selected
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeColors[r.type] ?? 'bg-gray-100 text-gray-700'}`}
-                      >
-                        {r.type}
-                      </span>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {filteredRecipes.map((r) => {
+                    const selected = selectedRecipeIds.has(r.id);
+                    return (
                       <div
-                        className={`flex h-5 w-5 items-center justify-center rounded border-2 text-xs ${
-                          selected ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300'
+                        key={r.id}
+                        onMouseEnter={() => setPreviewRecipe(r)}
+                        className={`group cursor-pointer rounded-xl border-2 p-4 text-left transition-all ${
+                          selected
+                            ? 'border-blue-600 bg-blue-50'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
                         }`}
+                        onClick={() => toggleRecipe(r.id)}
                       >
-                        {selected && '\u2713'}
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeColors[r.type] ?? 'bg-gray-100 text-gray-700'}`}
+                          >
+                            {r.type}
+                          </span>
+                          <div
+                            className={`flex h-5 w-5 items-center justify-center rounded border-2 text-xs ${
+                              selected
+                                ? 'border-blue-600 bg-blue-600 text-white'
+                                : 'border-gray-300'
+                            }`}
+                          >
+                            {selected && '\u2713'}
+                          </div>
+                        </div>
+                        <h3 className="mt-2 font-medium text-gray-900">{r.name}</h3>
+                        <p className="mt-1 text-xs text-gray-400">Preview on hover</p>
                       </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right: Preview Canvas */}
+              <div className="flex-1 rounded-2xl border border-gray-200 bg-white p-1">
+                <div className="flex h-full flex-col">
+                  <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                      Live Preview
+                    </span>
+                    <div className="flex gap-1">
+                      <div className="h-2 w-2 rounded-full bg-red-400" />
+                      <div className="h-2 w-2 rounded-full bg-yellow-400" />
+                      <div className="h-2 w-2 rounded-full bg-green-400" />
                     </div>
-                    <h3 className="mt-2 font-medium text-gray-900">{r.name}</h3>
-                    {r.packName && <p className="text-xs text-gray-400">{r.packName}</p>}
-                    {r.aiUsageRules && (
-                      <p className="mt-1 line-clamp-2 text-xs text-gray-500">{r.aiUsageRules}</p>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-8">
+                    {previewRecipe ? (
+                      <div className="mx-auto max-w-4xl">
+                        <div
+                          className="rounded-lg shadow-sm"
+                          dangerouslySetInnerHTML={{ __html: getPreviewCode(previewRecipe) }}
+                        />
+                        <div className="mt-8 border-t border-gray-100 pt-6">
+                          <h4 className="text-sm font-semibold text-gray-900">AI Usage Rules</h4>
+                          <p className="mt-2 text-xs leading-relaxed text-gray-500">
+                            {previewRecipe.aiUsageRules || 'No special rules defined.'}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-gray-400">
+                        <div className="text-center">
+                          <div className="text-4xl">✨</div>
+                          <p className="mt-2 text-sm">
+                            Hover over a component to preview it with your tokens.
+                          </p>
+                        </div>
+                      </div>
                     )}
-                  </button>
-                );
-              })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

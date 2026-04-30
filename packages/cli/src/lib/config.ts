@@ -12,6 +12,7 @@ export const configSchema = z.object({
   activePack: z.string(),
   lastSynced: z.string().optional(),
   registries: z.record(z.string(), z.string()).optional(),
+  targets: z.array(z.string()).optional(),
 });
 
 export type AiuiConfig = z.infer<typeof configSchema>;

@@ -9,6 +9,19 @@ export interface RegistryToken {
   description?: string;
 }
 
+export interface RegistryComponent {
+  id: string;
+  name: string;
+  slug: string;
+  type: string;
+  description?: string;
+  codeTemplate: string;
+  propsSchema?: Record<string, unknown>;
+  aiUsageRules?: string;
+  stylePackId: string;
+  dependencies?: string[];
+}
+
 export interface RegistryItem {
   name: string;
   slug: string;
@@ -49,13 +62,21 @@ function resolvePackUrl(packId: string, config?: AiuiConfig | null): string {
     const [namespace, slug] = parts;
     const customBase = config?.registries?.[namespace];
     if (customBase) {
-      return `${customBase}/api/registry/${slug}`;
+      return `${customBase}/api/registry/pack/${slug}`;
     }
     // Fall back to default registry with namespace
-    return `${registryUrl}/api/registry/${slug}`;
+    return `${registryUrl}/api/registry/pack/${slug}`;
   }
 
-  return `${registryUrl}/api/registry/${packId}`;
+  return `${registryUrl}/api/registry/pack/${packId}`;
+}
+
+/**
+ * Resolve a component identifier to a registry URL.
+ */
+function resolveComponentUrl(componentId: string, config?: AiuiConfig | null): string {
+  const registryUrl = config?.registryUrl ?? DEFAULT_REGISTRY;
+  return `${registryUrl}/api/registry/component/${componentId}`;
 }
 
 /**
@@ -83,6 +104,24 @@ export async function fetchPack(packId: string, config?: AiuiConfig | null): Pro
     throw new Error(`Failed to fetch pack: ${res.status} ${res.statusText}`);
   }
   return res.json() as Promise<RegistryItem>;
+}
+
+/**
+ * Fetch a single component from the registry.
+ */
+export async function fetchComponent(
+  componentId: string,
+  config?: AiuiConfig | null
+): Promise<RegistryComponent> {
+  const url = resolveComponentUrl(componentId, config);
+  const res = await fetch(url);
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error(`Component "${componentId}" not found in registry`);
+    }
+    throw new Error(`Failed to fetch component: ${res.status} ${res.statusText}`);
+  }
+  return res.json() as Promise<RegistryComponent>;
 }
 
 /**

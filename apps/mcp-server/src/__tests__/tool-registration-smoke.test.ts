@@ -27,7 +27,6 @@ import { registerAllTools } from '../tools';
 const EXPECTED_TOOLS = [
   // Read
   'get_project_context',
-  'resolve_tag',
   'list_components',
   'get_component_recipe',
   'get_theme_tokens',
@@ -37,6 +36,8 @@ const EXPECTED_TOOLS = [
   'get_design_memory',
   'check_design_memory',
   'open_design_studio',
+  'audit_design_principles',
+  'suggest_pattern_promotion',
   // Write
   'create_style_pack',
   'update_tokens',

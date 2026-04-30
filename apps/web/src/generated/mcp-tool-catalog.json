@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-04-20T07:44:13.595Z",
-  "count": 17,
+  "generatedAt": "2026-04-30T04:08:04.154Z",
+  "count": 19,
   "tools": [
+    {
+      "name": "audit_design_principles",
+      "description": "Perform a heuristic design and accessibility audit on a snippet of UI code. Checks for typographic hierarchy, visual noise, and common accessibility issues.",
+      "category": "read"
+    },
     {
       "name": "check_design_memory",
       "description": "Check if the design memory for a project is up to date. Returns freshness status without regenerating.",
@@ -43,13 +48,18 @@
       "category": "read"
     },
     {
+      "name": "suggest_pattern_promotion",
+      "description": "Suggest promoting a repetitive design pattern into a formal design token or component recipe. Should be called when the agent detects it has used the same hardcoded value or JSX structure multiple times.",
+      "category": "read"
+    },
+    {
       "name": "sync_design_memory",
       "description": "Generate or update the persistent design memory files for a project. Creates .aiui/design-memory.md (full design context for Claude) and .aiui/tokens.json (machine-readable tokens). Supports incremental mode that computes a diff and returns early if nothing changed. Add \"See .aiui/design-memory.md for the active design system\" to your CLAUDE.md so Claude loads it automatically in every conversation.",
       "category": "read"
     },
     {
       "name": "validate_ui_output",
-      "description": "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
+      "description": "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, accessibility, and semantic data binding.",
       "category": "read"
     },
     {

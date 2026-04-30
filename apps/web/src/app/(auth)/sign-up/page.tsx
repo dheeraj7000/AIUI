@@ -43,7 +43,10 @@ function validate(email: string, password: string, confirmPassword: string): For
 }
 
 const inputClass =
-  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200';
+  'block w-full px-3.5 py-2.5 text-[0.9375rem] transition-colors duration-150 focus:outline-none auth-input';
+
+const labelClass = 'block text-[0.8125rem] mb-1.5';
+const errorClass = 'mt-1.5 text-[0.75rem]';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -83,39 +86,46 @@ export default function SignUpPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white">Create your account</h2>
-      <p className="mt-1 mb-6 text-sm text-zinc-500">
+      <h2
+        className="text-[1.5rem] leading-[1.15]"
+        style={{ fontFamily: 'var(--font-display)', color: 'var(--ink)' }}
+      >
+        Create your account.
+      </h2>
+      <p className="mt-2 mb-6 text-[0.9375rem]" style={{ color: 'var(--ink-soft)' }}>
         Free to start. Set up your design system in minutes.
       </p>
 
       {serverError && (
-        <div className="mb-4 flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
-          <svg
-            className="mt-0.5 h-4 w-4 shrink-0 text-red-400"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <p className="text-sm text-red-400">{serverError}</p>
+        <div
+          className="mb-4 flex items-start gap-2 p-3"
+          style={{
+            background: 'var(--accent-soft)',
+            border: '1px solid var(--accent)',
+          }}
+        >
+          <p className="text-[0.875rem]" style={{ color: 'var(--accent-deep)' }}>
+            {serverError}
+          </p>
         </div>
       )}
 
       <GoogleSignInButton label="Sign up with Google" />
 
       <div className="my-5 flex items-center gap-3">
-        <div className="h-px flex-1 bg-white/10" />
-        <span className="text-xs uppercase tracking-wider text-zinc-600">or</span>
-        <div className="h-px flex-1 bg-white/10" />
+        <div className="h-px flex-1" style={{ background: 'var(--rule)' }} />
+        <span
+          className="text-[0.6875rem] uppercase tracking-[0.12em]"
+          style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono-editorial)' }}
+        >
+          or
+        </span>
+        <div className="h-px flex-1" style={{ background: 'var(--rule)' }} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-zinc-400 mb-1.5">
+          <label htmlFor="email" className={labelClass} style={{ color: 'var(--ink)' }}>
             Email address
           </label>
           <input
@@ -130,14 +140,14 @@ export default function SignUpPage() {
             aria-describedby={errors.email ? 'email-error' : undefined}
           />
           {errors.email && (
-            <p id="email-error" className="mt-1.5 text-xs text-red-400">
+            <p id="email-error" className={errorClass} style={{ color: 'var(--accent)' }}>
               {errors.email}
             </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-zinc-400 mb-1.5">
+          <label htmlFor="password" className={labelClass} style={{ color: 'var(--ink)' }}>
             Password
           </label>
           <input
@@ -152,17 +162,14 @@ export default function SignUpPage() {
             aria-describedby={errors.password ? 'password-error' : undefined}
           />
           {errors.password && (
-            <p id="password-error" className="mt-1.5 text-xs text-red-400">
+            <p id="password-error" className={errorClass} style={{ color: 'var(--accent)' }}>
               {errors.password}
             </p>
           )}
         </div>
 
         <div>
-          <label
-            htmlFor="confirmPassword"
-            className="block text-sm font-medium text-zinc-400 mb-1.5"
-          >
+          <label htmlFor="confirmPassword" className={labelClass} style={{ color: 'var(--ink)' }}>
             Confirm password
           </label>
           <input
@@ -177,7 +184,11 @@ export default function SignUpPage() {
             aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
           />
           {errors.confirmPassword && (
-            <p id="confirm-password-error" className="mt-1.5 text-xs text-red-400">
+            <p
+              id="confirm-password-error"
+              className={errorClass}
+              style={{ color: 'var(--accent)' }}
+            >
               {errors.confirmPassword}
             </p>
           )}
@@ -186,40 +197,16 @@ export default function SignUpPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          className="btn-ink w-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? (
-            <>
-              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
-              Creating account...
-            </>
-          ) : (
-            'Create account'
-          )}
+          {isSubmitting ? 'Creating account…' : 'Create account'}
         </button>
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-zinc-500">
+        <p className="text-[0.875rem]" style={{ color: 'var(--ink-soft)' }}>
           Already have an account?{' '}
-          <Link
-            href="/sign-in"
-            className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
+          <Link href="/sign-in" className="transition-colors" style={{ color: 'var(--accent)' }}>
             Sign in
           </Link>
         </p>

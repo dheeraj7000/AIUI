@@ -2,7 +2,13 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
-import { projects, styleTokens, designProfiles, computeTokensHash } from '@aiui/design-core';
+import {
+  projects,
+  styleTokens,
+  designProfiles,
+  computeTokensHash,
+  componentRecipes,
+} from '@aiui/design-core';
 import { NotFoundError } from '../lib/errors';
 import { getContext } from '../lib/context';
 import {
@@ -21,6 +27,7 @@ import {
   checkHeadingOrder,
   checkAriaRoles,
   checkColorContrast,
+  checkDataBinding,
   CSS_NAMED_COLORS,
   TAILWIND_PALETTE,
   type Violation,
@@ -50,15 +57,21 @@ export type { Violation };
 export function registerValidateUiOutput(server: AiuiMcpServer) {
   server.registerTool(
     'validate_ui_output',
-    "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
+    "Check generated UI code for compliance against the project's design system. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, accessibility, and semantic data binding.",
     {
       projectId: z.string().uuid().describe('The project ID to validate against'),
       code: z.string().describe('The generated UI code to validate'),
+      recipeId: z
+        .string()
+        .uuid()
+        .optional()
+        .describe('Optional recipe ID to validate against data-binding requirements'),
     },
     async (args) => {
       const db = getDb();
       const projectId = args.projectId as string;
       const code = args.code as string;
+      const recipeId = args.recipeId as string | undefined;
 
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
 
@@ -70,6 +83,29 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
 
       if (!project || !project.activeStylePackId) {
         throw new NotFoundError('Project', projectId);
+      }
+
+      const violations: Violation[] = [];
+
+      // -----------------------------------------------------------------------
+      // Data Binding Validation
+      // -----------------------------------------------------------------------
+      if (recipeId) {
+        const [recipe] = await db
+          .select()
+          .from(componentRecipes)
+          .where(eq(componentRecipes.id, recipeId))
+          .limit(1);
+
+        if (recipe) {
+          const schema = recipe.jsonSchema as {
+            dataRequirements?: Parameters<typeof checkDataBinding>[1];
+          } | null;
+          if (schema?.dataRequirements) {
+            const dataViolations = checkDataBinding(code, schema.dataRequirements);
+            violations.push(...dataViolations);
+          }
+        }
       }
 
       // Fetch approved tokens
@@ -114,8 +150,6 @@ export function registerValidateUiOutput(server: AiuiMcpServer) {
       const approvedBorderWidth = new Set(
         tokens.filter((t) => t.tokenType === 'border-width').map((t) => t.tokenValue.toLowerCase())
       );
-
-      const violations: Violation[] = [];
 
       // -----------------------------------------------------------------------
       // Token checks — only run when approved values exist for that type

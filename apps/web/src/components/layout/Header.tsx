@@ -25,14 +25,21 @@ function Breadcrumbs() {
   };
 
   return (
-    <div className="flex items-center gap-1.5 text-sm text-zinc-400">
+    <div className="flex items-center gap-1.5 text-[0.875rem]" style={{ color: 'var(--ink-soft)' }}>
       {segments.map((segment, i) => {
         const label = labels[segment] || segment;
         const isLast = i === segments.length - 1;
         return (
           <span key={i} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-zinc-700">/</span>}
-            <span className={isLast ? 'font-medium text-white' : ''}>{label}</span>
+            {i > 0 && <span style={{ color: 'var(--ink-faint)' }}>/</span>}
+            <span
+              style={{
+                color: isLast ? 'var(--ink)' : 'var(--ink-soft)',
+                fontWeight: isLast ? 500 : 400,
+              }}
+            >
+              {label}
+            </span>
           </span>
         );
       })}
@@ -72,15 +79,24 @@ export function Header({ onMenuClick }: HeaderProps) {
     await signOut();
   };
 
+  const dropdownItemStyle = { color: 'var(--ink-soft)' } as React.CSSProperties;
+
   return (
-    <header className="relative z-30 flex h-14 items-center justify-between border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl px-4">
+    <header
+      className="relative z-30 flex h-14 items-center justify-between px-4"
+      style={{
+        background: 'var(--paper)',
+        borderBottom: '1px solid var(--rule)',
+      }}
+    >
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-zinc-400 transition-all duration-200 hover:bg-white/5 hover:text-white md:hidden"
+          className="p-2 transition-colors md:hidden"
+          style={{ color: 'var(--ink-soft)' }}
           aria-label="Open menu"
         >
-          <Menu size={20} />
+          <Menu size={20} strokeWidth={1.5} />
         </button>
         <Breadcrumbs />
       </div>
@@ -89,15 +105,34 @@ export function Header({ onMenuClick }: HeaderProps) {
         <button
           onClick={() => setDropdownOpen((prev) => !prev)}
           aria-label="User menu"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-bold text-white transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/20"
+          className="flex h-8 w-8 items-center justify-center text-[0.8125rem] font-semibold transition-colors"
+          style={{
+            background: 'var(--ink)',
+            color: 'var(--paper)',
+            borderRadius: '50%',
+          }}
         >
           {userInitial}
         </button>
 
         {dropdownOpen && (
-          <div className="absolute right-0 top-full mt-2 z-50 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/95 backdrop-blur-xl shadow-2xl shadow-black/40">
+          <div
+            className="absolute right-0 top-full mt-2 z-50 w-56 max-w-[calc(100vw-2rem)] overflow-hidden"
+            style={{
+              background: 'var(--paper)',
+              border: '1px solid var(--rule-strong)',
+              boxShadow: '0 10px 30px -10px rgba(0,0,0,0.18)',
+            }}
+          >
             {userEmail && (
-              <div className="truncate border-b border-white/5 px-3 py-2.5 text-xs text-zinc-500">
+              <div
+                className="truncate px-3 py-2.5 text-[0.75rem]"
+                style={{
+                  borderBottom: '1px solid var(--rule)',
+                  color: 'var(--ink-muted)',
+                  fontFamily: 'var(--font-mono-editorial)',
+                }}
+              >
                 {userEmail}
               </div>
             )}
@@ -106,42 +141,46 @@ export function Header({ onMenuClick }: HeaderProps) {
               <Link
                 href="/profile"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+                className="flex items-center gap-2 px-3 py-2 text-[0.875rem] transition-colors"
+                style={dropdownItemStyle}
               >
-                <User size={16} />
+                <User size={14} strokeWidth={1.5} />
                 Profile
               </Link>
               <Link
                 href="/api-keys"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+                className="flex items-center gap-2 px-3 py-2 text-[0.875rem] transition-colors"
+                style={dropdownItemStyle}
               >
-                <Key size={16} />
+                <Key size={14} strokeWidth={1.5} />
                 API Keys
               </Link>
             </div>
 
-            <div className="border-t border-white/5" />
+            <div style={{ borderTop: '1px solid var(--rule)' }} />
 
             <div className="p-1">
               <Link
                 href="/"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+                className="flex items-center gap-2 px-3 py-2 text-[0.875rem] transition-colors"
+                style={dropdownItemStyle}
               >
-                <ExternalLink size={16} />
+                <ExternalLink size={14} strokeWidth={1.5} />
                 Back to Home
               </Link>
             </div>
 
-            <div className="border-t border-white/5" />
+            <div style={{ borderTop: '1px solid var(--rule)' }} />
 
             <div className="p-1">
               <button
                 onClick={handleSignOut}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                className="flex w-full items-center gap-2 px-3 py-2 text-[0.875rem] transition-colors"
+                style={{ color: 'var(--accent)' }}
               >
-                <LogOut size={16} />
+                <LogOut size={14} strokeWidth={1.5} />
                 Sign Out
               </button>
             </div>

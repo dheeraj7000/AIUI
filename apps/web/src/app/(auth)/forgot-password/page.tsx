@@ -8,7 +8,11 @@ import { useAuth } from '@/providers/AuthProvider';
 type Step = 'request' | 'confirm';
 
 const inputClass =
-  'block w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200';
+  'block w-full px-3.5 py-2.5 text-[0.9375rem] transition-colors duration-150 focus:outline-none auth-input';
+const labelClass = 'block text-[0.8125rem] mb-1.5';
+const headingStyle = { fontFamily: 'var(--font-display)', color: 'var(--ink)' } as const;
+const subStyle = { color: 'var(--ink-soft)' } as const;
+const linkStyle = { color: 'var(--accent)' } as const;
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -76,23 +80,35 @@ export default function ForgotPasswordPage() {
     }
   }
 
+  function ErrorBox() {
+    if (!error) return null;
+    return (
+      <div
+        className="mb-4 p-3"
+        style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)' }}
+      >
+        <p className="text-[0.875rem]" style={{ color: 'var(--accent-deep)' }}>
+          {error}
+        </p>
+      </div>
+    );
+  }
+
   if (step === 'request') {
     return (
       <div>
-        <h2 className="text-xl font-semibold text-white mb-2">Reset your password</h2>
-        <p className="text-sm text-zinc-500 mb-6">
+        <h2 className="text-[1.5rem] leading-[1.15]" style={headingStyle}>
+          Reset your password.
+        </h2>
+        <p className="mt-2 mb-6 text-[0.9375rem]" style={subStyle}>
           Enter your email address and we&apos;ll send you a code to reset your password.
         </p>
 
-        {error && (
-          <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 p-3">
-            <p className="text-red-400 text-sm">{error}</p>
-          </div>
-        )}
+        <ErrorBox />
 
         <form onSubmit={handleRequestCode} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-zinc-400 mb-1">
+            <label htmlFor="email" className={labelClass} style={{ color: 'var(--ink)' }}>
               Email
             </label>
             <input
@@ -109,17 +125,14 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-ink w-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Sending code...' : 'Send reset code'}
+            {isSubmitting ? 'Sending code…' : 'Send reset code'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
-          <Link
-            href="/sign-in"
-            className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-          >
+        <p className="mt-6 text-center text-[0.875rem]" style={subStyle}>
+          <Link href="/sign-in" className="transition-colors" style={linkStyle}>
             Back to sign in
           </Link>
         </p>
@@ -129,21 +142,22 @@ export default function ForgotPasswordPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white mb-2">Set new password</h2>
-      <p className="text-sm text-zinc-500 mb-6">
-        Enter the verification code sent to <span className="font-medium text-white">{email}</span>{' '}
+      <h2 className="text-[1.5rem] leading-[1.15]" style={headingStyle}>
+        Set new password.
+      </h2>
+      <p className="mt-2 mb-6 text-[0.9375rem]" style={subStyle}>
+        Enter the verification code sent to{' '}
+        <span style={{ color: 'var(--ink)', fontFamily: 'var(--font-mono-editorial)' }}>
+          {email}
+        </span>{' '}
         and your new password.
       </p>
 
-      {error && (
-        <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 p-3">
-          <p className="text-red-400 text-sm">{error}</p>
-        </div>
-      )}
+      <ErrorBox />
 
       <form onSubmit={handleResetPassword} className="space-y-4" noValidate>
         <div>
-          <label htmlFor="code" className="block text-sm font-medium text-zinc-400 mb-1">
+          <label htmlFor="code" className={labelClass} style={{ color: 'var(--ink)' }}>
             Verification code
           </label>
           <input
@@ -160,7 +174,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div>
-          <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-400 mb-1">
+          <label htmlFor="newPassword" className={labelClass} style={{ color: 'var(--ink)' }}>
             New password
           </label>
           <input
@@ -177,13 +191,13 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-ink w-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Resetting password...' : 'Reset password'}
+          {isSubmitting ? 'Resetting password…' : 'Reset password'}
         </button>
       </form>
 
-      <div className="mt-6 flex justify-between text-sm">
+      <div className="mt-6 flex justify-between text-[0.875rem]">
         <button
           type="button"
           onClick={() => {
@@ -192,14 +206,12 @@ export default function ForgotPasswordPage() {
             setNewPassword('');
             setError('');
           }}
-          className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+          className="transition-colors"
+          style={linkStyle}
         >
           Try a different email
         </button>
-        <Link
-          href="/sign-in"
-          className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-        >
+        <Link href="/sign-in" className="transition-colors" style={linkStyle}>
           Back to sign in
         </Link>
       </div>

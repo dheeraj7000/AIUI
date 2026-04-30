@@ -114,9 +114,14 @@ export const saasCleanV1 = {
             },
           },
         },
+        dataRequirements: {
+          requiresLoading: true,
+          requiresEmpty: true,
+          requiresError: true,
+        },
       },
       aiUsageRules:
-        'Always show 3 pricing tiers. Highlight the recommended plan with a border accent.',
+        'Always show 3 pricing tiers. Highlight the recommended plan with a border accent. Handle loading, empty, and error states for the plans data.',
     },
     {
       name: 'SaaS FAQ',

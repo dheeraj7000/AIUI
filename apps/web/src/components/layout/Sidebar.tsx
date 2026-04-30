@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -16,7 +17,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
-import { Wordmark } from '@/components/ui/Wordmark';
 
 interface NavItem {
   label: string;
@@ -40,6 +40,22 @@ const integrationItems: NavItem[] = [
   { label: 'MCP Tools', href: '/mcp-tools', icon: BookOpen },
 ];
 
+function EditorialMark() {
+  return (
+    <span
+      className="inline-flex items-baseline gap-[1px] text-[1.375rem] leading-none"
+      style={{ fontFamily: 'var(--font-display)' }}
+      aria-label="AIUI"
+    >
+      <span style={{ color: 'var(--ink)' }}>AI</span>
+      <span aria-hidden style={{ color: 'var(--accent)' }}>
+        ·
+      </span>
+      <span style={{ color: 'var(--ink)' }}>UI</span>
+    </span>
+  );
+}
+
 function NavLink({
   item,
   active,
@@ -54,15 +70,36 @@ function NavLink({
     <Link
       href={item.href}
       onClick={onClose}
-      className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
-        active
-          ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/10'
-          : 'text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent'
-      }`}
+      className="mb-0.5 flex items-center gap-3 px-3 py-2 text-[0.875rem] transition-colors duration-150"
+      style={{
+        color: active ? 'var(--ink)' : 'var(--ink-soft)',
+        background: active ? 'var(--paper-sunk)' : 'transparent',
+        borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent',
+        fontWeight: active ? 500 : 400,
+      }}
     >
-      <Icon size={18} className={active ? 'text-indigo-400' : 'text-zinc-500'} />
+      <Icon
+        size={16}
+        strokeWidth={1.5}
+        style={{ color: active ? 'var(--accent)' : 'var(--ink-muted)' }}
+      />
       {item.label}
     </Link>
+  );
+}
+
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="mb-2 px-3 text-[0.6875rem] uppercase"
+      style={{
+        fontFamily: 'var(--font-mono-editorial)',
+        color: 'var(--ink-muted)',
+        letterSpacing: '0.12em',
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -78,19 +115,26 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <nav className="flex h-full w-60 flex-col border-r border-white/5 bg-zinc-950/80 backdrop-blur-xl">
+    <nav
+      className="flex h-full w-60 flex-col"
+      style={{
+        background: 'var(--paper-deep)',
+        borderRight: '1px solid var(--rule)',
+      }}
+    >
       {/* Logo */}
-      <div className="flex h-14 items-center border-b border-white/5 px-4">
-        <Link href="/dashboard" className="text-lg font-bold tracking-tight">
-          <Wordmark size="md" />
+      <div
+        className="flex h-14 items-center px-4"
+        style={{ borderBottom: '1px solid var(--rule)' }}
+      >
+        <Link href="/dashboard" aria-label="AIUI dashboard">
+          <EditorialMark />
         </Link>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-zinc-600">
-          Main
-        </div>
+      <div className="flex-1 overflow-y-auto px-3 py-5">
+        <SectionLabel>Main</SectionLabel>
         {mainItems.map((item) => (
           <NavLink
             key={item.href}
@@ -100,8 +144,8 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           />
         ))}
 
-        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-widest text-zinc-600">
-          Design
+        <div className="mt-6">
+          <SectionLabel>Design</SectionLabel>
         </div>
         {designItems.map((item) => (
           <NavLink
@@ -112,8 +156,8 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           />
         ))}
 
-        <div className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-widest text-zinc-600">
-          Integration
+        <div className="mt-6">
+          <SectionLabel>Integration</SectionLabel>
         </div>
         {integrationItems.map((item) => (
           <NavLink
@@ -126,30 +170,43 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* User section */}
-      <div className="border-t border-white/5 px-3 py-3">
-        {userEmail && <p className="mb-2 truncate px-2 text-xs text-zinc-600">{userEmail}</p>}
-        <div className="flex items-center gap-1">
+      <div className="px-3 py-3" style={{ borderTop: '1px solid var(--rule)' }}>
+        {userEmail && (
+          <p
+            className="mb-2 truncate px-2 text-[0.75rem]"
+            style={{
+              fontFamily: 'var(--font-mono-editorial)',
+              color: 'var(--ink-muted)',
+            }}
+          >
+            {userEmail}
+          </p>
+        )}
+        <div className="flex items-center gap-2">
           <Link
             href="/profile"
             onClick={onClose}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-white"
+            className="flex items-center gap-2 px-2 py-1.5 text-[0.75rem] transition-colors"
+            style={{ color: 'var(--ink-soft)' }}
           >
-            <User size={14} />
+            <User size={14} strokeWidth={1.5} />
             Profile
           </Link>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition-colors hover:bg-white/5 hover:text-white"
+            className="flex items-center gap-2 px-2 py-1.5 text-[0.75rem] transition-colors"
+            style={{ color: 'var(--ink-soft)' }}
           >
-            <LogOut size={14} />
+            <LogOut size={14} strokeWidth={1.5} />
             Sign Out
           </button>
         </div>
         <Link
           href="/"
-          className="mt-2 flex items-center gap-1 px-2 text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+          className="mt-2 flex items-center gap-1 px-2 text-[0.75rem] transition-colors"
+          style={{ color: 'var(--ink-muted)' }}
         >
-          <ExternalLink size={12} />
+          <ExternalLink size={12} strokeWidth={1.5} />
           aiui.store
         </Link>
       </div>

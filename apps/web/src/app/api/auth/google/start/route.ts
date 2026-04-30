@@ -17,10 +17,9 @@ export async function GET(req: NextRequest) {
   const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
   if (!clientId || !redirectUri) {
-    return NextResponse.json(
-      { error: 'Google OAuth is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_REDIRECT_URI.' },
-      { status: 500 }
-    );
+    const signInUrl = new URL('/sign-in', req.url);
+    signInUrl.searchParams.set('error', 'google_not_configured');
+    return NextResponse.redirect(signInUrl);
   }
 
   // Generate a CSRF state token

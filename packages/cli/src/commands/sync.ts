@@ -30,22 +30,30 @@ export async function sync(): Promise<void> {
   }
 
   const info = detectFramework(cwd);
-  const format = inferFormat(info.framework, info.hasTailwind);
-  const { content: tokenFileContent, filename: tokenFilename } = transformTokens(
-    pack.tokens,
-    format
-  );
-
   const writeSpinner = ora('Regenerating .aiui/ files...').start();
+
   try {
     writeDesignMemory(pack, cwd);
     writeTokensJson(pack.tokens, cwd);
     cachePack(pack, cwd);
-    fs.writeFileSync(path.join(cwd, '.aiui', tokenFilename), tokenFileContent);
+
+    // Support multiple targets if defined in config, otherwise fall back to detected framework
+    const targets =
+      config.targets && config.targets.length > 0
+        ? config.targets
+        : [inferFormat(info.framework, info.hasTailwind)];
+
+    for (const target of targets) {
+      const { content, filename } = transformTokens(
+        pack.tokens,
+        target as Parameters<typeof transformTokens>[1]
+      );
+      fs.writeFileSync(path.join(cwd, '.aiui', filename), content);
+    }
 
     writeConfig({ ...config, lastSynced: new Date().toISOString() }, cwd);
 
-    writeSpinner.succeed('Synced .aiui/ files');
+    writeSpinner.succeed(`Synced .aiui/ files for ${targets.length} target(s)`);
   } catch (err) {
     writeSpinner.fail(`Failed: ${err instanceof Error ? err.message : err}`);
     process.exit(1);

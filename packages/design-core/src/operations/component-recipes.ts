@@ -1,4 +1,4 @@
-import { eq, and, ilike, desc, count } from 'drizzle-orm';
+import { eq, and, or, isNull, ilike, desc, count } from 'drizzle-orm';
 import { componentRecipes, stylePacks } from '../db/schema';
 import type { Database } from '../db';
 import type {
@@ -101,7 +101,14 @@ export async function getRecipe(db: Database, id: string) {
  * Returns both the data rows and a total count for pagination metadata.
  */
 export async function listRecipes(db: Database, organizationId: string, filters: ListRecipesInput) {
-  const conditions = [eq(componentRecipes.organizationId, organizationId)];
+  // Include the user's org-owned recipes AND seeded system recipes (org_id IS NULL).
+  // Without the IS NULL branch, every fresh signup sees an empty list because
+  // all 57 seeded recipes have organization_id = NULL.
+  const orgScope = or(
+    eq(componentRecipes.organizationId, organizationId),
+    isNull(componentRecipes.organizationId)
+  );
+  const conditions = orgScope ? [orgScope] : [];
 
   if (filters.search) {
     conditions.push(ilike(componentRecipes.name, `%${filters.search}%`));

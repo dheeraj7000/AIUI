@@ -896,7 +896,10 @@ export function registerDesignMemory(server: AiuiMcpServer) {
           '# Design System\n' +
           'This project uses AIUI for design management.\n' +
           'See `.aiui/design-memory.md` for the active design system — tokens, components, and rules.\n' +
-          'Always follow the design rules defined there before building any UI.\n',
+          '**Mandatory Workflow:**\n' +
+          '1. Always call `validate_ui_output` after generating UI code to ensure token compliance.\n' +
+          '2. Always call `audit_design_principles` to check for visual hierarchy and accessibility.\n' +
+          '3. If any issues are found, use `fix_compliance_issues` or manually correct the code before finishing.\n',
         diff: diff.hasChanges
           ? {
               summary: diff.summary,

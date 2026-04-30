@@ -33,6 +33,9 @@ const PUBLIC_PAGE_PREFIXES = [
   '/forgot-password',
   '/verify-email',
   '/docs',
+  '/status',
+  '/privacy',
+  '/terms',
   '/_next',
   '/favicon.ico',
 ];
