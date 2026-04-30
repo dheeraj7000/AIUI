@@ -5,7 +5,9 @@ import { runDesignAudit, runAllAccessibilityChecks } from './detectors';
 export function registerAuditDesignPrinciples(server: AiuiMcpServer) {
   server.registerTool(
     'audit_design_principles',
-    'Perform a heuristic design and accessibility audit on a snippet of UI code. Checks for typographic hierarchy, visual noise, and common accessibility issues.',
+    'Heuristic audit of a UI snippet for design quality and accessibility. ' +
+      'Complements `validate_ui_output` (which is token-focused): this one catches typographic hierarchy issues, excessive color/font variation, missing alt/aria attributes, and contrast problems. ' +
+      'Use BEFORE returning a finished UI to the user, especially for marketing pages, dashboards, or anything with rich visual hierarchy.',
     {
       code: z.string().describe('The UI code snippet to audit (JSX, HTML, or CSS)'),
     },

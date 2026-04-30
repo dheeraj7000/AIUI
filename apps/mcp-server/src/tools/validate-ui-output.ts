@@ -49,7 +49,10 @@ export type { Violation };
 export function registerValidateUiOutput(server: AiuiMcpServer) {
   server.registerTool(
     'validate_ui_output',
-    "Check generated UI code for compliance against the project's design tokens. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
+    '**Call this AFTER you generate ANY UI code, BEFORE returning the code to the user.** ' +
+      "Validates the code against the project's approved design tokens — colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths — and runs accessibility checks (alt text, button labels, heading order, contrast). " +
+      'If the response includes any violations, your next call MUST be `fix_compliance_issues` with those violations to auto-correct them. ' +
+      'Returns a compliance score (0–100) and a `memoryFresh` boolean — if false, also call `sync_design_memory` to refresh the local .aiui/ files.',
     {
       projectId: z.string().uuid().describe('The project ID to validate against'),
       code: z.string().describe('The generated UI code to validate'),

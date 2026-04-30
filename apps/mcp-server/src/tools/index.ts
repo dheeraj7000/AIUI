@@ -12,6 +12,7 @@ import { registerResetProject } from './reset-project';
 import { registerUndoTokens } from './undo-tokens';
 import { registerAuditDesignPrinciples } from './audit-design';
 import { registerSuggestPromotion } from './suggest-promotion';
+import { registerPromotePattern } from './promote-pattern';
 
 /**
  * Register all AIUI tools with the MCP server.
@@ -38,4 +39,5 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerFixCompliance(server);
   registerResetProject(server);
   registerUndoTokens(server);
+  registerPromotePattern(server);
 }

@@ -12,6 +12,7 @@ import { registerDesignMemory } from '../tools/design-memory';
 import { registerDesignStudio } from '../tools/design-studio';
 import { registerAuditDesignPrinciples } from '../tools/audit-design';
 import { registerSuggestPromotion } from '../tools/suggest-promotion';
+import { registerPromotePattern } from '../tools/promote-pattern';
 import { registerAllTools } from '../tools/index';
 
 describe('Tools registration exports', () => {
@@ -67,6 +68,10 @@ describe('Tools registration exports', () => {
     expect(typeof registerSuggestPromotion).toBe('function');
   });
 
+  it('registerPromotePattern is a function', () => {
+    expect(typeof registerPromotePattern).toBe('function');
+  });
+
   it('registerAllTools is a function', () => {
     expect(typeof registerAllTools).toBe('function');
   });
@@ -86,6 +91,7 @@ describe('Tools registration exports', () => {
       registerDesignStudio,
       registerAuditDesignPrinciples,
       registerSuggestPromotion,
+      registerPromotePattern,
       registerAllTools,
     ];
 

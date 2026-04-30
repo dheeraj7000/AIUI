@@ -10,7 +10,10 @@ import { getContext } from '../lib/context';
 export function registerGetProjectContext(server: AiuiMcpServer) {
   server.registerTool(
     'get_project_context',
-    'Fetch the project context for a slug. Returns framework target, asset list, token count, and a stale-memory warning if the design profile has been invalidated since last sync.',
+    '**Call this FIRST when starting work on a project.** ' +
+      'Fetches the project context for a slug: framework target, asset list, token count, and a stale-memory warning. ' +
+      'If `staleMemory` is true, call `sync_design_memory` before generating any UI so your output uses the latest tokens. ' +
+      "Auto-creates the project (with default tokens) if it doesn't exist yet and you have an authenticated MCP context.",
     { slug: z.string().describe('The project slug (URL-safe identifier)') },
     async (args) => {
       const db = getDb();

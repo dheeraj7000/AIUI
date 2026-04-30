@@ -4,8 +4,10 @@ import type { AiuiMcpServer } from '../server';
 export function registerSuggestPromotion(server: AiuiMcpServer) {
   server.registerTool(
     'suggest_pattern_promotion',
-    'Suggest promoting a repetitive design pattern into a formal design token or component recipe. ' +
-      'Should be called when the agent detects it has used the same hardcoded value or JSX structure multiple times.',
+    'Surface a recurring hardcoded value as a candidate for promotion to a project token. ' +
+      "Call this when you've used the same hex / spacing / radius value 3+ times across components — it produces a human-readable suggestion the user can confirm. " +
+      '**After the user agrees, call `promote_pattern` to actually create the token.** ' +
+      "This tool is the 'propose'; `promote_pattern` is the 'commit'.",
     {
       patternValue: z
         .string()

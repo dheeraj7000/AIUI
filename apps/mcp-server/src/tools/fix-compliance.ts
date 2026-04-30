@@ -10,7 +10,10 @@ import { requireScope } from '../lib/auth';
 export function registerFixCompliance(server: AiuiMcpServer) {
   server.registerTool(
     'fix_compliance_issues',
-    'Auto-fix design token compliance violations in code. Replaces non-compliant values with approved design tokens.',
+    '**Call this immediately AFTER `validate_ui_output` if it returned violations.** ' +
+      "Auto-rewrites the offending hardcoded values to use the project's approved design tokens — including smart Tailwind arbitrary-value-to-semantic-class swaps (e.g., `bg-[#FF5733]` → `bg-warm`). " +
+      'Returns the corrected code plus a list of fixes applied and any remaining issues. ' +
+      "If a violation can't be auto-fixed and the value is being used 3+ times across the codebase, consider calling `promote_pattern` to make it a real token instead.",
     {
       code: z.string().describe('The source code to fix'),
       violations: z

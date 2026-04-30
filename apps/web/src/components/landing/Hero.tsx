@@ -24,7 +24,7 @@ export function Hero() {
           <div className="col-span-12 lg:col-span-7">
             <div className="flex items-center gap-4">
               <span className="section-numeral">LOGIC_00</span>
-              <span className="eyebrow">Design Authority for AI Agents</span>
+              <span className="eyebrow">Discover · Crystallize · Enforce</span>
             </div>
 
             <h1
@@ -36,8 +36,8 @@ export function Hero() {
                 letterSpacing: '-0.05em',
               }}
             >
-              Design that <br />
-              doesn&rsquo;t <span>drift</span>.
+              Your design system, <br />
+              learned from your <span>code</span>.
             </h1>
 
             <div className="mt-12 space-y-6">
@@ -46,21 +46,22 @@ export function Hero() {
                   fontSize: '1.5rem',
                   lineHeight: 1.3,
                   color: 'var(--ink)',
-                  maxWidth: '42ch',
+                  maxWidth: '44ch',
                   fontWeight: 600,
                   letterSpacing: '-0.02em',
                 }}
               >
-                AI generates UI, but it doesn&rsquo;t understand your brand. AIUI enforces design
-                compliance at the token level.
+                AIUI watches your codebase, finds the patterns you keep reaching for, and enforces
+                them on every UI your AI writes.
               </p>
 
               <p
                 className="lede"
-                style={{ fontSize: '1.125rem', maxWidth: '50ch', fontWeight: 400 }}
+                style={{ fontSize: '1.125rem', maxWidth: '52ch', fontWeight: 400 }}
               >
-                A persistent design orchestration layer for Claude and Cursor. Your tokens, your
-                components, your rules — hardcoded into the agent&rsquo;s memory.
+                A persistent design memory for Claude and Cursor. Surfaces hardcoded values for
+                promotion, validates generated UI against your tokens, auto-fixes drift before it
+                ships.
               </p>
             </div>
 
@@ -100,6 +101,28 @@ export function Hero() {
                 System Documentation
               </a>
             </div>
+
+            {/* Three-verb loop */}
+            <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
+              <LoopStep
+                index="01"
+                verb="DISCOVER"
+                description="Scan the codebase for repeated values worth promoting."
+                tool="detect_patterns"
+              />
+              <LoopStep
+                index="02"
+                verb="CRYSTALLIZE"
+                description="Promote a recurring value into a project token, captured in design memory."
+                tool="promote_pattern"
+              />
+              <LoopStep
+                index="03"
+                verb="ENFORCE"
+                description="Validate every AI-generated component against the active tokens, auto-fix drift."
+                tool="validate_ui_output"
+              />
+            </div>
           </div>
 
           {/* Right — Design Logic Manifest */}
@@ -109,6 +132,35 @@ export function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+function LoopStep({
+  index,
+  verb,
+  description,
+  tool,
+}: {
+  index: string;
+  verb: string;
+  description: string;
+  tool: string;
+}) {
+  return (
+    <div className="border-t-2 border-[var(--ink)] pt-4">
+      <div className="flex items-baseline gap-3">
+        <span className="font-mono text-[10px] font-bold text-[var(--ink-muted)]">{index}</span>
+        <span className="font-mono text-xs font-extrabold tracking-widest text-[var(--accent)]">
+          {verb}
+        </span>
+      </div>
+      <p className="mt-3 text-sm leading-snug" style={{ color: 'var(--ink-soft)' }}>
+        {description}
+      </p>
+      <code className="mt-3 inline-block font-mono text-[10px] text-[var(--ink-muted)]">
+        {tool}()
+      </code>
+    </div>
   );
 }
 
@@ -132,20 +184,53 @@ function DesignLogicManifest() {
         </header>
 
         <div className="mt-8 space-y-8">
-          {/* Tokens Layer */}
+          {/* Discovered patterns */}
           <section>
             <div className="flex items-center justify-between mb-4">
               <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
-                L01_FOUNDATION_TOKENS
+                L01_DISCOVERED_PATTERNS
+              </span>
+              <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
+            </div>
+            <div className="bg-[var(--paper-sunk)] p-4 font-mono text-[10px] leading-relaxed border border-[var(--rule)] text-[var(--ink-soft)] space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <span>
+                  <span className="text-[var(--accent)]">●</span> #FF5733
+                </span>
+                <span className="text-[var(--ink-muted)]">×12 uses · bg, border</span>
+                <span className="text-[var(--success)]">→ promote</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span>
+                  <span className="text-[var(--accent)]">●</span> 0.875rem
+                </span>
+                <span className="text-[var(--ink-muted)]">×8 uses · text</span>
+                <span className="text-[var(--success)]">→ promote</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span>
+                  <span className="text-[var(--accent)]">●</span> 12px
+                </span>
+                <span className="text-[var(--ink-muted)]">×6 uses · rounded</span>
+                <span className="text-[var(--success)]">→ promote</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Crystallized tokens */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
+                L02_CRYSTALLIZED_TOKENS
               </span>
               <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: 'BRAND_PRIMARY', value: '#0F172A', color: 'oklch(15% 0.05 260)' },
-                { label: 'ACCENT_CORE', value: '#3B82F6', color: 'oklch(60% 0.2 250)' },
+                { label: 'COLOR.BRAND', value: '#FF5733', color: 'oklch(60% 0.18 30)' },
+                { label: 'FONT-SIZE.BODY', value: '0.875rem', color: 'oklch(96% 0.01 260)' },
+                { label: 'RADIUS.MD', value: '12px', color: 'oklch(96% 0.01 260)' },
                 { label: 'SURFACE_100', value: '#FFFFFF', color: 'oklch(100% 0 0)' },
-                { label: 'RULE_HAIRLINE', value: '#E2E8F0', color: 'oklch(92% 0.01 260)' },
               ].map((t) => (
                 <div
                   key={t.label}
@@ -166,46 +251,32 @@ function DesignLogicManifest() {
             </div>
           </section>
 
-          {/* Logic Layer */}
+          {/* Enforcement */}
           <section>
             <div className="flex items-center justify-between mb-4">
               <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
-                L02_COMPLIANCE_LOGIC
+                L03_ENFORCEMENT_LOG
               </span>
               <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
             </div>
             <div className="bg-[var(--paper-sunk)] p-4 font-mono text-[10px] leading-relaxed border border-[var(--rule)] text-[var(--ink-soft)]">
               <div className="flex gap-2">
-                <span className="text-[var(--success)]">PASS</span>
+                <span className="text-[var(--accent)]">INFO</span>
                 <span>validate_ui_output(projectId, code)</span>
               </div>
               <div className="mt-1 flex gap-2">
-                <span className="text-[var(--accent)]">INFO</span>
-                <span>Checking typographic hierarchy...</span>
+                <span className="text-[var(--ink-muted)]">→</span>
+                <span>Found 1 violation: bg-[#0070F3] not in token set.</span>
+              </div>
+              <div className="mt-1 flex gap-2">
+                <span className="text-[var(--accent)]">EXEC</span>
+                <span>fix_compliance_issues(...)</span>
               </div>
               <div className="mt-1 flex gap-2">
                 <span className="text-[var(--success)]">DONE</span>
-                <span>100% token compliance detected.</span>
+                <span>bg-[#0070F3] → bg-brand · 100% compliant.</span>
               </div>
             </div>
-          </section>
-
-          {/* Component Schema */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent)]">
-                L03_COMPONENT_CONTRACT
-              </span>
-              <span className="h-[2px] flex-1 mx-4 bg-[var(--rule)]" />
-            </div>
-            <div className="flex items-end gap-2">
-              {[4, 8, 12, 16, 24, 32].map((h) => (
-                <div key={h} className="bg-[var(--ink)] w-full" style={{ height: h }} />
-              ))}
-            </div>
-            <p className="mt-3 font-mono text-[9px] text-[var(--ink-muted)] text-right">
-              SPACING_SCALE_4PX_OPTIMIZED
-            </p>
           </section>
         </div>
 
