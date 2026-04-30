@@ -28,31 +28,16 @@ cd AIUI
 pnpm install
 ```
 
-### 2. Set up PostgreSQL
+### 2. Set up local environment
+
+We use Docker to run a local PostgreSQL database for development.
 
 ```bash
-# Create database and extensions
-sudo -u postgres psql -c "CREATE DATABASE aiui;"
-sudo -u postgres psql -d aiui -f infrastructure/scripts/init-db.sql
-
-# Create user
-sudo -u postgres psql -c "CREATE ROLE aiui LOGIN PASSWORD 'aiui';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE aiui TO aiui;"
-sudo -u postgres psql -d aiui -c "GRANT ALL ON SCHEMA public TO aiui;"
+# This will start the database and run all migrations
+pnpm setup:local
 ```
 
-### 3. Push schema and seed the design library
-
-```bash
-cd packages/design-core
-DATABASE_URL="postgresql://aiui:aiui@127.0.0.1:5432/aiui" pnpm db:push
-DATABASE_URL="postgresql://aiui:aiui@127.0.0.1:5432/aiui" pnpm seed
-cd ../..
-```
-
-This creates 14 style packs and ~161 component recipes from shadcn/ui, MagicUI, and community sources.
-
-### 4. Configure environment
+### 3. Configure environment
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Production migration runner.
  * Applies SQL migration files from the migrations directory.

@@ -1202,7 +1202,10 @@ function TokenRow({
   const isColor = token.tokenType === 'color';
 
   return (
-    <div className="grid grid-cols-[16rem_2.25rem_1fr] items-center gap-3 py-3" style={styles.rule}>
+    <div
+      className="flex flex-col sm:grid sm:grid-cols-[16rem_2.25rem_1fr] sm:items-center gap-3 py-3"
+      style={styles.rule}
+    >
       <div>
         <div className="text-[0.8125rem]" style={styles.monoInk}>
           {token.tokenKey}

@@ -8,6 +8,6 @@ export default tseslint.config(
     files: ['**/*.{ts,tsx}'],
   },
   {
-    ignores: ['node_modules/', 'dist/', '.next/', '.turbo/'],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.turbo/**'],
   }
 );

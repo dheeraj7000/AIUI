@@ -33,13 +33,13 @@ export function AppShell({ children }: AppShellProps) {
       )}
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 min-w-0 flex-col overflow-hidden">
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main
-          className="relative flex-1 overflow-y-auto p-6"
+          className="relative flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6"
           style={{ background: 'var(--paper)' }}
         >
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 mx-auto max-w-full">{children}</div>
         </main>
       </div>
     </div>

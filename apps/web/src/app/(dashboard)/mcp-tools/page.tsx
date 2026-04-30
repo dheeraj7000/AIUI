@@ -132,7 +132,7 @@ function withExample(tool: CatalogTool): McpTool {
 
 function ToolCard({ tool }: { tool: McpTool }) {
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-sm shadow-sm transition-colors hover:border-white/10">
+    <div className="min-w-0 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-sm shadow-sm transition-colors hover:border-white/10">
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <code className="font-mono text-base font-semibold text-white">{tool.name}</code>
         {tool.aliasOf && (

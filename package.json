@@ -8,7 +8,8 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
-    "prepare": "husky"
+    "prepare": "husky",
+    "setup:local": "sh scripts/setup-local.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

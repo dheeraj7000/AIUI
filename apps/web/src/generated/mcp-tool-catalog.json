@@ -1,15 +1,45 @@
 {
-  "generatedAt": "2026-04-30T06:23:49.090Z",
-  "count": 16,
+  "generatedAt": "2026-04-30T18:52:32.338Z",
+  "count": 22,
   "tools": [
     {
+      "name": "adopt_codebase",
+      "description": "Bring an EXISTING codebase under AIUI management in a single call. When the user is starting from a real app (not a fresh repo), use this instead of `init_project` + per-pattern `promote_pattern` calls — pass the design tokens you've already extracted from their code (via your own scan, or by asking them to run `aiui audit`) and this tool inserts them in bulk. Modes: `merge` (default — skip token keys that already exist) or `replace` (overwrite values). Returns counts and marks the design profile stale so the next `sync_design_memory` regenerates `.aiui/design-memory.md` with the new tokens. After calling: tell the user to run `sync_design_memory` and then `validate_ui_output` on a recent file to confirm coverage. If a lot of tokens were promoted, also suggest `aiui validate` in their terminal to see the codebase-wide compliance score.",
+      "category": "read"
+    },
+    {
       "name": "audit_design_principles",
-      "description": "Heuristic audit of a UI snippet for design quality and accessibility. Complements `validate_ui_output` (which is token-focused): this one catches typographic hierarchy issues, excessive color/font variation, missing alt/aria attributes, and contrast problems. Use BEFORE returning a finished UI to the user, especially for marketing pages, dashboards, or anything with rich visual hierarchy.",
+      "description": "Generic, project-agnostic heuristic audit for design quality + accessibility. Catches typographic hierarchy issues, excessive color/font variation, missing alt/aria attributes, contrast problems. For PROJECT-AWARE evaluation tied to the user's actual tokens, prefer the dedicated evaluators: `evaluate_typography`, `evaluate_color_palette`, `evaluate_visual_density`. This generic audit is best for snippets where you don't have a projectId yet (e.g. early-discovery designs, AI-generated drafts before init).",
       "category": "read"
     },
     {
       "name": "check_design_memory",
       "description": "Check if the design memory for a project is up to date. Returns freshness status without regenerating.",
+      "category": "read"
+    },
+    {
+      "name": "critique_for_persona",
+      "description": "Project-grounded UX critique from a specific user persona's perspective. Resolution order for the persona: (1) the `personaId` you pass — looked up in the project's stored personas table; (2) the inline `persona` override; (3) the project's default persona (the one with isDefault=true); (4) `studioDraft.shape` (legacy single-shape input). Extracts cognitive-load + hierarchy + friction + trust signals from the code. Returns a `prompt` field designed for you (the LLM) to compose the critique on top of. **Use after generating any user-facing surface** — landing pages, onboarding, pricing, checkout — where the *experience* matters more than token compliance. Pair with `evaluate_typography` / `evaluate_color_palette` / `evaluate_visual_density` for full coverage.",
+      "category": "read"
+    },
+    {
+      "name": "evaluate_color_palette",
+      "description": "Project-aware color palette evaluation. Scores how well a snippet's color usage aligns with THIS project's color tokens — flags hardcoded literals, raw Tailwind-palette utilities (`bg-red-500`) when semantic tokens exist, palette explosion (too many distinct colors), missing brand presence, and semantic-role mis-use (using a destructive token outside an error context). Returns 0–100 score, the project's expected tokens, what was observed, and structured issues. **Use after generating any UI with significant color decisions** — marketing pages, dashboards, branded components.",
+      "category": "read"
+    },
+    {
+      "name": "evaluate_motion",
+      "description": "Project-aware motion evaluation. Scores animation + transition discipline against THIS project's animation / transition tokens. Catches arbitrary `duration-[123ms]` values bypassing the project's timing scale, wide diversity (more than 3 distinct durations or 2 timing functions), missing `prefers-reduced-motion` safeguards, and motion-without-tokens. Returns 0–100 score plus structured issues. **Use after generating any UI with hover effects, transitions, animations, or scroll-driven motion** — landing heroes, expandable cards, modals, anything that animates.",
+      "category": "read"
+    },
+    {
+      "name": "evaluate_typography",
+      "description": "Project-aware typography evaluation. Unlike generic audit tools, this scores type usage against THIS project's defined font tokens, font-size scale, and visual hierarchy expectations. Returns a 0–100 score, observed vs expected sizes/fonts, and structured issues with specific fixes. **Use after generating any UI with prose, headings, or rich text content** — it catches inverted hierarchies, off-scale sizes, and font drift that `validate_ui_output` (which is purely token-set membership) doesn't catch.",
+      "category": "read"
+    },
+    {
+      "name": "evaluate_visual_density",
+      "description": "Project-aware visual density / spacing evaluation. Scores spacing discipline against THIS project's spacing tokens: adherence to the project's scale, rhythm consistency (sibling elements using the same gap), density tier (compact / default / airy), arbitrary-value bypass count. Returns 0–100 score plus structured issues. **Use after generating any UI where layout matters** — dashboards, forms, multi-section pages. The signal that 'something feels off' usually traces back to spacing rhythm.",
       "category": "read"
     },
     {

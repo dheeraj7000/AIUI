@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable */
 // Generate a static MCP tool catalog JSON from the canonical tool
 // registrations in apps/mcp-server/src/tools/*.ts. This keeps the dashboard
 // fallback (and any offline doc surface) from drifting when tools are added,
