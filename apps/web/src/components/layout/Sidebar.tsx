@@ -11,6 +11,7 @@ import {
   Download,
   Sparkles,
   MessageSquare,
+  Users,
   User,
   LogOut,
   ExternalLink,
@@ -32,6 +33,7 @@ const mainItems: NavItem[] = [
 const designItems: NavItem[] = [
   { label: 'Adopt', href: '/adopt', icon: Sparkles },
   { label: 'Critique', href: '/critique', icon: MessageSquare },
+  { label: 'Personas', href: '/personas', icon: Users },
   { label: 'Import', href: '/import', icon: Download },
 ];
 
