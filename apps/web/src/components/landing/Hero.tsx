@@ -125,7 +125,7 @@ export function Hero() {
               <LoopStep
                 index="03"
                 verb="ENFORCE"
-                description="Validate every AI-generated component against the active tokens, auto-fix drift."
+                description="Validate against tokens. Score typography, color palette, and visual density against project intent. Auto-fix drift."
                 tool="validate_ui_output"
               />
             </div>

@@ -14,6 +14,9 @@ import { registerAuditDesignPrinciples } from '../tools/audit-design';
 import { registerSuggestPromotion } from '../tools/suggest-promotion';
 import { registerPromotePattern } from '../tools/promote-pattern';
 import { registerAdoptCodebase } from '../tools/adopt-codebase';
+import { registerEvaluateTypography } from '../tools/evaluate-typography';
+import { registerEvaluateColorPalette } from '../tools/evaluate-color-palette';
+import { registerEvaluateVisualDensity } from '../tools/evaluate-visual-density';
 import { registerAllTools } from '../tools/index';
 
 describe('Tools registration exports', () => {
@@ -77,6 +80,18 @@ describe('Tools registration exports', () => {
     expect(typeof registerAdoptCodebase).toBe('function');
   });
 
+  it('registerEvaluateTypography is a function', () => {
+    expect(typeof registerEvaluateTypography).toBe('function');
+  });
+
+  it('registerEvaluateColorPalette is a function', () => {
+    expect(typeof registerEvaluateColorPalette).toBe('function');
+  });
+
+  it('registerEvaluateVisualDensity is a function', () => {
+    expect(typeof registerEvaluateVisualDensity).toBe('function');
+  });
+
   it('registerAllTools is a function', () => {
     expect(typeof registerAllTools).toBe('function');
   });
@@ -98,6 +113,9 @@ describe('Tools registration exports', () => {
       registerSuggestPromotion,
       registerPromotePattern,
       registerAdoptCodebase,
+      registerEvaluateTypography,
+      registerEvaluateColorPalette,
+      registerEvaluateVisualDensity,
       registerAllTools,
     ];
 

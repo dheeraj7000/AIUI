@@ -36,6 +36,9 @@ const EXPECTED_TOOLS = [
   'open_design_studio',
   'audit_design_principles',
   'suggest_pattern_promotion',
+  'evaluate_typography',
+  'evaluate_color_palette',
+  'evaluate_visual_density',
   // Write
   'update_tokens',
   'init_project',

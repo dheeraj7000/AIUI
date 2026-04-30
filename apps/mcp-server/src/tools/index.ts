@@ -14,6 +14,9 @@ import { registerAuditDesignPrinciples } from './audit-design';
 import { registerSuggestPromotion } from './suggest-promotion';
 import { registerPromotePattern } from './promote-pattern';
 import { registerAdoptCodebase } from './adopt-codebase';
+import { registerEvaluateTypography } from './evaluate-typography';
+import { registerEvaluateColorPalette } from './evaluate-color-palette';
+import { registerEvaluateVisualDensity } from './evaluate-visual-density';
 
 /**
  * Register all AIUI tools with the MCP server.
@@ -33,6 +36,9 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerDesignStudio(server);
   registerAuditDesignPrinciples(server);
   registerSuggestPromotion(server);
+  registerEvaluateTypography(server);
+  registerEvaluateColorPalette(server);
+  registerEvaluateVisualDensity(server);
 
   // Write tools
   registerWriteTokens(server);
