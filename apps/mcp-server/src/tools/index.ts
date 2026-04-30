@@ -17,6 +17,7 @@ import { registerAdoptCodebase } from './adopt-codebase';
 import { registerEvaluateTypography } from './evaluate-typography';
 import { registerEvaluateColorPalette } from './evaluate-color-palette';
 import { registerEvaluateVisualDensity } from './evaluate-visual-density';
+import { registerCritiqueForPersona } from './critique-for-persona';
 
 /**
  * Register all AIUI tools with the MCP server.
@@ -39,6 +40,7 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerEvaluateTypography(server);
   registerEvaluateColorPalette(server);
   registerEvaluateVisualDensity(server);
+  registerCritiqueForPersona(server);
 
   // Write tools
   registerWriteTokens(server);
