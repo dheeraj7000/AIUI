@@ -39,6 +39,7 @@ const EXPECTED_TOOLS = [
   'evaluate_typography',
   'evaluate_color_palette',
   'evaluate_visual_density',
+  'evaluate_motion',
   'critique_for_persona',
   // Write
   'update_tokens',

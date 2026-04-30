@@ -17,6 +17,7 @@ import { registerAdoptCodebase } from './adopt-codebase';
 import { registerEvaluateTypography } from './evaluate-typography';
 import { registerEvaluateColorPalette } from './evaluate-color-palette';
 import { registerEvaluateVisualDensity } from './evaluate-visual-density';
+import { registerEvaluateMotion } from './evaluate-motion';
 import { registerCritiqueForPersona } from './critique-for-persona';
 
 /**
@@ -40,6 +41,7 @@ export function registerAllTools(server: AiuiMcpServer) {
   registerEvaluateTypography(server);
   registerEvaluateColorPalette(server);
   registerEvaluateVisualDensity(server);
+  registerEvaluateMotion(server);
   registerCritiqueForPersona(server);
 
   // Write tools

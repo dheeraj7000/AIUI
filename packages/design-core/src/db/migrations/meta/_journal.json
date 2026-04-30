@@ -43,6 +43,13 @@
       "when": 1777286400000,
       "tag": "0005_remove_packs_and_recipes",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777286500000,
+      "tag": "0006_add_personas",
+      "breakpoints": true
     }
   ]
 }

@@ -17,6 +17,7 @@ import { registerAdoptCodebase } from '../tools/adopt-codebase';
 import { registerEvaluateTypography } from '../tools/evaluate-typography';
 import { registerEvaluateColorPalette } from '../tools/evaluate-color-palette';
 import { registerEvaluateVisualDensity } from '../tools/evaluate-visual-density';
+import { registerEvaluateMotion } from '../tools/evaluate-motion';
 import { registerCritiqueForPersona } from '../tools/critique-for-persona';
 import { registerAllTools } from '../tools/index';
 
@@ -93,6 +94,10 @@ describe('Tools registration exports', () => {
     expect(typeof registerEvaluateVisualDensity).toBe('function');
   });
 
+  it('registerEvaluateMotion is a function', () => {
+    expect(typeof registerEvaluateMotion).toBe('function');
+  });
+
   it('registerCritiqueForPersona is a function', () => {
     expect(typeof registerCritiqueForPersona).toBe('function');
   });
@@ -121,6 +126,7 @@ describe('Tools registration exports', () => {
       registerEvaluateTypography,
       registerEvaluateColorPalette,
       registerEvaluateVisualDensity,
+      registerEvaluateMotion,
       registerCritiqueForPersona,
       registerAllTools,
     ];

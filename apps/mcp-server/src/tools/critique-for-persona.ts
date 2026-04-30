@@ -3,9 +3,16 @@ import { eq } from 'drizzle-orm';
 import type { AiuiMcpServer } from '../server';
 import { getDb } from '../lib/db';
 import { NotFoundError } from '../lib/errors';
-import { projects, designProfiles } from '@aiui/design-core';
+import {
+  projects,
+  designProfiles,
+  getPersona,
+  getDefaultPersona,
+  extractPersonaSignals,
+  cognitiveLoadScore,
+  type PersonaSignals,
+} from '@aiui/design-core';
 import { getContext } from '../lib/context';
-import { extractPersonaSignals, cognitiveLoadScore } from './evaluators/persona-signals';
 import { loadProjectTokens } from './evaluators/core';
 
 /**
@@ -25,7 +32,7 @@ export function registerCritiqueForPersona(server: AiuiMcpServer) {
   server.registerTool(
     'critique_for_persona',
     "Project-grounded UX critique from a specific user persona's perspective. " +
-      "Pulls the project's audience, job-to-be-done, emotional target, brand personality, and anti-references from `studioDraft.shape` (set in the AIUI Studio). Falls back to a `persona` argument override when the project hasn't been shaped yet. " +
+      "Resolution order for the persona: (1) the `personaId` you pass — looked up in the project's stored personas table; (2) the inline `persona` override; (3) the project's default persona (the one with isDefault=true); (4) `studioDraft.shape` (legacy single-shape input). " +
       'Extracts cognitive-load + hierarchy + friction + trust signals from the code. ' +
       'Returns a `prompt` field designed for you (the LLM) to compose the critique on top of. ' +
       '**Use after generating any user-facing surface** — landing pages, onboarding, pricing, checkout — where the *experience* matters more than token compliance. Pair with `evaluate_typography` / `evaluate_color_palette` / `evaluate_visual_density` for full coverage.',
@@ -35,17 +42,27 @@ export function registerCritiqueForPersona(server: AiuiMcpServer) {
         .uuid()
         .describe('The project ID — used to pull persona shape + tokens + voice/tone.'),
       code: z.string().describe('The UI code (JSX, HTML, or CSS) to critique'),
+      personaId: z
+        .string()
+        .uuid()
+        .optional()
+        .describe(
+          'Optional explicit persona ID. The project must own this persona. Highest-priority resolution.'
+        ),
       persona: z
         .object({
           name: z.string().optional(),
           audience: z.string().optional(),
           jobToBeDone: z.string().optional(),
           emotionalState: z.string().optional(),
+          emotionAfterUse: z.array(z.string()).optional(),
+          brandPersonality: z.array(z.string()).optional(),
+          antiReferences: z.array(z.string()).optional(),
           constraints: z.array(z.string()).optional(),
         })
         .optional()
         .describe(
-          "Optional persona override. If omitted, pulled from the project's studioDraft.shape."
+          'Optional inline persona override. Lower priority than personaId, higher than the project default.'
         ),
       surface: z
         .enum(['landing', 'dashboard', 'form', 'pricing', 'settings', 'auth', 'other'])
@@ -58,12 +75,16 @@ export function registerCritiqueForPersona(server: AiuiMcpServer) {
       const db = getDb();
       const projectId = args.projectId as string;
       const code = args.code as string;
+      const personaId = args.personaId as string | undefined;
       const personaOverride = args.persona as
         | {
             name?: string;
             audience?: string;
             jobToBeDone?: string;
             emotionalState?: string;
+            emotionAfterUse?: string[];
+            brandPersonality?: string[];
+            antiReferences?: string[];
             constraints?: string[];
           }
         | undefined;
@@ -77,34 +98,7 @@ export function registerCritiqueForPersona(server: AiuiMcpServer) {
         throw new NotFoundError('Project', projectId);
       }
 
-      // Resolve persona: override > studioDraft.shape > defaults
-      const shape = (project.studioDraft as { shape?: Record<string, unknown> } | null)?.shape;
-      const persona = {
-        name: personaOverride?.name ?? 'project audience',
-        audience:
-          personaOverride?.audience ??
-          (typeof shape?.audience === 'string' ? shape.audience : null),
-        jobToBeDone:
-          personaOverride?.jobToBeDone ??
-          (typeof shape?.jobToBeDone === 'string' ? shape.jobToBeDone : null),
-        emotionalState: personaOverride?.emotionalState ?? null,
-        emotionAfterUse:
-          Array.isArray(shape?.emotionAfterUse) &&
-          shape.emotionAfterUse.every((s) => typeof s === 'string')
-            ? (shape.emotionAfterUse as string[])
-            : null,
-        brandPersonality:
-          Array.isArray(shape?.brandPersonality) &&
-          shape.brandPersonality.every((s) => typeof s === 'string')
-            ? (shape.brandPersonality as string[])
-            : null,
-        antiReferences:
-          Array.isArray(shape?.antiReferences) &&
-          shape.antiReferences.every((s) => typeof s === 'string')
-            ? (shape.antiReferences as string[])
-            : null,
-        constraints: personaOverride?.constraints ?? [],
-      };
+      const persona = await resolvePersona(db, projectId, personaId, personaOverride, project);
 
       const signals = extractPersonaSignals(code);
       const cognitiveLoad = cognitiveLoadScore(signals);
@@ -153,7 +147,7 @@ function renderCritiquePrompt(input: {
     antiReferences: string[] | null;
     constraints: string[];
   };
-  signals: ReturnType<typeof extractPersonaSignals>;
+  signals: PersonaSignals;
   cognitiveLoad: number;
   surface: string;
 }): string {
@@ -235,4 +229,134 @@ function renderCritiquePrompt(input: {
   );
 
   return lines.join('\n');
+}
+
+interface ResolvedPersona {
+  source: 'personaId' | 'override' | 'project-default' | 'studio-shape' | 'none';
+  name: string;
+  audience: string | null;
+  jobToBeDone: string | null;
+  emotionalState: string | null;
+  emotionAfterUse: string[] | null;
+  brandPersonality: string[] | null;
+  antiReferences: string[] | null;
+  constraints: string[];
+}
+
+/**
+ * Resolve which persona to use, in priority order:
+ * 1. `personaId` argument — looked up via getPersona, must belong to projectId
+ * 2. `personaOverride` argument — used inline as-is
+ * 3. Project's default persona row (isDefault = true)
+ * 4. Project's `studioDraft.shape` (legacy single-shape input)
+ * 5. Empty fallback
+ */
+async function resolvePersona(
+  db: ReturnType<typeof getDb>,
+  projectId: string,
+  personaId: string | undefined,
+  personaOverride:
+    | {
+        name?: string;
+        audience?: string;
+        jobToBeDone?: string;
+        emotionalState?: string;
+        emotionAfterUse?: string[];
+        brandPersonality?: string[];
+        antiReferences?: string[];
+        constraints?: string[];
+      }
+    | undefined,
+  project: typeof projects.$inferSelect
+): Promise<ResolvedPersona> {
+  // 1. explicit personaId
+  if (personaId) {
+    const row = await getPersona(db, personaId, projectId);
+    if (!row) {
+      throw new NotFoundError('Persona', personaId);
+    }
+    return {
+      source: 'personaId',
+      name: row.name,
+      audience: row.audience ?? null,
+      jobToBeDone: row.jobToBeDone ?? null,
+      emotionalState: row.emotionalState ?? null,
+      emotionAfterUse: (row.emotionAfterUse as string[] | null) ?? null,
+      brandPersonality: (row.brandPersonality as string[] | null) ?? null,
+      antiReferences: (row.antiReferences as string[] | null) ?? null,
+      constraints: (row.constraints as string[] | null) ?? [],
+    };
+  }
+
+  // 2. inline override
+  if (personaOverride) {
+    return {
+      source: 'override',
+      name: personaOverride.name ?? 'project audience',
+      audience: personaOverride.audience ?? null,
+      jobToBeDone: personaOverride.jobToBeDone ?? null,
+      emotionalState: personaOverride.emotionalState ?? null,
+      emotionAfterUse: personaOverride.emotionAfterUse ?? null,
+      brandPersonality: personaOverride.brandPersonality ?? null,
+      antiReferences: personaOverride.antiReferences ?? null,
+      constraints: personaOverride.constraints ?? [],
+    };
+  }
+
+  // 3. project default persona
+  const defaultRow = await getDefaultPersona(db, projectId);
+  if (defaultRow) {
+    return {
+      source: 'project-default',
+      name: defaultRow.name,
+      audience: defaultRow.audience ?? null,
+      jobToBeDone: defaultRow.jobToBeDone ?? null,
+      emotionalState: defaultRow.emotionalState ?? null,
+      emotionAfterUse: (defaultRow.emotionAfterUse as string[] | null) ?? null,
+      brandPersonality: (defaultRow.brandPersonality as string[] | null) ?? null,
+      antiReferences: (defaultRow.antiReferences as string[] | null) ?? null,
+      constraints: (defaultRow.constraints as string[] | null) ?? [],
+    };
+  }
+
+  // 4. studioDraft.shape (legacy single-shape input)
+  const shape = (project.studioDraft as { shape?: Record<string, unknown> } | null)?.shape;
+  if (shape) {
+    return {
+      source: 'studio-shape',
+      name: 'project audience',
+      audience: typeof shape.audience === 'string' ? shape.audience : null,
+      jobToBeDone: typeof shape.jobToBeDone === 'string' ? shape.jobToBeDone : null,
+      emotionalState: null,
+      emotionAfterUse:
+        Array.isArray(shape.emotionAfterUse) &&
+        shape.emotionAfterUse.every((s) => typeof s === 'string')
+          ? (shape.emotionAfterUse as string[])
+          : null,
+      brandPersonality:
+        Array.isArray(shape.brandPersonality) &&
+        shape.brandPersonality.every((s) => typeof s === 'string')
+          ? (shape.brandPersonality as string[])
+          : null,
+      antiReferences:
+        Array.isArray(shape.antiReferences) &&
+        shape.antiReferences.every((s) => typeof s === 'string')
+          ? (shape.antiReferences as string[])
+          : null,
+      constraints: [],
+    };
+  }
+
+  // 5. empty
+  return {
+    source: 'none',
+    name: 'project audience',
+    audience: null,
+    jobToBeDone: null,
+    emotionalState: null,
+    emotionAfterUse: null,
+    brandPersonality: null,
+    antiReferences: null,
+    constraints: [],
+  };
 }

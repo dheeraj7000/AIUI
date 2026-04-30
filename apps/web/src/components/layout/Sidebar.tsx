@@ -10,6 +10,7 @@ import {
   BookOpen,
   Download,
   Sparkles,
+  MessageSquare,
   User,
   LogOut,
   ExternalLink,
@@ -30,6 +31,7 @@ const mainItems: NavItem[] = [
 
 const designItems: NavItem[] = [
   { label: 'Adopt', href: '/adopt', icon: Sparkles },
+  { label: 'Critique', href: '/critique', icon: MessageSquare },
   { label: 'Import', href: '/import', icon: Download },
 ];
 

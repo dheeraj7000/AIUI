@@ -7,6 +7,7 @@ import { styleTokens } from './style-tokens';
 import { assets } from './assets';
 import { designProfiles } from './design-profiles';
 import { promptBundles } from './prompt-bundles';
+import { personas } from './personas';
 
 // ── Users ──────────────────────────────────────────────────────────────────
 export const usersRelations = relations(users, ({ many }) => ({
@@ -42,6 +43,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   assets: many(assets),
   designProfiles: many(designProfiles),
   promptBundles: many(promptBundles),
+  personas: many(personas),
 }));
 
 // ── Style Tokens ───────────────────────────────────────────────────────────
@@ -81,6 +83,14 @@ export const promptBundlesRelations = relations(promptBundles, ({ one }) => ({
   }),
   project: one(projects, {
     fields: [promptBundles.projectId],
+    references: [projects.id],
+  }),
+}));
+
+// ── Personas ───────────────────────────────────────────────────────────────
+export const personasRelations = relations(personas, ({ one }) => ({
+  project: one(projects, {
+    fields: [personas.projectId],
     references: [projects.id],
   }),
 }));

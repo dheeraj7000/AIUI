@@ -199,3 +199,22 @@ export {
 
 // Auth guards
 export { verifyOrgMembership, verifyResourceOwnership } from './lib/auth-guards';
+
+// Personas (reusable user-perspective definitions for critique_for_persona)
+export { createPersonaSchema, updatePersonaSchema } from './validation/persona';
+export type { CreatePersonaInput, UpdatePersonaInput } from './validation/persona';
+export {
+  createPersona,
+  listPersonas,
+  getPersona,
+  getDefaultPersona,
+  updatePersona,
+  deletePersona,
+} from './operations/personas';
+
+// Evaluators — pure heuristics, no DB calls. Shared by web + mcp-server.
+export {
+  extractPersonaSignals,
+  cognitiveLoadScore,
+  type PersonaSignals,
+} from './evaluators/persona-signals';

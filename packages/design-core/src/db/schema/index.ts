@@ -22,6 +22,7 @@ export { designProfiles } from './design-profiles';
 export { promptBundles } from './prompt-bundles';
 export { apiKeys } from './api-keys';
 export { graphNodes, graphEdges } from './graph';
+export { personas } from './personas';
 
 // Relations
 export {
@@ -33,4 +34,5 @@ export {
   assetsRelations,
   designProfilesRelations,
   promptBundlesRelations,
+  personasRelations,
 } from './relations';
