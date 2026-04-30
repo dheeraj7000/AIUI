@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-30T05:48:31.739Z",
-  "count": 15,
+  "generatedAt": "2026-04-30T06:23:49.090Z",
+  "count": 16,
   "tools": [
     {
       "name": "audit_design_principles",
-      "description": "Perform a heuristic design and accessibility audit on a snippet of UI code. Checks for typographic hierarchy, visual noise, and common accessibility issues.",
+      "description": "Heuristic audit of a UI snippet for design quality and accessibility. Complements `validate_ui_output` (which is token-focused): this one catches typographic hierarchy issues, excessive color/font variation, missing alt/aria attributes, and contrast problems. Use BEFORE returning a finished UI to the user, especially for marketing pages, dashboards, or anything with rich visual hierarchy.",
       "category": "read"
     },
     {
@@ -24,7 +24,7 @@
     },
     {
       "name": "get_project_context",
-      "description": "Fetch the project context for a slug. Returns framework target, asset list, token count, and a stale-memory warning if the design profile has been invalidated since last sync.",
+      "description": "**Call this FIRST when starting work on a project.** Fetches the project context for a slug: framework target, asset list, token count, and a stale-memory warning. If `staleMemory` is true, call `sync_design_memory` before generating any UI so your output uses the latest tokens. Auto-creates the project (with default tokens) if it doesn't exist yet and you have an authenticated MCP context.",
       "category": "read"
     },
     {
@@ -38,8 +38,13 @@
       "category": "read"
     },
     {
+      "name": "promote_pattern",
+      "description": "Promote a recurring hardcoded value into a project-scoped design token. This is the EXECUTABLE follow-up to `suggest_pattern_promotion`: when you've used the same hex / spacing / radius value multiple times across components, call this tool to commit it as a real token. Inserts the token under the project, marks the design profile stale so the next `sync_design_memory` regenerates `.aiui/design-memory.md` and `.aiui/tokens.json` with the new token included. After promotion, refactor your future code to use the new token name (call `update_tokens` if you need to edit it later). Idempotent on (projectSlug, tokenKey): if the token already exists, returns the existing row without overwriting.",
+      "category": "read"
+    },
+    {
       "name": "suggest_pattern_promotion",
-      "description": "Suggest promoting a repetitive design pattern into a formal design token or component recipe. Should be called when the agent detects it has used the same hardcoded value or JSX structure multiple times.",
+      "description": "Surface a recurring hardcoded value as a candidate for promotion to a project token. Call this when you've used the same hex / spacing / radius value 3+ times across components — it produces a human-readable suggestion the user can confirm. **After the user agrees, call `promote_pattern` to actually create the token.** This tool is the 'propose'; `promote_pattern` is the 'commit'.",
       "category": "read"
     },
     {
@@ -49,12 +54,12 @@
     },
     {
       "name": "validate_ui_output",
-      "description": "Check generated UI code for compliance against the project's design tokens. Validates colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths, and accessibility.",
+      "description": "**Call this AFTER you generate ANY UI code, BEFORE returning the code to the user.** Validates the code against the project's approved design tokens — colors, fonts, spacing, radii, font sizes, z-index, opacity, border widths — and runs accessibility checks (alt text, button labels, heading order, contrast). If the response includes any violations, your next call MUST be `fix_compliance_issues` with those violations to auto-correct them. Returns a compliance score (0–100) and a `memoryFresh` boolean — if false, also call `sync_design_memory` to refresh the local .aiui/ files.",
       "category": "read"
     },
     {
       "name": "fix_compliance_issues",
-      "description": "Auto-fix design token compliance violations in code. Replaces non-compliant values with approved design tokens.",
+      "description": "**Call this immediately AFTER `validate_ui_output` if it returned violations.** Auto-rewrites the offending hardcoded values to use the project's approved design tokens — including smart Tailwind arbitrary-value-to-semantic-class swaps (e.g., `bg-[#FF5733]` → `bg-warm`). Returns the corrected code plus a list of fixes applied and any remaining issues. If a violation can't be auto-fixed and the value is being used 3+ times across the codebase, consider calling `promote_pattern` to make it a real token instead.",
       "category": "write"
     },
     {

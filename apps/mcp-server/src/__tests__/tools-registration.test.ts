@@ -13,6 +13,7 @@ import { registerDesignStudio } from '../tools/design-studio';
 import { registerAuditDesignPrinciples } from '../tools/audit-design';
 import { registerSuggestPromotion } from '../tools/suggest-promotion';
 import { registerPromotePattern } from '../tools/promote-pattern';
+import { registerAdoptCodebase } from '../tools/adopt-codebase';
 import { registerAllTools } from '../tools/index';
 
 describe('Tools registration exports', () => {
@@ -72,6 +73,10 @@ describe('Tools registration exports', () => {
     expect(typeof registerPromotePattern).toBe('function');
   });
 
+  it('registerAdoptCodebase is a function', () => {
+    expect(typeof registerAdoptCodebase).toBe('function');
+  });
+
   it('registerAllTools is a function', () => {
     expect(typeof registerAllTools).toBe('function');
   });
@@ -92,6 +97,7 @@ describe('Tools registration exports', () => {
       registerAuditDesignPrinciples,
       registerSuggestPromotion,
       registerPromotePattern,
+      registerAdoptCodebase,
       registerAllTools,
     ];
 

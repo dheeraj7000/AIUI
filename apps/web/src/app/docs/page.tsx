@@ -32,14 +32,14 @@ const quickSteps = [
   },
   {
     n: '02',
-    title: 'Bring your tokens.',
-    body: 'Import tokens you already have (CSS variables, Tokens Studio, Tailwind config) into the project. Everything you bring becomes part of your design memory.',
-    action: { href: '/import', label: 'Import tokens' },
+    title: 'Adopt your existing codebase.',
+    body: 'Run `aiui adopt` in your repo — it scans every file, extracts the colors, spacings, radii, and fonts you already use, and ingests them as project tokens. One command, no manual import.',
+    action: { href: '/adopt', label: 'Adopt' },
   },
   {
     n: '03',
     title: 'Connect your editor.',
-    body: 'Generate an API key, copy the MCP config into Claude Code, Cursor, Windsurf, or VS Code. From that point on, every UI the AI writes pulls from your tokens.',
+    body: 'Generate an API key, copy the MCP config into Claude Code, Cursor, Windsurf, or VS Code. From that point on, every UI the AI writes pulls from your tokens — and validates against them before returning.',
     action: { href: '/api-keys', label: 'Get an API key' },
   },
 ];
@@ -84,7 +84,15 @@ const mcpWriteTools: Array<{ name: string; desc: string }> = [
     name: 'init_project',
     desc: 'First call on an empty repo — seeds default tokens, profile, and memory.',
   },
+  {
+    name: 'adopt_codebase',
+    desc: 'Bulk-import detected tokens from an existing codebase in one transaction.',
+  },
   { name: 'update_tokens', desc: 'Add, change, or remove tokens on a project.' },
+  {
+    name: 'promote_pattern',
+    desc: 'Promote a recurring hardcoded value into a project-scoped token.',
+  },
   { name: 'fix_compliance_issues', desc: 'Rewrite code to use approved tokens.' },
   {
     name: 'reset_project_to_starter',

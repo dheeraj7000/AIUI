@@ -94,4 +94,56 @@ program
     await detectPatternsCommand();
   });
 
+// --- audit ---
+program
+  .command('audit')
+  .description('Read-only design audit: scan codebase, report token candidates + drift + coverage')
+  .option('--files <glob>', 'Files to scan', 'src/**/*.{tsx,jsx,ts,js,css,html}')
+  .option('--permissive', 'Lower the promotion threshold; show review-tier candidates too')
+  .option('--json', 'Emit the full report as JSON for scripting')
+  .action(async (options) => {
+    const { audit } = await import('./commands/audit.js');
+    await audit({
+      glob: options.files,
+      permissive: options.permissive ?? false,
+      json: options.json ?? false,
+    });
+  });
+
+// --- adopt ---
+program
+  .command('adopt')
+  .description('Ingest the design system from an existing codebase into your AIUI project')
+  .option('--files <glob>', 'Files to scan', 'src/**/*.{tsx,jsx,ts,js,css,html}')
+  .option('--api-key <key>', 'AIUI API key (or set AIUI_API_KEY)')
+  .option('--api-url <url>', 'AIUI server URL', process.env.AIUI_API_URL ?? 'https://aiui.store')
+  .option('--project <slug>', 'Project slug (defaults to .aiui/config.json projectSlug)')
+  .option('-y, --yes', 'Adopt every candidate (auto + review) without prompting')
+  .option('--review-all', 'Interactively triage review-tier candidates (multi-select)')
+  .option('--mode <mode>', 'merge (skip existing keys) or replace (overwrite)', 'merge')
+  .action(async (options) => {
+    const { adopt } = await import('./commands/adopt.js');
+    await adopt({
+      glob: options.files,
+      apiKey: options.apiKey,
+      apiUrl: options.apiUrl,
+      project: options.project,
+      yes: options.yes ?? false,
+      reviewAll: options.reviewAll ?? false,
+      mode: options.mode as 'merge' | 'replace',
+    });
+  });
+
+// --- watch ---
+program
+  .command('watch')
+  .description('Continuously watch for new design-token candidates as you edit code')
+  .option('--files <glob>', 'Files to scan', 'src/**/*.{tsx,jsx,ts,js,css,html}')
+  .option('--interval <ms>', 'Polling interval in milliseconds', '4000')
+  .action(async (options) => {
+    const intervalMs = parseInt(options.interval, 10);
+    const { watch } = await import('./commands/watch.js');
+    await watch({ glob: options.files, intervalMs: isNaN(intervalMs) ? 4000 : intervalMs });
+  });
+
 program.parse();

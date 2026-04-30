@@ -9,6 +9,7 @@ import {
   Key,
   BookOpen,
   Download,
+  Sparkles,
   User,
   LogOut,
   ExternalLink,
@@ -27,7 +28,10 @@ const mainItems: NavItem[] = [
   { label: 'Projects', href: '/projects', icon: FolderOpen },
 ];
 
-const designItems: NavItem[] = [{ label: 'Import', href: '/import', icon: Download }];
+const designItems: NavItem[] = [
+  { label: 'Adopt', href: '/adopt', icon: Sparkles },
+  { label: 'Import', href: '/import', icon: Download },
+];
 
 const integrationItems: NavItem[] = [
   { label: 'API Keys', href: '/api-keys', icon: Key },

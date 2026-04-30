@@ -43,6 +43,7 @@ const EXPECTED_TOOLS = [
   'reset_project_to_starter',
   'undo_last_token_change',
   'promote_pattern',
+  'adopt_codebase',
 ] as const;
 
 describe('Unified tool registration (stdio + HTTP)', () => {

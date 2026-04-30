@@ -24,7 +24,7 @@ export function Hero() {
           <div className="col-span-12 lg:col-span-7">
             <div className="flex items-center gap-4">
               <span className="section-numeral">LOGIC_00</span>
-              <span className="eyebrow">Discover · Crystallize · Enforce</span>
+              <span className="eyebrow">Adopt · Discover · Crystallize · Enforce</span>
             </div>
 
             <h1
@@ -46,21 +46,21 @@ export function Hero() {
                   fontSize: '1.5rem',
                   lineHeight: 1.3,
                   color: 'var(--ink)',
-                  maxWidth: '44ch',
+                  maxWidth: '46ch',
                   fontWeight: 600,
                   letterSpacing: '-0.02em',
                 }}
               >
-                AIUI watches your codebase, finds the patterns you keep reaching for, and enforces
-                them on every UI your AI writes.
+                Point AIUI at your existing repo. It ingests the patterns you already use, memorizes
+                them, and enforces them on every UI your AI writes after that.
               </p>
 
               <p
                 className="lede"
-                style={{ fontSize: '1.125rem', maxWidth: '52ch', fontWeight: 400 }}
+                style={{ fontSize: '1.125rem', maxWidth: '54ch', fontWeight: 400 }}
               >
-                A persistent design memory for Claude and Cursor. Surfaces hardcoded values for
-                promotion, validates generated UI against your tokens, auto-fixes drift before it
+                A persistent design memory for Claude and Cursor. Adopts an existing codebase in one
+                command, validates generated UI against your tokens, auto-fixes drift before it
                 ships.
               </p>
             </div>
@@ -102,13 +102,19 @@ export function Hero() {
               </a>
             </div>
 
-            {/* Three-verb loop */}
-            <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
+            {/* Four-verb loop */}
+            <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl">
+              <LoopStep
+                index="00"
+                verb="ADOPT"
+                description="Ingest an existing codebase. One command, scans every file, imports detected tokens."
+                tool="aiui adopt"
+              />
               <LoopStep
                 index="01"
                 verb="DISCOVER"
-                description="Scan the codebase for repeated values worth promoting."
-                tool="detect_patterns"
+                description="Continuously surface new repeated values worth promoting."
+                tool="aiui watch"
               />
               <LoopStep
                 index="02"
@@ -158,7 +164,7 @@ function LoopStep({
         {description}
       </p>
       <code className="mt-3 inline-block font-mono text-[10px] text-[var(--ink-muted)]">
-        {tool}()
+        {tool.startsWith('aiui ') ? `$ ${tool}` : `${tool}()`}
       </code>
     </div>
   );
