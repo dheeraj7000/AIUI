@@ -101,13 +101,28 @@ program
   .option('--files <glob>', 'Files to scan', 'src/**/*.{tsx,jsx,ts,js,css,html}')
   .option('--permissive', 'Lower the promotion threshold; show review-tier candidates too')
   .option('--json', 'Emit the full report as JSON for scripting')
+  .option('--ci', 'CI mode: emit GitHub Actions annotations, no spinners')
+  .option('--github-comment', 'Post (or update) a PR comment with the audit report')
+  .option('--project <slug>', 'Project slug (used in the PR comment header)')
+  .option('--strict', 'Exit 1 if any promotion candidates exist or arbitrary values are present')
+  .option('--max-candidates <n>', 'Exit 1 if more than N total candidates surface')
+  .option('--min-coverage <n>', 'Exit 1 if token coverage falls below this percent')
   .action(async (options) => {
     const { audit } = await import('./commands/audit.js');
-    await audit({
+    const exitCode = await audit({
       glob: options.files,
       permissive: options.permissive ?? false,
       json: options.json ?? false,
+      ci: options.ci ?? false,
+      githubComment: options.githubComment ?? false,
+      project: options.project,
+      strict: options.strict ?? false,
+      maxCandidates:
+        options.maxCandidates !== undefined ? parseInt(options.maxCandidates, 10) : undefined,
+      minCoverage:
+        options.minCoverage !== undefined ? parseInt(options.minCoverage, 10) : undefined,
     });
+    process.exit(exitCode);
   });
 
 // --- adopt ---
@@ -121,9 +136,15 @@ program
   .option('-y, --yes', 'Adopt every candidate (auto + review) without prompting')
   .option('--review-all', 'Interactively triage review-tier candidates (multi-select)')
   .option('--mode <mode>', 'merge (skip existing keys) or replace (overwrite)', 'merge')
+  .option(
+    '--ci',
+    'CI mode: never prompt; promote auto-tier candidates only (use --include-review to also take review-tier)'
+  )
+  .option('--include-review', 'In --ci mode, also promote review-tier candidates without prompting')
+  .option('--github-comment', 'Post (or update) a PR comment with the adoption summary')
   .action(async (options) => {
     const { adopt } = await import('./commands/adopt.js');
-    await adopt({
+    const exitCode = await adopt({
       glob: options.files,
       apiKey: options.apiKey,
       apiUrl: options.apiUrl,
@@ -131,7 +152,11 @@ program
       yes: options.yes ?? false,
       reviewAll: options.reviewAll ?? false,
       mode: options.mode as 'merge' | 'replace',
+      ci: options.ci ?? false,
+      includeReview: options.includeReview ?? false,
+      githubComment: options.githubComment ?? false,
     });
+    process.exit(exitCode);
   });
 
 // --- watch ---

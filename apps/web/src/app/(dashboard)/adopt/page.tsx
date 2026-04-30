@@ -64,6 +64,36 @@ export default function AdoptPage() {
         </p>
       </div>
 
+      <div className="mt-8 border-t pt-8" style={{ borderColor: 'var(--rule)' }}>
+        <h2
+          className="font-mono text-sm font-bold uppercase tracking-[0.12em]"
+          style={{ color: 'var(--ink)' }}
+        >
+          On every PR (GitHub Actions)
+        </h2>
+        <p className="mt-3 text-sm" style={{ color: 'var(--ink-soft)' }}>
+          Both <code className="font-mono">aiui audit</code> and{' '}
+          <code className="font-mono">aiui adopt</code> ship a{' '}
+          <code className="font-mono">--ci</code> mode that emits GitHub Actions annotations and a{' '}
+          <code className="font-mono">--github-comment</code> mode that posts (or updates) a single
+          PR comment with the report. Drop the sample workflow into{' '}
+          <code className="font-mono">.github/workflows/aiui-design-audit.yml</code> and every PR
+          gets a coverage score and promotion candidates inline.
+        </p>
+        <pre
+          className="mt-4 p-4 font-mono text-xs overflow-x-auto"
+          style={{
+            background: 'var(--paper-sunk)',
+            color: 'var(--ink)',
+            border: '1px solid var(--rule)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <span style={{ color: 'var(--ink-muted)' }}>$</span> npx -y @aiui/cli audit --ci
+          --github-comment --project my-app
+        </pre>
+      </div>
+
       <div className="mt-10 flex items-center gap-4">
         <Link
           href="/api-keys"

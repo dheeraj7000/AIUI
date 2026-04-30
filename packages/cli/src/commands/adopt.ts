@@ -1,6 +1,8 @@
 import { runAudit, renderAuditReport } from '../lib/audit-engine.js';
 import { adopt as postAdopt, ApiError, type AdoptToken } from '../lib/api-client.js';
 import { readConfig } from '../lib/config.js';
+import { readGitHubContext, upsertPrComment } from '../lib/github.js';
+import { renderAdoptComment } from '../lib/ci-output.js';
 
 export interface AdoptOptions {
   glob?: string;
@@ -10,6 +12,10 @@ export interface AdoptOptions {
   yes?: boolean;
   reviewAll?: boolean;
   mode?: 'merge' | 'replace';
+  ci?: boolean;
+  githubComment?: boolean;
+  /** When --ci is set: include review-tier candidates too (otherwise auto only). */
+  includeReview?: boolean;
 }
 
 const DEFAULT_API_URL = process.env.AIUI_API_URL ?? 'https://aiui.store';
@@ -19,11 +25,16 @@ const DEFAULT_API_URL = process.env.AIUI_API_URL ?? 'https://aiui.store';
  * candidates, then bulk-imports the approved tokens to the project on the
  * AIUI server via `/llm/adopt`. Auto-promote-tier candidates are committed
  * without prompting.
+ *
+ * In `--ci` mode: never prompts. Promotes the auto-tier (and review-tier
+ * when --include-review is set), posts a PR comment with --github-comment,
+ * exits 0 unless the API rejects the request.
  */
-export async function adopt(opts: AdoptOptions): Promise<void> {
+export async function adopt(opts: AdoptOptions): Promise<number> {
   const cwd = process.cwd();
   const ora = (await import('ora')).default;
   const chalk = (await import('chalk')).default;
+  const isCi = opts.ci ?? !!process.env.CI;
 
   const apiKey = opts.apiKey ?? process.env.AIUI_API_KEY;
   if (!apiKey) {
@@ -35,7 +46,7 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
         '  Generate one in the dashboard at ' + (opts.apiUrl ?? DEFAULT_API_URL) + '/api-keys'
       )
     );
-    process.exit(1);
+    return 1;
   }
 
   const config = readConfig(cwd);
@@ -46,18 +57,22 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
         '  Missing project slug. Pass --project <slug> or run `aiui init` in this directory first.'
       )
     );
-    process.exit(1);
+    return 1;
   }
 
   const apiUrl = opts.apiUrl ?? config?.apiUrl ?? DEFAULT_API_URL;
 
   // 1. Scan
-  const spinner = ora('Auditing codebase for design patterns...').start();
+  const spinner = isCi ? null : ora('Auditing codebase for design patterns...').start();
   const report = await runAudit(cwd, { glob: opts.glob, permissive: true });
-  spinner.succeed(`Scanned ${report.filesScanned} files`);
+  spinner?.succeed(`Scanned ${report.filesScanned} files`);
 
-  for (const line of renderAuditReport(report)) {
-    console.log(line);
+  if (!isCi) {
+    for (const line of renderAuditReport(report)) console.log(line);
+  } else {
+    console.log(
+      `[aiui adopt] scanned ${report.filesScanned} files; coverage ${report.coverageEstimate}%`
+    );
   }
 
   const auto = report.candidates.filter((c) => c.action === 'auto-promote');
@@ -65,10 +80,10 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
 
   if (auto.length === 0 && review.length === 0) {
     console.log(chalk.dim('  Nothing to adopt. Exiting.'));
-    return;
+    return 0;
   }
 
-  // 2. Confirm
+  // 2. Confirm (or auto-select in CI / --yes mode)
   const confirmed: AdoptToken[] = auto.map((c) => ({
     tokenKey: c.suggestedName,
     tokenType: c.type,
@@ -76,38 +91,9 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
     description: `Auto-promoted from ${c.count} uses across ${c.files.length} file(s).`,
   }));
 
-  if (review.length > 0 && !opts.yes) {
-    const prompts = (await import('prompts')).default;
-    if (opts.reviewAll) {
-      const { selected } = await prompts({
-        type: 'multiselect',
-        name: 'selected',
-        message: `Pick which review-tier candidates to promote (${review.length}):`,
-        choices: review.map((c) => ({
-          title: `${c.value}  ${chalk.dim(c.type)} ×${c.count} → ${c.suggestedName}`,
-          value: c.suggestedName,
-          selected: false,
-        })),
-      });
-      const selectedSet = new Set<string>(selected ?? []);
-      for (const c of review) {
-        if (selectedSet.has(c.suggestedName)) {
-          confirmed.push({
-            tokenKey: c.suggestedName,
-            tokenType: c.type,
-            tokenValue: c.value,
-            description: `Promoted from ${c.count} uses across ${c.files.length} file(s).`,
-          });
-        }
-      }
-    } else {
-      console.log(
-        chalk.dim(
-          '  Skipping review-tier (' + review.length + '). Pass --review-all to triage them.'
-        )
-      );
-    }
-  } else if (review.length > 0 && opts.yes) {
+  const shouldIncludeReview = opts.yes || (isCi && opts.includeReview);
+
+  if (review.length > 0 && shouldIncludeReview) {
     for (const c of review) {
       confirmed.push({
         tokenKey: c.suggestedName,
@@ -116,19 +102,47 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
         description: `Promoted from ${c.count} uses across ${c.files.length} file(s).`,
       });
     }
+  } else if (review.length > 0 && !isCi && opts.reviewAll) {
+    const prompts = (await import('prompts')).default;
+    const { selected } = await prompts({
+      type: 'multiselect',
+      name: 'selected',
+      message: `Pick which review-tier candidates to promote (${review.length}):`,
+      choices: review.map((c) => ({
+        title: `${c.value}  ${chalk.dim(c.type)} ×${c.count} → ${c.suggestedName}`,
+        value: c.suggestedName,
+        selected: false,
+      })),
+    });
+    const selectedSet = new Set<string>(selected ?? []);
+    for (const c of review) {
+      if (selectedSet.has(c.suggestedName)) {
+        confirmed.push({
+          tokenKey: c.suggestedName,
+          tokenType: c.type,
+          tokenValue: c.value,
+          description: `Promoted from ${c.count} uses across ${c.files.length} file(s).`,
+        });
+      }
+    }
+  } else if (review.length > 0 && !isCi) {
+    console.log(
+      chalk.dim('  Skipping review-tier (' + review.length + '). Pass --review-all to triage them.')
+    );
   }
 
   if (confirmed.length === 0) {
     console.log(chalk.dim('  No tokens selected. Exiting.'));
-    return;
+    return 0;
   }
 
   // 3. Push
-  const pushSpinner = ora(
-    `Pushing ${confirmed.length} token(s) to project "${projectSlug}"...`
-  ).start();
+  const pushSpinner = isCi
+    ? null
+    : ora(`Pushing ${confirmed.length} token(s) to project "${projectSlug}"...`).start();
+  let result;
   try {
-    const result = await postAdopt(apiUrl, apiKey, projectSlug, {
+    result = await postAdopt(apiUrl, apiKey, projectSlug, {
       tokens: confirmed,
       mode: opts.mode ?? 'merge',
       source: {
@@ -137,16 +151,52 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
         coverageEstimate: report.coverageEstimate,
       },
     });
-    pushSpinner.succeed(
+    pushSpinner?.succeed(
       `Adopted: ${chalk.green(result.promoted)} new · ${chalk.dim(result.skipped)} skipped` +
         (result.updated > 0 ? ` · ${chalk.cyan(result.updated)} updated` : '')
     );
+    if (isCi) {
+      console.log(
+        `[aiui adopt] promoted=${result.promoted} updated=${result.updated} skipped=${result.skipped} totalTokens=${result.totalTokens}`
+      );
+    }
     if (result.errors.length > 0) {
       console.log(chalk.yellow(`  ${result.errors.length} token(s) failed:`));
       for (const e of result.errors) {
         console.log(`    ${chalk.dim('×')} ${e.key}: ${e.reason}`);
       }
     }
+  } catch (err) {
+    if (err instanceof ApiError) {
+      pushSpinner?.fail(`Server rejected adoption (HTTP ${err.status}): ${err.message}`);
+    } else {
+      pushSpinner?.fail(`Failed to push: ${err instanceof Error ? err.message : err}`);
+    }
+    return 1;
+  }
+
+  if (opts.githubComment) {
+    const ctx = readGitHubContext();
+    if (!ctx) {
+      console.error(
+        '[aiui adopt] --github-comment skipped: missing GITHUB_TOKEN / GITHUB_REPOSITORY / GITHUB_EVENT_PATH or no PR number.'
+      );
+    } else {
+      const runUrl =
+        process.env.GITHUB_SERVER_URL && process.env.GITHUB_RUN_ID
+          ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+          : undefined;
+      try {
+        await upsertPrComment(ctx, renderAdoptComment(result, { projectSlug, runUrl }));
+      } catch (err) {
+        console.error(
+          `[aiui adopt] failed to post PR comment: ${err instanceof Error ? err.message : err}`
+        );
+      }
+    }
+  }
+
+  if (!isCi) {
     console.log('');
     console.log(
       chalk.dim(
@@ -156,12 +206,7 @@ export async function adopt(opts: AdoptOptions): Promise<void> {
       )
     );
     console.log('');
-  } catch (err) {
-    if (err instanceof ApiError) {
-      pushSpinner.fail(`Server rejected adoption (HTTP ${err.status}): ${err.message}`);
-    } else {
-      pushSpinner.fail(`Failed to push: ${err instanceof Error ? err.message : err}`);
-    }
-    process.exit(1);
   }
+
+  return 0;
 }

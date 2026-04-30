@@ -1,0 +1,68 @@
+# AIUI design audit on every PR.
+#
+# What this does
+# --------------
+# - On every PR open / update, scans the repo for hardcoded design values
+#   (colors, spacings, radii) and posts (or updates) a single PR comment
+#   with promotion candidates and a coverage estimate.
+# - Optionally also runs `aiui adopt --ci` to auto-promote high-confidence
+#   candidates straight into your AIUI project tokens — comment that step in
+#   only after you trust the audit output.
+#
+# Setup
+# -----
+# 1. In your AIUI dashboard (https://aiui.store/api-keys), generate a
+#    "CI" API key.
+# 2. In your GitHub repo: Settings → Secrets and variables → Actions →
+#    New repository secret. Add:
+#      - AIUI_API_KEY  — the value from step 1
+#      - AIUI_PROJECT  — the project slug (e.g. "my-app")
+# 3. Copy this file to `.github/workflows/aiui-design-audit.yml`
+#    (drop the `.example` suffix).
+
+name: AIUI design audit
+
+on:
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write # required for --github-comment
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Read-only audit: posts a PR comment, never writes to your AIUI project.
+      - name: AIUI audit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx -y @aiui/cli audit \
+            --ci \
+            --github-comment \
+            --project "${{ secrets.AIUI_PROJECT }}" \
+            --min-coverage 50
+
+      # OPTIONAL: actually ingest the auto-promote candidates as project
+      # tokens on every merge to main. Uncomment once you trust the audit
+      # output and want CI to keep your design system in sync with the code.
+      #
+      # - name: AIUI adopt (auto-promote tier only)
+      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      #   env:
+      #     AIUI_API_KEY: ${{ secrets.AIUI_API_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     npx -y @aiui/cli adopt \
+      #       --ci \
+      #       --github-comment \
+      #       --project "${{ secrets.AIUI_PROJECT }}"
