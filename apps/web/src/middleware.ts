@@ -60,7 +60,7 @@ function isPublicApiPath(pathname: string): boolean {
   for (const prefix of PUBLIC_API_PREFIXES) {
     if (pathname === prefix || pathname.startsWith(prefix)) return true;
   }
-  if (pathname.match(/^\/api\/registry\/[^/]+$/)) return true;
+  if (pathname.startsWith('/api/registry/')) return true;
   return false;
 }
 
